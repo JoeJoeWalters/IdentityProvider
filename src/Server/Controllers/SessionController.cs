@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Server.Contracts;
 
 namespace Server.Controllers
 {
@@ -25,7 +26,7 @@ namespace Server.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpGet]
-        [Route("userinfo")]
+        [Route(URIs.userinfo_endpoint)]
         public ActionResult UserInfo()
         {
             return new OkResult();

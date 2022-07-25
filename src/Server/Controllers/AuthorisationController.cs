@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
+using Server.Contracts;
 
 namespace Server.Controllers
 {
@@ -61,7 +62,7 @@ namespace Server.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpGet]
-        [Route("par")]
+        [Route(URIs.pushed_authorization_request_endpoint)]
         public ActionResult PushedAuthorisationRequests()
         {
             return new OkResult();
@@ -73,7 +74,7 @@ namespace Server.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpGet]
-        [Route("login")]
+        [Route(URIs.authorization_endpoint)]
         public ActionResult Authorisation(OAuthTokenRequest request)
         {
             // Check the client id and secret being asked for;
@@ -134,7 +135,7 @@ namespace Server.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpPost]
-        [Route("token")]
+        [Route(URIs.token_endpoint)]
         public ActionResult Token()
         {
             return new OkResult();
@@ -146,7 +147,7 @@ namespace Server.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpPost]
-        [Route("token/intospect")]
+        [Route(URIs.introspection_endpoint)]
         public ActionResult TokenIntrospection()
         {
             return new OkResult();
@@ -158,7 +159,7 @@ namespace Server.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpPost]
-        [Route("token/revoke")]
+        [Route(URIs.revocation_endpoint)]
         public ActionResult TokenRevocation()
         {
             return new OkResult();
@@ -170,7 +171,7 @@ namespace Server.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpGet]
-        [Route("logout")]
+        [Route(URIs.revocation_endpoint)]
         public ActionResult LogOut()
         {
             return new OkResult();
