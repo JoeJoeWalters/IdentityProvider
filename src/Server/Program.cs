@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics.CodeAnalysis;
+using Server.Authentication;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace Server
 {
@@ -14,6 +17,29 @@ namespace Server
         static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            
+            IConfigurationSection securityKeys = builder.Configuration.GetSection("SecurityKeys");
+            if (securityKeys != null)
+            {
+                string JWTKey = securityKeys.GetValue<String>("JWTKey");
+                string JWTIssuer = securityKeys.GetValue<String>("JWTIssuer");
+                string JWTAudience = securityKeys.GetValue<String>("JWTAudience");
+
+                // Set up the authentication service with the appropriate authenticator implementation
+                FileStream accessControl = File.OpenRead(Path.Combine(Environment.CurrentDirectory, "users.json"));
+                IUserAuthenticator userAuthenticator = new UserAuthenticator(
+                                                            new TokenValidationParameters()
+                                                            {
+                                                                ValidateLifetime = true,
+                                                                ValidateAudience = true,
+                                                                ValidateIssuer = true,
+                                                                ValidIssuer = JWTIssuer,
+                                                                ValidAudience = JWTAudience,
+                                                                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(JWTKey))
+                                                            });
+                userAuthenticator.RefreshAccessList(accessControl);
+                builder.Services.AddSingleton<IUserAuthenticator>(userAuthenticator);
+            }
 
             // API Versioning
             builder.Services.AddApiVersioning(o =>
