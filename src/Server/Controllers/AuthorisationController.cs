@@ -5,6 +5,7 @@ using Server.Contracts.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using System.Security.Cryptography;
 
 namespace Server.Controllers
 {
@@ -16,15 +17,13 @@ namespace Server.Controllers
     {
         private readonly ILogger<SessionController> _logger;
         private readonly IUserAuthenticator _userAuthenticator;
+        private readonly ServerSettings _serverSettings; 
 
-        // Token encoding details
-        public String JWTKey { get; internal set; }
-        public String JWTIssuer { get; internal set; }
-        public String JWTAudience { get; internal set; }
-        public Int16 AccessTokenExpiry { get => 60; }
-        public Int16 RefreshTokenExpiry { get => 3600; }
-        public SymmetricSecurityKey JWTSecurityKey { get; internal set; }
-        public SigningCredentials JWTSigningCredentials { get; internal set; }
+        private Int16 _accessTokenExpiry { get => 60; }
+        private Int16 _refreshTokenExpiry { get => 3600; }
+
+        // https://vmsdurano.com/-net-core-3-1-signing-jwt-with-rsa/
+        private SigningCredentials _signingCredentials { get; set; }
 
 
         /// <summary>
@@ -34,22 +33,26 @@ namespace Server.Controllers
         public AuthorisationController(
             ILogger<SessionController> logger,
             IUserAuthenticator userAuthenticator,
-            String JWTKey,
-            String JWTIssuer,
-            String JWTAudience)
+            ServerSettings serverSettings)
         {
             // Assign the logger family
             _logger = logger;
 
-            // Assign the user authentication method to create JWT Tokens from
+            // Assign the user authentication method to create tokens from
             _userAuthenticator = userAuthenticator;
 
-            // Set up the signing credentials for JWT Tokens
-            this.JWTKey = JWTKey;
-            this.JWTIssuer = JWTIssuer;
-            this.JWTAudience = JWTAudience;
-            JWTSecurityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.JWTKey));
-            JWTSigningCredentials = new SigningCredentials(JWTSecurityKey, SecurityAlgorithms.HmacSha256Signature);
+            // Set up the signing credentials for tokens
+            _serverSettings = serverSettings;
+
+            //RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048);
+            RSA rsa = RSA.Create();
+            rsa.ImportFromPem(_serverSettings.PrivateKey.ToCharArray());
+            //rsa.ImportRSAPrivateKey(Convert.FromBase64String(_serverSettings.PrivateKey, out _);
+
+            _signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256)
+            {
+                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
+            };
         }
 
         // https://connect2id.com/products/server/docs/api/par
@@ -78,7 +81,7 @@ namespace Server.Controllers
             if (securityUser != null)
             {
                 // Generate a new JWT Header to wrap the token
-                JwtHeader header = new JwtHeader(JWTSigningCredentials);
+                JwtHeader header = new JwtHeader(_signingCredentials);
 
                 // Combine the claims list to a standard claim array for the JWT payload
                 List<Claim> mergedClaims = new List<Claim>()
@@ -91,11 +94,11 @@ namespace Server.Controllers
                 // Create the content of the JWT Token with the appropriate expiry date
                 // and claims to identify who the user is and what they are able to do
                 JwtPayload payload = new JwtPayload(
-                    this.JWTIssuer,
-                    this.JWTAudience,
+                    this._serverSettings.Issuer,
+                    this._serverSettings.Audience,
                     mergedClaims,
                     DateTime.UtcNow,
-                    DateTime.UtcNow.AddSeconds(this.AccessTokenExpiry));
+                    DateTime.UtcNow.AddSeconds(this._accessTokenExpiry));
 
                 // Generate the final tokem from the header and it's payload
                 JwtSecurityToken secToken = new JwtSecurityToken(header, payload);
@@ -107,7 +110,7 @@ namespace Server.Controllers
                     new OAuthTokenSuccess()
                     {
                         AccessToken = tokenString,
-                        ExpiresIn = this.AccessTokenExpiry,
+                        ExpiresIn = this._accessTokenExpiry,
                         RefreshToken = tokenString,
                         Scope = "test",
                         TokenType = "bearer"
@@ -157,6 +160,18 @@ namespace Server.Controllers
         [HttpPost]
         [Route("token/revoke")]
         public ActionResult TokenRevocation()
+        {
+            return new OkResult();
+        }
+
+        // https://connect2id.com/products/server/docs/api/logout
+        /// <summary>
+        /// Let a client application (OpenID relying party) notify the Identity Provider (IdP) that an end-user has logged out of the application
+        /// </summary>
+        /// <returns></returns> 
+        [HttpGet]
+        [Route("logout")]
+        public ActionResult LogOut()
         {
             return new OkResult();
         }

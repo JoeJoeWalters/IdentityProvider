@@ -31,18 +31,6 @@ namespace Server.Controllers
             return new OkResult();
         }
 
-        // https://connect2id.com/products/server/docs/api/logout
-        /// <summary>
-        /// Let a client application (OpenID relying party) notify the Identity Provider (IdP) that an end-user has logged out of the application
-        /// </summary>
-        /// <returns></returns> 
-        [HttpGet]
-        [Route("logout")]
-        public ActionResult LogOut()
-        {
-            return new OkResult();
-        }
-
 
     }
 }

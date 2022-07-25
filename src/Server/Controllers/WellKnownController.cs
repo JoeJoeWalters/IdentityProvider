@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Server.Authentication;
 
 namespace Server.Controllers
 {
@@ -8,15 +9,18 @@ namespace Server.Controllers
     [ApiController]
     public class WellKnownController : ControllerBase
     {
-        private readonly ILogger<SessionController> _logger;
+        private readonly ILogger<WellKnownController> _logger;
+        private readonly ServerSettings _serverSettings;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
-        public WellKnownController(ILogger<SessionController> logger)
+        public WellKnownController(ILogger<WellKnownController> logger,
+            ServerSettings serverSettings)
         {
             _logger = logger;
+            _serverSettings = serverSettings;
         }
 
         // https://connect2id.com/products/server/docs/api/discovery
