@@ -9,7 +9,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{428EC208-152
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F246A6D4-C3C8-4258-A9E7-BBAFE279F3BD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server.Unit.Tests", "test\Server.Unit.Tests\Server.Unit.Tests.csproj", "{B375912F-AB3A-4082-8826-08FC0AC526B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server.Unit.Tests", "test\Server.Unit.Tests\Server.Unit.Tests.csproj", "{B375912F-AB3A-4082-8826-08FC0AC526B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postman", "postman", "{A5EB2CE9-96F4-4747-8406-1A388EDE46B7}"
+	ProjectSection(SolutionItems) = preProject
+		postman\IdentityProvider.postman_collection.json = postman\IdentityProvider.postman_collection.json
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
