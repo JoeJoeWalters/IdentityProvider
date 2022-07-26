@@ -10,7 +10,7 @@ using Server.Helpers;
 namespace Server.Controllers
 {
     /// <summary>
-    /// https://github.com/openiddict/openiddict-core/blob/dev/src/OpenIddict.Server/OpenIddictServerEvents.Discovery.cs
+    /// 
     /// </summary>
     [ApiController]
     public class WellKnownController : ControllerBase
@@ -29,7 +29,6 @@ namespace Server.Controllers
             _serverSettings = serverSettings;
         }
 
-        // https://connect2id.com/products/server/docs/api/discovery
         /// <summary>
         /// Discover the OAuth 2.0 / OpenID Connect endpoints, capabilities, supported cryptographic algorithms and features.
         /// </summary>
@@ -61,7 +60,6 @@ namespace Server.Controllers
             return new OkObjectResult(metaData);
         }
 
-        // https://connect2id.com/products/server/docs/api/federation-entity-configuration
         /// <summary>
         /// Obtain the authorities, metadata and signing keys for a server participating in a OpenID Connect federation.
         /// </summary>
@@ -74,7 +72,6 @@ namespace Server.Controllers
             return new OkResult();
         }
 
-        // https://connect2id.com/products/server/docs/api/jwk-set
         /// <summary>
         /// Retrieve the public server JSON Web Key (JWK) to verify the signature of an issued token or to encrypt request objects to it.
         /// </summary>

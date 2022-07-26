@@ -1,6 +1,11 @@
 ﻿namespace Server.Contracts.MetaData
 {
-    //https://auth0.com/blog/navigating-rs256-and-jwks/
+    // Dev References:
+    // https://auth0.com/blog/navigating-rs256-and-jwks/
+    // https://connect2id.com/products/server/docs/api/jwk-set
+    /// <summary>
+    /// List of all available keys as requested by the client 
+    /// </summary>
     public class JWKS
     {
         /// <summary>
@@ -9,6 +14,9 @@
         public List<JWKSKey> Keys { get; set; }
     }
 
+    /// <summary>
+    /// Representation of a X509 / PEM key used by the system and their properties for the client
+    /// </summary>
     public class JWKSKey
     {
         /// <summary>
