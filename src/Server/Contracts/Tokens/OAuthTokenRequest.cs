@@ -13,22 +13,14 @@ namespace Server.Contracts.Tokens
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class OAuthTokenRequest
     {
-        public enum GrantType
-        {
-            authorization_code,
-            client_credentials,
-            password
-        }
-
-        [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(Required = Required.Always, PropertyName = "grant_type")]
-        public GrantType Type { get; set; } = GrantType.client_credentials;
+        public String Type { get; set; } = GrantTypes.ClientCredentials;
 
         [JsonProperty(Required = Required.Default, PropertyName = "client_id")]
-        public String ClientId { get; set; } = null;
+        public String ClientId { get; set; } = String.Empty;
 
         [JsonProperty(Required = Required.Default, PropertyName = "client_secret")]
-        public String ClientSecret { get; set; } = null;
+        public String ClientSecret { get; set; } = String.Empty;
 
         [JsonProperty(Required = Required.Default, PropertyName = "username")]
         public String Username { get; set; } = String.Empty;

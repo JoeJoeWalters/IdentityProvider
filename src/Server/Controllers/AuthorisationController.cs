@@ -50,7 +50,7 @@ namespace Server.Controllers
             rsa.ImportFromPem(_serverSettings.PrivateKey.ToCharArray());
             //rsa.ImportRSAPrivateKey(Convert.FromBase64String(_serverSettings.PrivateKey, out _);
 
-            _signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256)
+            _signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256Signature, SecurityAlgorithms.Sha256Digest)
             {
                 CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
             };
@@ -75,7 +75,7 @@ namespace Server.Controllers
         /// <returns></returns> 
         [HttpGet]
         [Route(URIs.authorization_endpoint)]
-        public ActionResult Authorisation(OAuthTokenRequest request)
+        public ActionResult Authorisation([FromQuery]OAuthTokenRequest request)
         {
             // Check the client id and secret being asked for;
             SecurityUser securityUser = _userAuthenticator.AuthenticateOAuth(request);
@@ -141,16 +141,20 @@ namespace Server.Controllers
             return new OkResult();
         }
 
-        // https://connect2id.com/products/server/docs/api/token-introspection
+        // https://datatracker.ietf.org/doc/html/rfc7662#section-2.1
         /// <summary>
         /// Validate an access token and retrieve its underlying authorisation (for resource servers).
         /// </summary>
         /// <returns></returns> 
         [HttpPost]
         [Route(URIs.introspection_endpoint)]
-        public ActionResult TokenIntrospection()
+        public ActionResult TokenIntrospection([FromQuery]TokenIntrospectionRequest request)
         {
-            return new OkResult();
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(request.token);
+            var token = jsonToken as JwtSecurityToken;
+
+            return new OkObjectResult(token.ToString());
         }
 
         // https://connect2id.com/products/server/docs/api/token-revocation

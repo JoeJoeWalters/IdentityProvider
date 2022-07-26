@@ -33,7 +33,7 @@ namespace Server.Authentication
             {
                 switch (tokenRequest.Type)
                 {
-                    case OAuthTokenRequest.GrantType.client_credentials:
+                    case GrantTypes.ClientCredentials:
 
                         result = accessControl
                             .Users
@@ -47,7 +47,7 @@ namespace Server.Authentication
 
                         break;
 
-                    case OAuthTokenRequest.GrantType.password:
+                    case GrantTypes.Password:
 
                         result = accessControl
                             .Users
@@ -61,7 +61,7 @@ namespace Server.Authentication
 
                         break;
 
-                    case OAuthTokenRequest.GrantType.authorization_code:
+                    case GrantTypes.AuthorisationCode:
 
                         result = accessControl
                             .Users
