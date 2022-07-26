@@ -87,20 +87,18 @@ namespace Server.Controllers
                 JwtHeader header = new JwtHeader(_signingCredentials);
 
                 // Combine the claims list to a standard claim array for the JWT payload
-                List<Claim> mergedClaims = new List<Claim>()
+                List<Claim> claims = new List<Claim>()
                 {
-                /*    new Claim(ClaimTypes.NameIdentifier, securityUser.Id),
-                    new Claim(ClaimTypes.Name, securityUser.Username)*/
                     new Claim("scope", "test")
                 };
-                mergedClaims.AddRange(securityUser.Claims);
+                claims.AddRange(securityUser.Claims);
 
                 // Create the content of the JWT Token with the appropriate expiry date
                 // and claims to identify who the user is and what they are able to do
                 JwtPayload payload = new JwtPayload(
                     this._serverSettings.Issuer,
                     this._serverSettings.Audience,
-                    mergedClaims,
+                    claims,
                     DateTime.UtcNow,
                     DateTime.UtcNow.AddSeconds(this._accessTokenExpiry));
 
