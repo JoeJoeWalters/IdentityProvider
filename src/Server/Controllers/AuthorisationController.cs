@@ -7,6 +7,8 @@ using System.Security.Claims;
 using System.Text;
 using System.Security.Cryptography;
 using Server.Contracts;
+using Server.Helpers;
+using Newtonsoft.Json;
 
 namespace Server.Controllers
 {
@@ -150,11 +152,45 @@ namespace Server.Controllers
         [Route(URIs.introspection_endpoint)]
         public ActionResult TokenIntrospection([FromQuery]TokenIntrospectionRequest request)
         {
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(request.token);
-            var token = jsonToken as JwtSecurityToken;
+            RSA rsa = RSA.Create();
+            rsa.ImportFromPem(_serverSettings.PublicKey.ToCharArray());
 
-            return new OkObjectResult(token.ToString());
+            JwtSecurityTokenHandler handler = new JwtSecurityTokenHandler();
+            TokenValidationParameters validationParameters = new TokenValidationParameters
+            {
+                ValidIssuer = _serverSettings.Issuer,
+                ValidAudiences = new[] { _serverSettings.Audience },
+                IssuerSigningKeys = new List<SecurityKey> { new RsaSecurityKey(rsa) }
+            };
+
+            try
+            {
+                ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out SecurityToken jsonToken);
+                JwtSecurityToken token = jsonToken as JwtSecurityToken;
+                return new OkObjectResult(JsonConvert.SerializeObject(token, Formatting.Indented));
+            }
+            catch (SecurityTokenExpiredException expEx)
+            {
+
+            }
+            catch (SecurityTokenInvalidAlgorithmException algEx)
+            {
+
+            }
+            catch (SecurityTokenInvalidAudienceException audEx)
+            {
+
+            }
+            catch (SecurityTokenInvalidSignatureException sigEx)
+            {
+
+            }
+            catch (SecurityTokenInvalidSigningKeyException keyEx)
+            {
+
+            }
+
+            return new BadRequestResult();
         }
 
         // https://connect2id.com/products/server/docs/api/token-revocation
