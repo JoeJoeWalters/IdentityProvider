@@ -14,12 +14,12 @@
         /// <summary>
         /// algorithm for the key
         /// </summary>
-        public string alg { get; set; }
+        public string alg { get; set; } = String.Empty;
 
         /// <summary>
         ///  key type
         /// </summary>
-        public string kty { get; set; }
+        public string kty { get; set; } = String.Empty;
 
         /// <summary>
         /// how the key was meant to be used. e.g. sig represents signature verification.
@@ -29,26 +29,26 @@
         /// <summary>
         /// is the x509 certificate chain
         /// </summary>
-        public string x5c { get; set; }
+        public string x5c { get; set; } = String.Empty;
 
         /// <summary>
         /// moduluos for a standard pem
         /// </summary>
-        public string n { get; set; }
+        public string n { get; set; } = String.Empty;
 
         /// <summary>
         /// exponent for a standard pem
         /// </summary>
-        public string e { get; set; }
+        public string e { get; set; } = String.Empty;
 
         /// <summary>
         /// unique identifier for the key
         /// </summary>
-        public string kid { get; set; }
+        public string kid { get; set; } = String.Empty;
 
         /// <summary>
         /// thumbprint of the x.509 cert (SHA-1 thumbprint)
         /// </summary>
-        public string x5t { get; set; }
+        public string x5t { get; set; } = String.Empty;
     }
 }

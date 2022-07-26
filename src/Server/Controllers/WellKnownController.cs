@@ -2,6 +2,10 @@
 using Server.Authentication;
 using Server.Contracts;
 using Server.Contracts.MetaData;
+using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+using Server.Helpers;
 
 namespace Server.Controllers
 {
@@ -79,7 +83,34 @@ namespace Server.Controllers
         [Route(URIs.jwks_uri)]
         public ActionResult JWKSet()
         {
-            return new OkResult();
+            // Strip the PEM down to a format where we can export it and also so we can then compute the thumbprint hash
+            string strippedKey = _serverSettings.PublicKey.StripPEM();
+            string sha1Hash = strippedKey.ComputeSha1Hash();
+         
+            // Get the exponent and modulus by importing to the RSA object and then exporting the parameters
+            RSA imported = RSA.Create();
+            imported.ImportFromPem(_serverSettings.PublicKey);
+            RSAParameters properties = imported.ExportParameters(false);
+
+            JWKS returnSet = new JWKS()
+            {
+                 Keys = new List<JWKSKey>() 
+                 { 
+                    new JWKSKey()
+                    { 
+                        alg = "RS256",
+                        e = Convert.ToBase64String(properties.Exponent),
+                        kid = sha1Hash,
+                        kty = "RSA",
+                        n = Convert.ToBase64String(properties.Modulus),
+                        use = "sig",
+                        x5c = strippedKey,
+                        x5t = sha1Hash
+                    }
+                 }
+            };
+
+            return new OkObjectResult(returnSet);
         }
     }
 }
