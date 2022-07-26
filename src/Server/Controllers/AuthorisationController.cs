@@ -33,6 +33,8 @@ namespace Server.Controllers
         /// 
         /// </summary>
         /// <param name="logger"></param>
+        /// <param name="userAuthenticator"></param>
+        /// <param name="serverSettings"></param>
         public AuthorisationController(
             ILogger<SessionController> logger,
             IUserAuthenticator userAuthenticator,
