@@ -34,7 +34,8 @@ namespace Server
 
                 builder.Services.AddSingleton<ServerSettings>(settings);
 
-                using (FileStream accessControlStream = File.OpenRead(Path.Combine(Environment.CurrentDirectory, "users.json")))
+                string path = Path.Combine(Environment.CurrentDirectory, "users.json");
+                using (FileStream accessControlStream = File.OpenRead(path))
                 {
                     // Set up the authentication service with the appropriate authenticator implementation
                     IUserAuthenticator userAuthenticator = new UserAuthenticator(

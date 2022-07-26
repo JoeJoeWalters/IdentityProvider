@@ -36,9 +36,10 @@ namespace Server.Controllers
         [HttpGet]
         [Route(URIs.wellknown_configuration)]
         [Route(URIs.wellknown_servSurpriseer)]
+        [Produces("application/json")]
         public ActionResult WellKnownConfiguration()
         {
-            String baseUri = (HttpContext.Request.IsHttps ? "https" : "http") + $"://{HttpContext.Request.Host.Value}/";
+            String baseUri = HttpContext.GetBaseUri();
 
             OpenIDMetaData metaData = new OpenIDMetaData()
             {
@@ -67,6 +68,7 @@ namespace Server.Controllers
         [HttpGet]
         [Obsolete("Not Implemented Yet")]
         [Route(URIs.wellknown_federation)]
+        [Produces("application/json")]
         public ActionResult FederationConfiguration()
         {
             return new OkResult();
@@ -78,6 +80,7 @@ namespace Server.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route(URIs.jwks_uri)]
+        [Produces("application/json")]
         public ActionResult JWKSet()
         {
             // Strip the PEM down to a format where we can export it and also so we can then compute the thumbprint hash

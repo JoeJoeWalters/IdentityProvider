@@ -268,8 +268,9 @@ namespace Server.Authentication
             {
                 using (StreamReader reader = new StreamReader(stream))
                 {
+                    string raw = reader.ReadToEnd();
                     return RefreshAccessList(
-                        JsonConvert.DeserializeObject<AccessControl>(reader.ReadToEnd())
+                        JsonConvert.DeserializeObject<AccessControl>(raw)
                         );
                 }
             }

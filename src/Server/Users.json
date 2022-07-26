@@ -4,7 +4,7 @@
       "Id": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Key": "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
       "Authentication": [ "basic", "apikey", "oauth" ],
-      "Username": "username",
+      "Username": "admin",
       "Password": "password",
       "ClientId": "clientid123",
       "ClientSecret": "clientsecret123",
