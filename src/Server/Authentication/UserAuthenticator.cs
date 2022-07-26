@@ -74,6 +74,12 @@ namespace Server.Authentication
 
                         break;
 
+                    case GrantTypes.RefreshToken:
+
+                        // Go look up the corresponding given token and refresh it, add to the expiry and hand back again
+
+                        break;
+
                     default:
 
                         result = null;
