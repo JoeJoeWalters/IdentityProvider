@@ -91,6 +91,7 @@ namespace Server.Controllers
                 {
                 /*    new Claim(ClaimTypes.NameIdentifier, securityUser.Id),
                     new Claim(ClaimTypes.Name, securityUser.Username)*/
+                    new Claim("scope", "test")
                 };
                 mergedClaims.AddRange(securityUser.Claims);
 
@@ -167,30 +168,13 @@ namespace Server.Controllers
             {
                 ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out SecurityToken jsonToken);
                 JwtSecurityToken token = jsonToken as JwtSecurityToken;
-                return new OkObjectResult(JsonConvert.SerializeObject(token, Formatting.Indented));
+                return new OkObjectResult(new TokenIntrospectionResponse() { active = true, scope = token.Claims.Where(claim => claim.Type.ToLower() == "scope").FirstOrDefault().Value, exp = token.Payload.Exp });
             }
-            catch (SecurityTokenExpiredException expEx)
+            catch (Exception ex)
             {
-
-            }
-            catch (SecurityTokenInvalidAlgorithmException algEx)
-            {
-
-            }
-            catch (SecurityTokenInvalidAudienceException audEx)
-            {
-
-            }
-            catch (SecurityTokenInvalidSignatureException sigEx)
-            {
-
-            }
-            catch (SecurityTokenInvalidSigningKeyException keyEx)
-            {
-
             }
 
-            return new BadRequestResult();
+            return new UnauthorizedObjectResult(new TokenIntrospectionResponse() { active = false });
         }
 
         // https://connect2id.com/products/server/docs/api/token-revocation
