@@ -28,6 +28,12 @@ namespace Server.Contracts.Tokens
         [JsonProperty(Required = Required.Default, PropertyName = "password")]
         public String Password { get; set; } = String.Empty;
 
+        [JsonProperty(Required = Required.Default, PropertyName = "refresh_token")]
+        public String RefreshToken { get; set; } = String.Empty;
+
+        [JsonProperty(Required = Required.Default, PropertyName = "valid_for")]
+        public Int32 ValidFor { get; set; } = 60; // In Seconds Max 2592000 (30 Days)
+
         [JsonProperty(Required = Required.Default, PropertyName = "code")]
         public String Code { get; set; } = String.Empty;
 
