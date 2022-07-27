@@ -76,6 +76,8 @@ namespace Server.Authentication
 
                     case GrantTypes.RefreshToken:
 
+                        // https://stackoverflow.com/questions/57481524/what-is-encoded-in-refresh-token
+                        // https://stackoverflow.com/questions/39890282/oauth2-0-what-should-be-the-content-format-of-refresh-token-before-encryption
                         // Go look up the corresponding given token and refresh it, add to the expiry and hand back again
 
                         break;
