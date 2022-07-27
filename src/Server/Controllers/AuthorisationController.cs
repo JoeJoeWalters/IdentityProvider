@@ -105,29 +105,18 @@ namespace Server.Controllers
                     now,
                     now.AddSeconds(this._accessTokenExpiry));
 
-                // Create the content of the refresh JWT Token with the appropriate expiry date
-                JwtPayload refreshPayload = new JwtPayload(
-                    this._serverSettings.Issuer,
-                    this._serverSettings.Audience,
-                    claims,
-                    now,
-                    now.AddSeconds(this._refreshTokenExpiry));
-
                 // Generate the final tokem from the header and it's payload
                 JwtSecurityToken secToken = new JwtSecurityToken(header, secPayload);
-                JwtSecurityToken refreshToken = new JwtSecurityToken(header, refreshPayload);
+                JwtSecurityToken refreshToken = secToken.GenerateRefreshToken(this._refreshTokenExpiry, now);
 
-                // Token to String so you can use it in the client
-                String tokenString = (new JwtSecurityTokenHandler()).WriteToken(secToken);
-
-                string refreshTokenString = (new JwtSecurityTokenHandler()).WriteToken(refreshToken);
+                var handler = new JwtSecurityTokenHandler();
 
                 return new OkObjectResult(
                     new OAuthTokenSuccess()
                     {
-                        AccessToken = tokenString,
+                        AccessToken = handler.WriteToken(secToken),
                         ExpiresIn = this._accessTokenExpiry,
-                        RefreshToken = refreshTokenString,
+                        RefreshToken = handler.WriteToken(refreshToken),
                         Scope = "test",
                         TokenType = "bearer"
                     });

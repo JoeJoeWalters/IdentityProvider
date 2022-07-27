@@ -1,4 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace Server.Helpers
 {
@@ -11,10 +13,20 @@ namespace Server.Helpers
         /// Generate the refresh token from the security token
         /// </summary>
         /// <param name="token"></param>
+        /// <param name="expiry"></param>
+        /// <param name="issuedTime"></param>
         /// <returns></returns>
-        public static JwtSecurityToken GenerateRefreshToken(this JwtSecurityToken token)
+        public static JwtSecurityToken GenerateRefreshToken(this JwtSecurityToken token, Int32 expiry, DateTime issuedTime)
         {
-            return new JwtSecurityToken() { }; // Placeholder
+            // Clone the token
+            JwtHeader clonedHeader = new JwtHeader(token.Header.SigningCredentials);
+            JwtPayload clonedPayload = new JwtPayload(
+                    token.Issuer,
+                    token.Audiences.First(),
+                    token.Claims,
+                    issuedTime,
+                    issuedTime.AddSeconds(expiry));
+            return new JwtSecurityToken(clonedHeader, clonedPayload);
         }
 
         /// <summary>
