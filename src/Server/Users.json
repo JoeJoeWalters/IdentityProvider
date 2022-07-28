@@ -10,6 +10,7 @@
       "ClientId": "clientid123",
       "ClientSecret": "clientsecret123",
       "Claims": [
+        /*
         {
           "Type": "admin",
           "Value": "full"
@@ -17,7 +18,7 @@
         {
           "Type": "finance",
           "Value": "readonly"
-        }
+        }*/
       ]
     },
     {
@@ -30,6 +31,7 @@
       "ClientId": "clientid456",
       "ClientSecret": "clientsecret456",
       "Claims": [
+        /*
         {
           "Type": "admin",
           "Value": "full"
@@ -37,7 +39,7 @@
         {
           "Type": "finance",
           "Value": "readonly"
-        }
+        }*/
       ]
     }
   ]
