@@ -40,6 +40,7 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
+                                    user.Audience == tokenRequest.Audience &&
                                     user.ClientId == tokenRequest.ClientId &&
                                     user.ClientSecret == tokenRequest.ClientSecret &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
@@ -54,6 +55,7 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
+                                    user.Audience == tokenRequest.Audience &&
                                     user.Username == tokenRequest.Username &&
                                     user.Password == tokenRequest.Password &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
@@ -68,6 +70,7 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
+                                    user.Audience == tokenRequest.Audience &&
                                     user.Key == tokenRequest.Code &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
                             }).FirstOrDefault();
@@ -76,13 +79,11 @@ namespace Server.Authentication
 
                     default:
 
-                        result = null;
                         break;
                 }
             }
-            catch
+            catch(Exception ex)
             {
-                result = null;
             };
 
             return await Task.FromResult<SecurityUser>(result);

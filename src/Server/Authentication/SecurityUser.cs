@@ -21,6 +21,12 @@ namespace Server.Authentication
             apikey
         }
 
+        /// <summary>
+        /// Which system are they a member of? 
+        /// </summary>
+        [JsonProperty(Required = Required.Always)]
+        public String Audience { get; set; }
+
         [JsonProperty(Required = Required.Always)]
         public String Id { get; set; }
 

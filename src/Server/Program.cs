@@ -18,19 +18,16 @@ namespace Server
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            IConfigurationSection securityKeys = builder.Configuration.GetSection("SecurityKeys");
-            if (securityKeys != null)
+            ServerSettings settings = builder.Configuration.GetSection("SecurityKeys").Get<ServerSettings>();
+            if (settings != null)
             {
+                /*
                 string issuer = securityKeys.GetValue<String>("Issuer");
-                string audience = securityKeys.GetValue<String>("Audience");
+                List<Audience> audiences = securityKeys.GetValue<List<Audience>>("Audiences");
+                */
 
-                ServerSettings settings = new ServerSettings()
-                {
-                    Issuer = issuer,
-                    Audience = audience,
-                    PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8),
-                    PublicKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "public.pem"), Encoding.UTF8)
-                };
+                settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
+                settings.PublicKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "public.pem"), Encoding.UTF8);
 
                 builder.Services.AddSingleton<ServerSettings>(settings);
 
@@ -44,8 +41,8 @@ namespace Server
                                                                     ValidateLifetime = true,
                                                                     ValidateAudience = true,
                                                                     ValidateIssuer = true,
-                                                                    ValidIssuer = issuer,
-                                                                    ValidAudience = audience
+                                                                    ValidIssuer = settings.Issuer,
+                                                                    ValidAudiences = settings.Audiences.Select(aud => aud.Name)
                                                                 });
 
                     userAuthenticator.RefreshAccessList(accessControlStream);

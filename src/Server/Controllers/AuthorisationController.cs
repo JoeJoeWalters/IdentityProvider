@@ -138,11 +138,12 @@ namespace Server.Controllers
                         new Claim("scope", "test")
                     };
                     claims.AddRange(securityUser.Claims);
+                    claims.Add(new Claim("uid", securityUser.Id));
 
                     // Create the content of the JWT Token with the appropriate expiry date
                     JwtPayload secPayload = new JwtPayload(
                         this._serverSettings.Issuer,
-                        request.Audience.IsNullOrEmpty() ? this._serverSettings.Audience : request.Audience,
+                        request.Audience.IsNullOrEmpty() ? this._serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name : request.Audience,
                         claims,
                         now,
                         now.AddSeconds(this._accessTokenExpiry));
@@ -202,7 +203,7 @@ namespace Server.Controllers
             TokenValidationParameters validationParameters = new TokenValidationParameters
             {
                 ValidIssuer = _serverSettings.Issuer,
-                ValidAudiences = new[] { _serverSettings.Audience },
+                ValidAudiences = _serverSettings.Audiences.Select(aud => aud.Name).ToArray(),
                 IssuerSigningKeys = new List<SecurityKey> { new RsaSecurityKey(rsa) }
             };
 
