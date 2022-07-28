@@ -18,6 +18,7 @@ namespace Server.Helpers
         /// <param name="token"></param>
         /// <param name="expiry"></param>
         /// <param name="issuedTime"></param>
+        /// <param name="signingCredentials"></param>
         /// <returns></returns>
         public static JwtSecurityToken GenerateRefreshToken(this JwtSecurityToken token, Int32 expiry, DateTime issuedTime, SigningCredentials signingCredentials)
         {
@@ -46,6 +47,7 @@ namespace Server.Helpers
         /// <param name="token"></param>
         /// <param name="expiry"></param>
         /// <param name="issuedTime"></param>
+        /// <param name="signingCredentials"></param>
         /// <returns></returns>
         public static JwtSecurityToken GenerateFromRefreshToken(this JwtSecurityToken token, Int32 expiry, DateTime issuedTime, SigningCredentials signingCredentials)
         {
