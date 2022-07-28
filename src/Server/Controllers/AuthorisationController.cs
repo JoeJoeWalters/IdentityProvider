@@ -20,7 +20,7 @@ namespace Server.Controllers
     {
         private readonly ILogger<SessionController> _logger;
         private readonly IUserAuthenticator _userAuthenticator;
-        private readonly ServerSettings _serverSettings; 
+        private readonly ServerSettings _serverSettings;
 
         private Int16 _accessTokenExpiry { get => 60; }
         private Int16 _refreshTokenExpiry { get => 3600; }
@@ -78,58 +78,99 @@ namespace Server.Controllers
         /// <returns></returns> 
         [HttpGet]
         [Route(URIs.authorization_endpoint)]
-        public ActionResult Authorisation([FromQuery]OAuthTokenRequest request)
+        public ActionResult Authorisation([FromQuery] OAuthTokenRequest request)
         {
-            // Check the client id and secret being asked for;
-            SecurityUser securityUser = _userAuthenticator.AuthenticateOAuth(request);
-            if (securityUser != null)
+            DateTime now = DateTime.UtcNow; // Fixed point in time
+
+            var handler = new JwtSecurityTokenHandler();
+
+            // No authentication needed if a refresh token is being given
+            if (request.Type == GrantTypes.RefreshToken)
             {
-                DateTime now = DateTime.UtcNow; // Fixed point in quantum
+                // https://stackoverflow.com/questions/57481524/what-is-encoded-in-refresh-token
+                // https://stackoverflow.com/questions/39890282/oauth2-0-what-should-be-the-content-format-of-refresh-token-before-encryption
+                // Go look up the corresponding given token and refresh it, add to the expiry and hand back again
 
-                // Generate a new JWT Header to wrap the token
-                JwtHeader header = new JwtHeader(_signingCredentials);
-                header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
+                // Generate the new token from the refresh token as that holds the same data that was previously agreed
+                JwtSecurityToken token = (new JwtSecurityToken(request.RefreshToken)).GenerateFromRefreshToken(this._accessTokenExpiry, now, _signingCredentials);
 
-                // Combine the claims list to a standard claim array for the JWT payload
-                List<Claim> claims = new List<Claim>()
+                // Generate the new refresh token from the generated token
+                JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials);
+
+                try
                 {
-                    new Claim("scope", "test")
-                };
-                claims.AddRange(securityUser.Claims);
 
-                // Create the content of the JWT Token with the appropriate expiry date
-                JwtPayload secPayload = new JwtPayload(
-                    this._serverSettings.Issuer,
-                    this._serverSettings.Audience,
-                    claims,
-                    now,
-                    now.AddSeconds(this._accessTokenExpiry));
-
-                // Generate the final tokem from the header and it's payload
-                JwtSecurityToken secToken = new JwtSecurityToken(header, secPayload);
-                JwtSecurityToken refreshToken = secToken.GenerateRefreshToken(this._refreshTokenExpiry, now);
-
-                var handler = new JwtSecurityTokenHandler();
-
-                return new OkObjectResult(
-                    new OAuthTokenSuccess()
-                    {
-                        AccessToken = handler.WriteToken(secToken),
-                        ExpiresIn = this._accessTokenExpiry,
-                        RefreshToken = handler.WriteToken(refreshToken),
-                        Scope = "test",
-                        TokenType = "bearer"
-                    });
+                    return new OkObjectResult(
+                        new OAuthTokenSuccess()
+                        {
+                            AccessToken = handler.WriteToken(token),
+                            ExpiresIn = this._accessTokenExpiry,
+                            RefreshToken = handler.WriteToken(refreshToken),
+                            Scope = "",
+                            TokenType = "bearer"
+                        });
+                }
+                catch(Exception ex)
+                {
+                    return new BadRequestObjectResult(
+                        new OAuthTokenFailure()
+                        {
+                            Reason = OAuthTokenFailure.ReasonType.invalid_request,
+                            ReasonDescription = "Could not process given refresh token",
+                            ReasonUri = ""
+                        });
+                }
             }
             else
             {
-                return new BadRequestObjectResult(
-                    new OAuthTokenFailure()
+                // Check the client id and secret being asked for;
+                SecurityUser securityUser = _userAuthenticator.AuthenticateOAuth(request);
+                if (securityUser != null)
+                {
+
+                    // Generate a new JWT Header to wrap the token
+                    JwtHeader header = new JwtHeader(_signingCredentials);
+                    header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
+                    
+                    // Combine the claims list to a standard claim array for the JWT payload
+                    List<Claim> claims = new List<Claim>()
                     {
-                        Reason = OAuthTokenFailure.ReasonType.unauthorized_client,
-                        ReasonDescription = "Reason for the failure here",
-                        ReasonUri = "url of the failure code"
-                    });
+                        new Claim("scope", "test")
+                    };
+                    claims.AddRange(securityUser.Claims);
+
+                    // Create the content of the JWT Token with the appropriate expiry date
+                    JwtPayload secPayload = new JwtPayload(
+                        this._serverSettings.Issuer,
+                        this._serverSettings.Audience,
+                        claims,
+                        now,
+                        now.AddSeconds(this._accessTokenExpiry));
+
+                    // Generate the final tokem from the header and it's payload
+                    JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
+                    JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials);
+
+                    return new OkObjectResult(
+                        new OAuthTokenSuccess()
+                        {
+                            AccessToken = handler.WriteToken(token),
+                            ExpiresIn = this._accessTokenExpiry,
+                            RefreshToken = handler.WriteToken(refreshToken),
+                            Scope = "",
+                            TokenType = "bearer"
+                        });
+                }
+                else
+                {
+                    return new BadRequestObjectResult(
+                        new OAuthTokenFailure()
+                        {
+                            Reason = OAuthTokenFailure.ReasonType.unauthorized_client,
+                            ReasonDescription = "Reason for the failure here",
+                            ReasonUri = ""
+                        });
+                }
             }
         }
 
@@ -152,7 +193,7 @@ namespace Server.Controllers
         /// <returns></returns> 
         [HttpPost]
         [Route(URIs.introspection_endpoint)]
-        public ActionResult TokenIntrospection([FromQuery]TokenIntrospectionRequest request)
+        public ActionResult TokenIntrospection([FromQuery] TokenIntrospectionRequest request)
         {
             RSA rsa = RSA.Create();
             rsa.ImportFromPem(_serverSettings.PublicKey.ToCharArray());
