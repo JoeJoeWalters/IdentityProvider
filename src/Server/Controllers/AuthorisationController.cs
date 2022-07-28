@@ -92,10 +92,10 @@ namespace Server.Controllers
                 // Go look up the corresponding given token and refresh it, add to the expiry and hand back again
 
                 // Generate the new token from the refresh token as that holds the same data that was previously agreed
-                JwtSecurityToken token = (new JwtSecurityToken(request.RefreshToken)).GenerateFromRefreshToken(this._accessTokenExpiry, now, _signingCredentials);
+                JwtSecurityToken token = (new JwtSecurityToken(request.RefreshToken)).GenerateFromRefreshToken(this._accessTokenExpiry, now, _signingCredentials, _serverSettings);
 
                 // Generate the new refresh token from the generated token
-                JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials);
+                JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials, _serverSettings);
 
                 try
                 {
@@ -142,14 +142,14 @@ namespace Server.Controllers
                     // Create the content of the JWT Token with the appropriate expiry date
                     JwtPayload secPayload = new JwtPayload(
                         this._serverSettings.Issuer,
-                        this._serverSettings.Audience,
+                        request.Audience.IsNullOrEmpty() ? this._serverSettings.Audience : request.Audience,
                         claims,
                         now,
                         now.AddSeconds(this._accessTokenExpiry));
 
                     // Generate the final tokem from the header and it's payload
                     JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
-                    JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials);
+                    JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials, _serverSettings);
 
                     return new OkObjectResult(
                         new OAuthTokenSuccess()
@@ -210,13 +210,46 @@ namespace Server.Controllers
             {
                 ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out SecurityToken jsonToken);
                 JwtSecurityToken token = jsonToken as JwtSecurityToken;
-                return new OkObjectResult(new TokenIntrospectionResponse() { active = true, scope = token.Claims.Where(claim => claim.Type.ToLower() == "scope").FirstOrDefault().Value, exp = token.Payload.Exp });
+
+                string type = token.Header["typ"].ToString();
+
+                if ((type.IsNullOrEmpty() ? "JWT" : type) == request.token_type_hint)
+                    return new OkObjectResult(
+                        JsonConvert.SerializeObject(
+                            new TokenIntrospectionResponse() { active = true, scope = token.Claims.Where(claim => claim.Type.ToLower() == "scope").FirstOrDefault().Value, exp = token.Payload.Exp }, 
+                            Formatting.Indented, 
+                            new JsonSerializerSettings
+                            {
+                                NullValueHandling = NullValueHandling.Ignore
+                            }));
+            }
+            catch(SecurityTokenInvalidAudienceException audEx)
+            {
+            }
+            catch(SecurityTokenInvalidAlgorithmException algEx)
+            {
+
+            }
+            catch(SecurityTokenInvalidIssuerException issEx)
+            {
+
+            }
+            catch(SecurityTokenInvalidSignatureException sigEx)
+            {
+                
             }
             catch (Exception ex)
             {
             }
 
-            return new UnauthorizedObjectResult(new TokenIntrospectionResponse() { active = false });
+            return new UnauthorizedObjectResult(
+                JsonConvert.SerializeObject(
+                    new TokenIntrospectionResponse() { active = false }, 
+                    Formatting.Indented, 
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    }));
         }
 
         // https://connect2id.com/products/server/docs/api/token-revocation

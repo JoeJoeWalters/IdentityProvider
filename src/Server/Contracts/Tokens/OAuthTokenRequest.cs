@@ -13,6 +13,16 @@ namespace Server.Contracts.Tokens
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class OAuthTokenRequest
     {
+        // https://stackoverflow.com/questions/45876960/how-to-specify-audience-for-an-oauth2-access-token
+        /// <summary>
+        /// (Extended) Audience is not normally part of the auth request but indicates the partition key (e.g. logins for System A or System B)
+        /// </summary>
+        [JsonProperty(Required = Required.Always, PropertyName = "audience")]
+        public String Audience { get; set; } = String.Empty;
+
+        /// <summary>
+        /// authorization_code, client_credentials, password, refresh_token
+        /// </summary>
         [JsonProperty(Required = Required.Always, PropertyName = "grant_type")]
         public String Type { get; set; } = GrantTypes.ClientCredentials;
 
@@ -28,9 +38,15 @@ namespace Server.Contracts.Tokens
         [JsonProperty(Required = Required.Default, PropertyName = "password")]
         public String Password { get; set; } = String.Empty;
 
+        /// <summary>
+        /// Required when the grant_type is refresh_token
+        /// </summary>
         [JsonProperty(Required = Required.Default, PropertyName = "refresh_token")]
         public String RefreshToken { get; set; } = String.Empty;
 
+        /// <summary>
+        /// How long the new token should be valid for in Seconds up to a Max of 2592000 (30 Days), default is 60 (1 minute)
+        /// </summary>
         [JsonProperty(Required = Required.Default, PropertyName = "valid_for")]
         public Int32 ValidFor { get; set; } = 60; // In Seconds Max 2592000 (30 Days)
 
