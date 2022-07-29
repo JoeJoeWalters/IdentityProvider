@@ -92,10 +92,10 @@ namespace Server.Controllers
                 // Go look up the corresponding given token and refresh it, add to the expiry and hand back again
 
                 // Generate the new token from the refresh token as that holds the same data that was previously agreed
-                JwtSecurityToken token = (new JwtSecurityToken(request.RefreshToken)).GenerateFromRefreshToken(this._accessTokenExpiry, now, _signingCredentials, _serverSettings);
+                JwtSecurityToken token = (new JwtSecurityToken(request.RefreshToken)).GenerateFromRefreshToken(_accessTokenExpiry, now, _signingCredentials, _serverSettings);
 
                 // Generate the new refresh token from the generated token
-                JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials, _serverSettings);
+                JwtSecurityToken refreshToken = token.GenerateRefreshToken(_refreshTokenExpiry, now, _signingCredentials, _serverSettings);
 
                 try
                 {
@@ -104,7 +104,7 @@ namespace Server.Controllers
                         new OAuthTokenSuccess()
                         {
                             AccessToken = handler.WriteToken(token),
-                            ExpiresIn = this._accessTokenExpiry,
+                            ExpiresIn = _accessTokenExpiry,
                             RefreshToken = handler.WriteToken(refreshToken),
                             Scope = "",
                             TokenType = "bearer"
@@ -138,25 +138,25 @@ namespace Server.Controllers
                         new Claim("scope", "test")
                     };
                     claims.AddRange(securityUser.Claims);
-                    claims.Add(new Claim("uid", securityUser.Id));
+                    claims.Add(new Claim("sub", securityUser.Id)); // Add the user id as the subject (sub claim) 
 
                     // Create the content of the JWT Token with the appropriate expiry date
                     JwtPayload secPayload = new JwtPayload(
-                        this._serverSettings.Issuer,
-                        request.Audience.IsNullOrEmpty() ? this._serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name : request.Audience,
+                        _serverSettings.Issuer,
+                        request.Audience.IsNullOrEmpty() ? _serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name : request.Audience,
                         claims,
                         now,
-                        now.AddSeconds(this._accessTokenExpiry));
+                        now.AddSeconds(_accessTokenExpiry));
 
                     // Generate the final tokem from the header and it's payload
                     JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
-                    JwtSecurityToken refreshToken = token.GenerateRefreshToken(this._refreshTokenExpiry, now, _signingCredentials, _serverSettings);
+                    JwtSecurityToken refreshToken = token.GenerateRefreshToken(_refreshTokenExpiry, now, _signingCredentials, _serverSettings);
 
                     return new OkObjectResult(
                         new OAuthTokenSuccess()
                         {
                             AccessToken = handler.WriteToken(token),
-                            ExpiresIn = this._accessTokenExpiry,
+                            ExpiresIn = _accessTokenExpiry,
                             RefreshToken = handler.WriteToken(refreshToken),
                             Scope = "",
                             TokenType = "bearer"

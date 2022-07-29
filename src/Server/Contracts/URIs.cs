@@ -14,7 +14,7 @@
 
         public const string pushed_authorization_request_endpoint = "par";
 
-        public const string authorization_endpoint = "login";
+        public const string authorization_endpoint = "authorize";
 
         public const string token_endpoint = "token";
 
