@@ -4,7 +4,24 @@
     ViewData["Title"] = "Home page";
 }
 
-<div class="">
+<script type="module">
+    //import Vue from 'https://unpkg.com/vue@2.6.0/dist/vue.esm.browser.min.js';
+    import { createApp } from './lib/vue/vue.esm-browser.min.js';
+    const app = createApp({
+        data() {
+            return {
+                count: 0
+            }
+        },
+        methods: {
+            increment() {
+                this.count++
+            }
+        },
+    }).mount('#app');
+</script>
+
+<div class="" id="app">
     <h1 class="display-4">Login</h1>
     <form id="LoginForm">
         <div class="form-group">
@@ -32,6 +49,6 @@
             <label for="loginPassword">Password</label>
             <input type="password" class="form-control" id="loginPassword" placeholder="Password">
         </div>
-        <button type="button" class="btn btn-primary">Authenticate</button>
+        <button type="button" class="btn btn-primary" v-on:click="increment">Count is: {{ count }}</button>
     </form>
 </div>
