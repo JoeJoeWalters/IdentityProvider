@@ -13,6 +13,7 @@
                     <button class="nav-link active" id="nav-wellKnown-tab" data-bs-toggle="tab" data-bs-target="#nav-wellKnown" type="button" role="tab" aria-controls="nav-wellKnown" aria-selected="true">Well Known</button>
                     <button class="nav-link" v-if="!jwksDisabled" id="nav-jwks-tab" data-bs-toggle="tab" data-bs-target="#nav-jwks" type="button" role="tab" aria-controls="nav-jwks" aria-selected="false">JWKS</button>
                     <button class="nav-link" v-if="!authDisabled" id="nav-authenticate-tab" data-bs-toggle="tab" data-bs-target="#nav-authenticate" type="button" role="tab" aria-controls="nav-authenticate" aria-selected="false">Authenticate</button>
+                    <button class="nav-link" v-if="!introspectDisabled" id="nav-introspection-tab" data-bs-toggle="tab" data-bs-target="#nav-introspection" type="button" role="tab" aria-controls="nav-introspection" aria-selected="false">Introspection</button>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
@@ -85,15 +86,38 @@
                     </form>
 
                 </div>
-                <div v-if="!jwksDisabled" class="tab-pane fade show active" id="nav-jwks" role="tabpanel" aria-labelledby="nav-jwks-tab">
+                <div v-if="!jwksDisabled" class="tab-pane fade" id="nav-jwks" role="tabpanel" aria-labelledby="nav-jwks-tab">
                     <form id="JWKS">
-                        <button type="button" class="btn btn-primary" v-on:click="getJWKS" :disabled="jwksDisabled">Load JWKS</button>
                         <div v-for="item in jwksData.keys" class="card">
                             <div class="card-body">
-                                <h5 class="card-title">{{item.kty}}</h5>
+                                <h5 class="card-title">{{item.kid}}</h5>
                                 <div class="form-group">
-                                    <label for="x5c">x5c</label>
+                                    <label for="alg">Algorithm</label>
+                                    <input type="text" class="form-control" readonly="readonly" id="alg" v-model="item.alg">
+                                </div>
+                                <div class="form-group">
+                                    <label for="use">Use</label>
+                                    <input type="text" class="form-control" readonly="readonly" id="use" v-model="item.use">
+                                </div>
+                                <div class="form-group">
+                                    <label for="x5c">Certificate Chain</label>
                                     <textarea class="form-control" rows="5">{{item.x5c}}</textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="n">Modulus</label>
+                                    <input type="text" class="form-control" readonly="readonly" id="n" v-model="item.n">
+                                </div>
+                                <div class="form-group">
+                                    <label for="e">Exponent</label>
+                                    <input type="text" class="form-control" readonly="readonly" id="e" v-model="item.e">
+                                </div>
+                                <div class="form-group">
+                                    <label for="kty">Type</label>
+                                    <input type="text" class="form-control" readonly="readonly" id="kty" v-model="item.kty">
+                                </div>
+                                <div class="form-group">
+                                    <label for="x5t">Thumbprint</label>
+                                    <input type="text" class="form-control" readonly="readonly" id="x5t" v-model="item.x5t">
                                 </div>
                             </div>
                         </div>
@@ -126,7 +150,26 @@
                             <label for="loginPassword">Password</label>
                             <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="loginScreen.password">
                         </div>
-                        <button type="button" class="btn btn-primary" v-on:click="authenticate" :disabled="authDisabled">Authenticate</button>
+                        <button type="button" class="btn btn-primary" v-on:click="getAuthorized" :disabled="authDisabled">Authenticate</button>
+                    </form>
+                </div>
+                <div v-if="!authDisabled" class="tab-pane fade" id="nav-introspection" role="tabpanel" aria-labelledby="nav-introspection-tab">
+                    <form id="IntrospectionForm">
+                        <div class="form-group">
+                            <label for="token_type_hint">Type</label>
+                            <select class="form-control" id="token_type_hint" v-model="introspectionScreen.token_type_hint">
+                                <option>jwt</option>
+                                <option>refresh</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="introspectionToken">Token</label>
+                            <input type="text" class="form-control" id="introspectionToken" aria-describedby="tokenHelp" placeholder="Enter Token" v-model="introspectionScreen.token">
+                            <small id="tokenHelp" class="form-text text-muted">Please enter your token.</small>
+                        </div>
+                        <button type="button" class="btn" v-on:click="copyIntrospectionJWT" :disabled="introspectDisabled">Take Access Token</button>
+                        <button type="button" class="btn" v-on:click="copyIntrospectionRefresh" :disabled="introspectDisabled">Take Refresh Token</button>
+                        <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
                     </form>
                 </div>
             </div>
@@ -174,16 +217,32 @@
             return "";
         };
 
+        function serialize(obj) {
+            var str = [];
+            for (var p in obj)
+                if (obj.hasOwnProperty(p)) {
+                    str.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+                }
+            return str.join("&");
+        }
+
         // Make an API call with the given parameters
         function apiCall(url, method, request, callback) {
 
             debugger;
+            var data;
+            if (method == "GET") {
+                data = serialize(request)
+            }
+            else {
+                data = JSON.stringify(request);
+            }
 
             // Make the ajax call
             $.ajax({
                 type: method,
                 url: url,
-                data: JSON.stringify(request),
+                data: data,
                 crossDomain: true,
                 dataType: 'json',
                 contentType: 'application/json; charset=utf-8',
@@ -207,10 +266,10 @@
                 },
                 error: function(jgXHR, status) {
 
-                    alert("Error: " + jgXHR.responseText);
+                    //alert("Error: " + jgXHR.responseText);
 
                     // Do the failure calls
-                    callback(false, { data: null, messsages: ["Error Connecting To Api"] });
+                    callback(false, { data: jgXHR.responseText, messsages: ["Error Connecting To Api"] });
                 }
             });
         }
@@ -235,6 +294,10 @@
                     wellKnownScreen: {
                         wellKnownUri: "https://localhost:7198/.well-known/openid-configuration"
                     },
+                    introspectionScreen: {
+                        token: "",
+                        token_type_hint: ""
+                    },
                     wellKnownData: {
                         issuer: "",
                         jwks_uri: "",
@@ -250,20 +313,7 @@
                         response_types_supported: [],
                         response_modes_supported: []
                     },
-                    jwksData: {
-                        keys: [
-                            {
-                                alg: "",
-                                kty: "",
-                                use: "",
-                                x5c: "",
-                                n: "",
-                                e: "",
-                                kid: "",
-                                x5t: ""
-                            }
-                        ]
-                    }
+                    jwksData: {}
                 }
             },
             computed: {
@@ -272,6 +322,9 @@
                 },
                 authDisabled: function() {
                     return (this.wellKnownData.authorization_endpoint == undefined || this.wellKnownData.authorization_endpoint == "");
+                },
+                introspectDisabled: function() {
+                    return (this.token == "" && this.refreshToken == "");
                 },
                 decodedToken: function() {
                     if (this.token != undefined && this.token != "") {
@@ -296,24 +349,62 @@
                 }
             },
             methods: {
-                authenticate() {
-                    this.token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiSldUIiwia2lkIjoiN2I3NmVhODBmNjA5Yzg4NDRlOTZjM2FmMGIyNThhMGYyYjdhMjBiYSJ9.eyJzY29wZSI6InRlc3QiLCJzdWIiOiI3YWMzOTUwNC01M2YxLTQ3ZjUtOTZiOS0zYzI2ODI5NjJiOGIiLCJhaXQiOiIxNjU5MjgxNTgxIiwibmJmIjoxNjU5MjgxNTgwLCJleHAiOjE2NTkyODE2NDEsImlzcyI6Imh0dHBzOi8vZ2l0aHViLmNvbS9Kb2VKb2VXYWx0ZXJzL0lkZW50aXR5UHJvdmlkZXIiLCJhdWQiOiJTeXN0ZW0gQSJ9.A-d_BjVW45V70yz_W27mS_g1KmUzqsL8sakZW_8Lcx7bWLlPpqT6C00Xzjeh3KtTLR1Dk8vKnUIx6zFhuzFE3sy-yeezNOzVyTLlEdKP17ytGcg_ewefz2H74q2cYPIdm_FO2GF96l854WXPoHgWJnYy95GnZYEafmddx5qdasHdLVu1FST3u7NFYqXagBCVYj0HnZ8o1N2h38Jsnn7YLsMyVZWvcmsjAx2W3iPdDA_QvyMdE6A6NbYTdLpYA6A3IUdO8MDn7BUX4Lhln9flyFtytk9pNl_CjWOI9nUan3yDF9kuP9zGo9SoR67lhKoLIc6P-A1aqAk6VnwOJ8Tq4A";
-                    this.refreshToken = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiUmVmcmVzaCIsImtpZCI6IjdiNzZlYTgwZjYwOWM4ODQ0ZTk2YzNhZjBiMjU4YTBmMmI3YTIwYmEifQ.eyJzY29wZSI6InRlc3QiLCJzdWIiOiI3YWMzOTUwNC01M2YxLTQ3ZjUtOTZiOS0zYzI2ODI5NjJiOGIiLCJhaXQiOlsiMTY1OTI4MTU4MSIsIjE2NTkyODE1ODEiXSwibmJmIjoxNjU5MjgxNTgwLCJleHAiOjE2NTkyODUxODEsImlzcyI6Imh0dHBzOi8vZ2l0aHViLmNvbS9Kb2VKb2VXYWx0ZXJzL0lkZW50aXR5UHJvdmlkZXIiLCJhdWQiOiJTeXN0ZW0gQSJ9.sto-XKs9r99uQPe1rK8D-EhTwllIY49VGk0N0TYgwi2iYOWlC9Yk11MoDLP0G7evJKWJY9c-orTZRQ-5l-lEfBwApnrTvMzJLEYaKmt9jO0klbPvOd7bKXcp7jj9hXq86ApMSobJEozSntQ8iClxxSbbwBoztrIOJWvs48HrMUJTFvc9yqkH-uSdAFthM7CYSKpJEpdoz2O8CTNKWyL6BlCZgoqZuMpDGHTlILLzXaW2xixatX83oorfRMdrRq9IYg-svNNPh63V_CMTGDvadHut9nAytwO-WEbxBXuTuGja0x7g32NUBz2cQikWETc__H832w1krfM32-erjQOntA";
-                },
                 getWellKnown() {
                     apiCall(this.wellKnownScreen.wellKnownUri, "GET", {}, this.callbackWellKnown);
                 },
-                callbackWellKnown(success, data) {
-                    this.wellKnownData = data; // Copy over existing object (same properties anyway)
+                callbackWellKnown(success, response) {
+                    this.wellKnownData = response; // Copy over existing object (same properties anyway)
+
+                    // Now load the JWKS if possible
+                    if (!this.jwksDisabled)
+                        this.getJWKS();
                 },
                 getJWKS() {
                     apiCall(this.wellKnownData.jwks_uri, "GET", {}, this.callbackJWKS);
                 },
-                callbackJWKS(success, data) {
-                    alert(success);
-                    alert(data);
+                callbackJWKS(success, response) {
+                    this.jwksData = response; // Copy over existing object (same properties anyway)
+                },
+                getAuthorized() {
+                    var request;
+                    if (this.loginScreen.type == "password") {
+                        request = { audience: this.loginScreen.audience, type: "password", username: this.loginScreen.username, password: this.loginScreen.password };
+                    }
+                    apiCall(this.wellKnownData.authorization_endpoint, "GET", request, this.callbackAuthorized);
+                },
+                callbackAuthorized(success, response) {
+                    if (success) {
+                        this.token = response.accessToken;
+                        this.refreshToken = response.refreshToken;
+                    }
+                    else {
+                        var failureData = JSON.parse(response.data);
+
+                        debugger;
+
+                        // Failure .. Kill the context
+                        this.token = "";
+                        this.tokenExpires = "";
+                        this.refreshToken = "";
+                        this.refreshTokenExpires = "";
+                    }
+                },
+                copyIntrospectionJWT() {
+                    this.introspectionScreen.token_type_hint = "jwt";
+                    this.introspectionScreen.token = this.token;
                     debugger;
-                    this.jwksData = data; // Copy over existing object (same properties anyway)
+                },
+                copyIntrospectionRefesh() {
+                    this.introspectionScreen.token_type_hint = "refresh";
+                    this.introspectionScreen.token = this.refreshToken;
+                    debugger;
+                },
+                getIntrospection() {
+                    // Post but with query params (I know right!)
+                    apiCall(this.wellKnownData.introspection_endpoint + "?" + serialize({ token: this.introspectionScreen.token, token_type_hint: this.introspectionScreen.token_type_hint }), "POST", {}, this.callbackIntrospection);
+                },
+                callbackIntrospection(success, response) {
+                    debugger;
                 }
             },
         }).mount('#app');

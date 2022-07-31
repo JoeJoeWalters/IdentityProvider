@@ -18,7 +18,7 @@
 
         public const string token_endpoint = "token";
 
-        public const string introspection_endpoint = "token/intospect";
+        public const string introspection_endpoint = "token/introspect";
 
         public const string revocation_endpoint = "token/revoke";
 
