@@ -16,20 +16,10 @@ namespace Server
     {
         static void Main(string[] args)
         {
-            var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddCors(options =>
-            {
-                options.AddPolicy(name: MyAllowSpecificOrigins,
-                                  policy =>
-                                  {
-                                      policy.AllowAnyOrigin()
-                                            .AllowAnyHeader()
-                                            .AllowAnyMethod();
-                                  });
-            });
+            builder.Services.AddCors();
 
             ServerSettings settings = builder.Configuration.GetSection("SecurityKeys").Get<ServerSettings>();
             if (settings != null)
@@ -119,13 +109,17 @@ namespace Server
                 app.UseSwaggerUI();
             }
 
-            app.UseCors();
-
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
 
             app.MapControllers();
+
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
 
             app.Run();
         }
