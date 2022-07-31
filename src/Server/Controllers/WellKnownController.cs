@@ -6,6 +6,8 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Server.Helpers;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Cors;
 
 namespace Server.Controllers
 {
@@ -58,7 +60,7 @@ namespace Server.Controllers
                 userinfo_endpoint = new Uri($"{baseUri}{URIs.userinfo_endpoint}")
             };
 
-            return new OkObjectResult(metaData);
+            return new OkObjectResult(JsonConvert.SerializeObject(metaData, Formatting.Indented));
         }
 
         /// <summary>
@@ -110,7 +112,7 @@ namespace Server.Controllers
                  }
             };
 
-            return new OkObjectResult(returnSet);
+            return new OkObjectResult(JsonConvert.SerializeObject(returnSet, Formatting.Indented));
         }
     }
 }

@@ -23,7 +23,7 @@
                             <input type="text" class="form-control" id="wellKnownUri" aria-describedby="jwksUriHelp" placeholder="Enter Uri" v-model="wellKnownScreen.wellKnownUri">
                             <small id="jwksUriHelp" class="form-text text-muted">Please enter the Well Known Uri of the Identity Provider.</small>
                         </div>
-                        <button type="button" class="btn btn-primary" v-on:click="getWellKnown">Get Endpoints</button>
+                        <button type="button" class="btn btn-primary" v-on:click="getWellKnown">Get Well Known Data</button>
                     </form>
 
                 </div>
@@ -105,6 +105,41 @@
             return "";
         };
 
+        // Make an API call with the given parameters
+        function apiCall(url, method, request, callback) {
+
+            debugger;
+
+            // Make the ajax call
+            $.ajax({
+                type: method,
+                url: url,
+                data: JSON.stringify(request),
+                crossDomain: true,
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function(data, status, jqXHR) {
+
+                    // Was the call successful?
+                    var success = (status == "success");
+                    if (!success)
+                        alert("Error: " + jqXHR.responseText);
+
+                    // Success?
+                    callback(success, data);
+                },
+                error: function(jgXHR, status) {
+
+                    debugger;
+
+                    alert("Error: " + jgXHR.responseText);
+
+                    // Do the failure calls
+                    callback(false, { data: null, messsages: ["Error Connecting To Api"] });
+                }
+            });
+        }
+
         function unixTicksToIsoString(seconds) {
             var expiryDateTime = new Date(seconds * 1000);
             return expiryDateTime.toISOString();
@@ -124,6 +159,21 @@
                     },
                     wellKnownScreen: {
                         wellKnownUri: "https://localhost:7198/.well-known/openid-configuration"
+                    },
+                    wellKnownData: {
+                        issuer: "",
+                        jwks_uri: "",
+                        registration_endpoint: "",
+                        pushed_authorization_request_endpoint: "",
+                        authorization_endpoint: "",
+                        token_endpoint: "",
+                        introspection_endpoint: "",
+                        revocation_endpoint: "",
+                        userinfo_endpoint: "",
+                        end_session_endpoint: "",
+                        grant_types_supported: [],
+                        response_types_supported: [],
+                        response_modes_supported: []
                     }
                 }
             },
@@ -156,7 +206,10 @@
                     this.refreshToken = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiUmVmcmVzaCIsImtpZCI6IjdiNzZlYTgwZjYwOWM4ODQ0ZTk2YzNhZjBiMjU4YTBmMmI3YTIwYmEifQ.eyJzY29wZSI6InRlc3QiLCJzdWIiOiI3YWMzOTUwNC01M2YxLTQ3ZjUtOTZiOS0zYzI2ODI5NjJiOGIiLCJhaXQiOlsiMTY1OTI4MTU4MSIsIjE2NTkyODE1ODEiXSwibmJmIjoxNjU5MjgxNTgwLCJleHAiOjE2NTkyODUxODEsImlzcyI6Imh0dHBzOi8vZ2l0aHViLmNvbS9Kb2VKb2VXYWx0ZXJzL0lkZW50aXR5UHJvdmlkZXIiLCJhdWQiOiJTeXN0ZW0gQSJ9.sto-XKs9r99uQPe1rK8D-EhTwllIY49VGk0N0TYgwi2iYOWlC9Yk11MoDLP0G7evJKWJY9c-orTZRQ-5l-lEfBwApnrTvMzJLEYaKmt9jO0klbPvOd7bKXcp7jj9hXq86ApMSobJEozSntQ8iClxxSbbwBoztrIOJWvs48HrMUJTFvc9yqkH-uSdAFthM7CYSKpJEpdoz2O8CTNKWyL6BlCZgoqZuMpDGHTlILLzXaW2xixatX83oorfRMdrRq9IYg-svNNPh63V_CMTGDvadHut9nAytwO-WEbxBXuTuGja0x7g32NUBz2cQikWETc__H832w1krfM32-erjQOntA";
                 },
                 getWellKnown() {
-                    alert("Do something!");
+                    apiCall(this.wellKnownScreen.wellKnownUri, "GET", {}, this.callbackWellKnown);
+                },
+                callbackWellKnown(success, data) {
+                    debugger;
                 }
             },
         }).mount('#app');
