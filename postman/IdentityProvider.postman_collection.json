@@ -1,9 +1,110 @@
 {
 	"info": {
 		"_postman_id": "bf58e397-c1f9-4267-a23a-a1e156bcf8ac",
-		"name": "IdentityProvider",
+		"name": "Identity Provider",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "761107"
 	},
-	"item": []
+	"item": [
+		{
+			"name": "Well Known Configuration",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7198/.well-known/openid-configuration",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7198",
+					"path": [
+						".well-known",
+						"openid-configuration"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "JWKS",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "Authorize",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:7198/authorize?audience=System A&type=password&username=admin_a&password=password",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7198",
+					"path": [
+						"authorize"
+					],
+					"query": [
+						{
+							"key": "audience",
+							"value": "System A"
+						},
+						{
+							"key": "type",
+							"value": "password"
+						},
+						{
+							"key": "username",
+							"value": "admin_a"
+						},
+						{
+							"key": "password",
+							"value": "password"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Introspection",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "token",
+							"value": "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiSldUIiwia2lkIjoiN2I3NmVhODBmNjA5Yzg4NDRlOTZjM2FmMGIyNThhMGYyYjdhMjBiYSJ9",
+							"type": "text"
+						},
+						{
+							"key": "token_type_hint",
+							"value": "jwt",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "https://localhost:7198/token/introspect",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "7198",
+					"path": [
+						"token",
+						"introspect"
+					]
+				}
+			},
+			"response": []
+		}
+	]
 }
