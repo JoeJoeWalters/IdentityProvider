@@ -6,36 +6,61 @@
 
 <div class="row">
     <div class="col col-sm-8">
-        <div>
-            <h1 class="display-4">Login</h1>
-            <form id="LoginForm">
-                <div class="form-group">
-                    <label for="loginAudience">Audience</label>
-                    <select class="form-control" id="loginAudience" v-model="loginScreen.audience">
-                        <option>System A</option>
-                        <option>System B</option>
-                    </select>
+        <div class="row">
+
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-wellKnown-tab" data-bs-toggle="tab" data-bs-target="#nav-wellKnown" type="button" role="tab" aria-controls="nav-wellKnown" aria-selected="true">Well Known</button>
+                    <button class="nav-link" id="nav-authenticate-tab" data-bs-toggle="tab" data-bs-target="#nav-authenticate" type="button" role="tab" aria-controls="nav-authenticate" aria-selected="false">Authenticate</button>
+                    <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
                 </div>
-                <div class="form-group">
-                    <label for="loginType">Type</label>
-                    <select class="form-control" id="loginType" v-model="loginScreen.type">
-                        <option value="authorization_code">Authorization Code</option>
-                        <option value="client_credentials">Client Credentials</option>
-                        <option value="password">Password</option>
-                        <option value="refresh_token">Refresh Token</option>
-                    </select>
+            </nav>
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-wellKnown" role="tabpanel" aria-labelledby="nav-wellKnown-tab">
+                    <form id="WellKnown">
+                        <div class="form-group">
+                            <label for="loginUsername">URI</label>
+                            <input type="text" class="form-control" id="wellKnownUri" aria-describedby="jwksUriHelp" placeholder="Enter Uri" v-model="wellKnownScreen.wellKnownUri">
+                            <small id="jwksUriHelp" class="form-text text-muted">Please enter the Well Known Uri of the Identity Provider.</small>
+                        </div>
+                        <button type="button" class="btn btn-primary" v-on:click="getWellKnown">Get Endpoints</button>
+                    </form>
+
                 </div>
-                <div class="form-group">
-                    <label for="loginUsername">Username</label>
-                    <input type="text" class="form-control" id="loginUsername" aria-describedby="usernameHelp" placeholder="Enter Username" v-model="loginScreen.username">
-                    <small id="usernameHelp" class="form-text text-muted">Please enter your username.</small>
+                <div class="tab-pane fade" id="nav-authenticate" role="tabpanel" aria-labelledby="nav-authenticate-tab">
+                    <form id="LoginForm">
+                        <div class="form-group">
+                            <label for="loginAudience">Audience</label>
+                            <select class="form-control" id="loginAudience" v-model="loginScreen.audience">
+                                <option>System A</option>
+                                <option>System B</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginType">Type</label>
+                            <select class="form-control" id="loginType" v-model="loginScreen.type">
+                                <option value="authorization_code">Authorization Code</option>
+                                <option value="client_credentials">Client Credentials</option>
+                                <option value="password">Password</option>
+                                <option value="refresh_token">Refresh Token</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Username</label>
+                            <input type="text" class="form-control" id="loginUsername" aria-describedby="usernameHelp" placeholder="Enter Username" v-model="loginScreen.username">
+                            <small id="usernameHelp" class="form-text text-muted">Please enter your username.</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="loginScreen.password">
+                        </div>
+                        <button type="button" class="btn btn-primary" v-on:click="authenticate">Authenticate</button>
+                    </form>
+
                 </div>
-                <div class="form-group">
-                    <label for="loginPassword">Password</label>
-                    <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="loginScreen.password">
+                <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
                 </div>
-                <button type="button" class="btn btn-primary" v-on:click="authenticate">Authenticate</button>
-            </form>
+            </div>
         </div>
     </div>
     <div class="col col-sm-4">
@@ -61,7 +86,7 @@
 @section Scripts {
 
     <script type="module">
-        //import Vue from 'https://unpkg.com/vue@2.6.0/dist/vue.esm.browser.min.js';
+
         import { createApp } from './lib/vue/vue.esm-browser.min.js';
 
         function parseJwt(token) {
@@ -96,6 +121,9 @@
                         type: "password",
                         username: "",
                         password: ""
+                    },
+                    wellKnownScreen: {
+                        wellKnownUri: "https://localhost:7198/.well-known/openid-configuration"
                     }
                 }
             },
@@ -126,6 +154,9 @@
                 authenticate() {
                     this.token = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiSldUIiwia2lkIjoiN2I3NmVhODBmNjA5Yzg4NDRlOTZjM2FmMGIyNThhMGYyYjdhMjBiYSJ9.eyJzY29wZSI6InRlc3QiLCJzdWIiOiI3YWMzOTUwNC01M2YxLTQ3ZjUtOTZiOS0zYzI2ODI5NjJiOGIiLCJhaXQiOiIxNjU5MjgxNTgxIiwibmJmIjoxNjU5MjgxNTgwLCJleHAiOjE2NTkyODE2NDEsImlzcyI6Imh0dHBzOi8vZ2l0aHViLmNvbS9Kb2VKb2VXYWx0ZXJzL0lkZW50aXR5UHJvdmlkZXIiLCJhdWQiOiJTeXN0ZW0gQSJ9.A-d_BjVW45V70yz_W27mS_g1KmUzqsL8sakZW_8Lcx7bWLlPpqT6C00Xzjeh3KtTLR1Dk8vKnUIx6zFhuzFE3sy-yeezNOzVyTLlEdKP17ytGcg_ewefz2H74q2cYPIdm_FO2GF96l854WXPoHgWJnYy95GnZYEafmddx5qdasHdLVu1FST3u7NFYqXagBCVYj0HnZ8o1N2h38Jsnn7YLsMyVZWvcmsjAx2W3iPdDA_QvyMdE6A6NbYTdLpYA6A3IUdO8MDn7BUX4Lhln9flyFtytk9pNl_CjWOI9nUan3yDF9kuP9zGo9SoR67lhKoLIc6P-A1aqAk6VnwOJ8Tq4A";
                     this.refreshToken = "eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNyc2Etc2hhMjU2IiwidHlwIjoiUmVmcmVzaCIsImtpZCI6IjdiNzZlYTgwZjYwOWM4ODQ0ZTk2YzNhZjBiMjU4YTBmMmI3YTIwYmEifQ.eyJzY29wZSI6InRlc3QiLCJzdWIiOiI3YWMzOTUwNC01M2YxLTQ3ZjUtOTZiOS0zYzI2ODI5NjJiOGIiLCJhaXQiOlsiMTY1OTI4MTU4MSIsIjE2NTkyODE1ODEiXSwibmJmIjoxNjU5MjgxNTgwLCJleHAiOjE2NTkyODUxODEsImlzcyI6Imh0dHBzOi8vZ2l0aHViLmNvbS9Kb2VKb2VXYWx0ZXJzL0lkZW50aXR5UHJvdmlkZXIiLCJhdWQiOiJTeXN0ZW0gQSJ9.sto-XKs9r99uQPe1rK8D-EhTwllIY49VGk0N0TYgwi2iYOWlC9Yk11MoDLP0G7evJKWJY9c-orTZRQ-5l-lEfBwApnrTvMzJLEYaKmt9jO0klbPvOd7bKXcp7jj9hXq86ApMSobJEozSntQ8iClxxSbbwBoztrIOJWvs48HrMUJTFvc9yqkH-uSdAFthM7CYSKpJEpdoz2O8CTNKWyL6BlCZgoqZuMpDGHTlILLzXaW2xixatX83oorfRMdrRq9IYg-svNNPh63V_CMTGDvadHut9nAytwO-WEbxBXuTuGja0x7g32NUBz2cQikWETc__H832w1krfM32-erjQOntA";
+                },
+                getWellKnown() {
+                    alert("Do something!");
                 }
             },
         }).mount('#app');
