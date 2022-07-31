@@ -167,9 +167,11 @@
                             <input type="text" class="form-control" id="introspectionToken" aria-describedby="tokenHelp" placeholder="Enter Token" v-model="introspectionScreen.token">
                             <small id="tokenHelp" class="form-text text-muted">Please enter your token.</small>
                         </div>
-                        <button type="button" class="btn" v-on:click="copyIntrospectionJWT" :disabled="introspectDisabled">Take Access Token</button>
-                        <button type="button" class="btn" v-on:click="copyIntrospectionRefresh" :disabled="introspectDisabled">Take Refresh Token</button>
-                        <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
+                        <div class="btn-toolbar">
+                            <button type="button" class="btn btn-info" v-on:click="copyIntrospectionJWT" :disabled="introspectDisabled">Take Access Token</button>&nbsp;
+                            <button type="button" class="btn btn-info" v-on:click="copyIntrospectionRefresh" :disabled="introspectDisabled">Take Refresh Token</button>&nbsp;
+                            <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -229,7 +231,7 @@
         // Make an API call with the given parameters
         function apiCall(url, method, request, callback) {
 
-            debugger;
+            //debugger;
             var data;
             if (method == "GET") {
                 data = serialize(request)
@@ -265,8 +267,6 @@
                     callback(success, data);
                 },
                 error: function(jgXHR, status) {
-
-                    //alert("Error: " + jgXHR.responseText);
 
                     // Do the failure calls
                     callback(false, { data: jgXHR.responseText, messsages: ["Error Connecting To Api"] });
@@ -392,12 +392,10 @@
                 copyIntrospectionJWT() {
                     this.introspectionScreen.token_type_hint = "jwt";
                     this.introspectionScreen.token = this.token;
-                    debugger;
                 },
-                copyIntrospectionRefesh() {
+                copyIntrospectionRefresh() {
                     this.introspectionScreen.token_type_hint = "refresh";
                     this.introspectionScreen.token = this.refreshToken;
-                    debugger;
                 },
                 getIntrospection() {
                     // Post but with query params (I know right!)

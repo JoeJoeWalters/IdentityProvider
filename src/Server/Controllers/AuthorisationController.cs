@@ -193,6 +193,7 @@ namespace Server.Controllers
         /// Validate an access token and retrieve its underlying authorisation (for resource servers).
         /// </summary>
         /// <returns></returns> 
+        [HttpGet]
         [HttpPost]
         [Route(URIs.introspection_endpoint)]
         public ActionResult TokenIntrospection([FromQuery] TokenIntrospectionRequest request)
@@ -213,9 +214,9 @@ namespace Server.Controllers
                 ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out SecurityToken jsonToken);
                 JwtSecurityToken token = jsonToken as JwtSecurityToken;
 
-                string type = token.Header["typ"].ToString();
+                string type = token.Header["typ"].ToString().ToLower();
 
-                if ((type.IsNullOrEmpty() ? "JWT" : type) == request.token_type_hint)
+                if ((type.ToLower().IsNullOrEmpty() ? "jwt" : type) == request.token_type_hint.ToLower())
                     return new OkObjectResult(
                         JsonConvert.SerializeObject(
                             new TokenIntrospectionResponse() { active = true, scope = token.Claims.Where(claim => claim.Type.ToLower() == "scope").FirstOrDefault().Value, exp = token.Payload.Exp },
