@@ -11,8 +11,8 @@
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-wellKnown-tab" data-bs-toggle="tab" data-bs-target="#nav-wellKnown" type="button" role="tab" aria-controls="nav-wellKnown" aria-selected="true">Well Known</button>
-                    <button class="nav-link" id="nav-jwks-tab" data-bs-toggle="tab" data-bs-target="#nav-jwks" type="button" role="tab" aria-controls="nav-jwks" aria-selected="false">JWKS</button>
-                    <button class="nav-link" id="nav-authenticate-tab" data-bs-toggle="tab" data-bs-target="#nav-authenticate" type="button" role="tab" aria-controls="nav-authenticate" aria-selected="false">Authenticate</button>
+                    <button class="nav-link" v-if="!jwksDisabled" id="nav-jwks-tab" data-bs-toggle="tab" data-bs-target="#nav-jwks" type="button" role="tab" aria-controls="nav-jwks" aria-selected="false">JWKS</button>
+                    <button class="nav-link" v-if="!authDisabled" id="nav-authenticate-tab" data-bs-toggle="tab" data-bs-target="#nav-authenticate" type="button" role="tab" aria-controls="nav-authenticate" aria-selected="false">Authenticate</button>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
@@ -85,14 +85,19 @@
                     </form>
 
                 </div>
-                <div class="tab-pane fade show active" id="nav-jwks" role="tabpanel" aria-labelledby="nav-jwks-tab">
+                <div v-if="!jwksDisabled" class="tab-pane fade show active" id="nav-jwks" role="tabpanel" aria-labelledby="nav-jwks-tab">
                     <form id="JWKS">
                         <button type="button" class="btn btn-primary" v-on:click="getJWKS" :disabled="jwksDisabled">Load JWKS</button>
-                        <div class="form-group">
+                        <div v-for="item in jwksData.keys" class="card" style="width: 18rem;">
+                            <div class="card-body">
+                                <h5 class="card-title">{{item.kty}}</h5>
+                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                                <a href="#" class="btn btn-primary">Go somewhere</a>
+                            </div>
                         </div>
                     </form>
                 </div>
-                <div class="tab-pane fade" id="nav-authenticate" role="tabpanel" aria-labelledby="nav-authenticate-tab">
+                <div v-if="!authDisabled" class="tab-pane fade" id="nav-authenticate" role="tabpanel" aria-labelledby="nav-authenticate-tab">
                     <form id="LoginForm">
                         <div class="form-group">
                             <label for="loginAudience">Audience</label>
@@ -121,9 +126,6 @@
                         </div>
                         <button type="button" class="btn btn-primary" v-on:click="authenticate" :disabled="authDisabled">Authenticate</button>
                     </form>
-
-                </div>
-                <div class="tab-pane fade" id="nav-contact" role="tabpanel" aria-labelledby="nav-contact-tab">
                 </div>
             </div>
         </div>
@@ -172,6 +174,8 @@
 
         // Make an API call with the given parameters
         function apiCall(url, method, request, callback) {
+            
+                        debugger;
 
             // Make the ajax call
             $.ajax({
@@ -185,9 +189,10 @@
 
                     // Was the call successful?
                     var success = (status == "success");
-                    if (!success)
+                    if (!success) 
+                    {
                         alert("Error: " + jqXHR.responseText);
-
+                    }
                     try {
                         var convertedData = JSON.parse(data);
                         data = convertedData;
@@ -200,8 +205,6 @@
                     callback(success, data);
                 },
                 error: function(jgXHR, status) {
-
-                    debugger;
 
                     alert("Error: " + jgXHR.responseText);
 
@@ -245,6 +248,20 @@
                         grant_types_supported: [],
                         response_types_supported: [],
                         response_modes_supported: []
+                    },
+                    jwksData: {
+                        keys: [
+                            {
+                                alg: "",
+                                kty: "",
+                                use: "",
+                                x5c: "",
+                                n: "",
+                                e: "",
+                                kid: "",
+                                x5t: ""
+                            }
+                        ]
                     }
                 }
             },
@@ -287,6 +304,15 @@
                 },
                 callbackWellKnown(success, data) {
                     this.wellKnownData = data; // Copy over existing object (same properties anyway)
+                },
+                getJWKS() {
+                    apiCall(this.wellKnownData.jwks_uri, "GET", {}, this.callbackJWKS);
+                },
+                callbackJWKS(success, data) {
+                    alert(success);
+                    alert(data);
+                    debugger;
+                    this.jwksData = data; // Copy over existing object (same properties anyway)
                 }
             },
         }).mount('#app');

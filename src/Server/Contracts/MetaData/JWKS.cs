@@ -11,7 +11,7 @@
         /// <summary>
         /// List of available keys for use with the identity provider
         /// </summary>
-        public List<JWKSKey> Keys { get; set; }
+        public List<JWKSKey> keys { get; set; }
     }
 
     /// <summary>

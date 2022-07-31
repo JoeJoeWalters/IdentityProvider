@@ -61,7 +61,7 @@ namespace Server.Controllers
                 userinfo_endpoint = new Uri($"{baseUri}{URIs.userinfo_endpoint}")
             };
 
-            return new OkObjectResult(JsonConvert.SerializeObject(metaData, Formatting.Indented));
+            return new OkObjectResult(JsonConvert.SerializeObject(metaData, Formatting.None));
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace Server.Controllers
 
             JWKS returnSet = new JWKS()
             {
-                Keys = new List<JWKSKey>()
+                keys = new List<JWKSKey>()
                  {
                     new JWKSKey()
                     {
@@ -113,7 +113,7 @@ namespace Server.Controllers
                  }
             };
 
-            return new OkObjectResult(JsonConvert.SerializeObject(returnSet, Formatting.Indented));
+            return new OkObjectResult(JsonConvert.SerializeObject(returnSet, Formatting.None));
         }
     }
 }
