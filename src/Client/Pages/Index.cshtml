@@ -88,11 +88,13 @@
                 <div v-if="!jwksDisabled" class="tab-pane fade show active" id="nav-jwks" role="tabpanel" aria-labelledby="nav-jwks-tab">
                     <form id="JWKS">
                         <button type="button" class="btn btn-primary" v-on:click="getJWKS" :disabled="jwksDisabled">Load JWKS</button>
-                        <div v-for="item in jwksData.keys" class="card" style="width: 18rem;">
+                        <div v-for="item in jwksData.keys" class="card">
                             <div class="card-body">
                                 <h5 class="card-title">{{item.kty}}</h5>
-                                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                <a href="#" class="btn btn-primary">Go somewhere</a>
+                                <div class="form-group">
+                                    <label for="x5c">x5c</label>
+                                    <textarea class="form-control" rows="5">{{item.x5c}}</textarea>
+                                </div>
                             </div>
                         </div>
                     </form>
@@ -174,8 +176,8 @@
 
         // Make an API call with the given parameters
         function apiCall(url, method, request, callback) {
-            
-                        debugger;
+
+            debugger;
 
             // Make the ajax call
             $.ajax({
@@ -189,8 +191,7 @@
 
                     // Was the call successful?
                     var success = (status == "success");
-                    if (!success) 
-                    {
+                    if (!success) {
                         alert("Error: " + jqXHR.responseText);
                     }
                     try {
