@@ -11,14 +11,14 @@
             <form id="LoginForm">
                 <div class="form-group">
                     <label for="loginAudience">Audience</label>
-                    <select class="form-control" id="loginAudience">
+                    <select class="form-control" id="loginAudience" v-model="loginScreen.audience">
                         <option>System A</option>
                         <option>System B</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="loginType">Type</label>
-                    <select class="form-control" id="loginType">
+                    <select class="form-control" id="loginType" v-model="loginScreen.type">
                         <option value="authorization_code">Authorization Code</option>
                         <option value="client_credentials">Client Credentials</option>
                         <option value="password">Password</option>
@@ -27,12 +27,12 @@
                 </div>
                 <div class="form-group">
                     <label for="loginUsername">Username</label>
-                    <input type="text" class="form-control" id="loginUsername" aria-describedby="usernameHelp" placeholder="Enter Username">
+                    <input type="text" class="form-control" id="loginUsername" aria-describedby="usernameHelp" placeholder="Enter Username" v-model="loginScreen.username">
                     <small id="usernameHelp" class="form-text text-muted">Please enter your username.</small>
                 </div>
                 <div class="form-group">
                     <label for="loginPassword">Password</label>
-                    <input type="password" class="form-control" id="loginPassword" placeholder="Password">
+                    <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="loginScreen.password">
                 </div>
                 <button type="button" class="btn btn-primary" v-on:click="authenticate">Authenticate</button>
             </form>
@@ -90,7 +90,13 @@
                 return {
                     token: "",
                     refreshToken: "",
-                    tokenExpires: ""
+                    tokenExpires: "",
+                    loginScreen: {
+                        audience: "System B",
+                        type: "password",
+                        username: "",
+                        password: ""
+                    }
                 }
             },
             computed: {
