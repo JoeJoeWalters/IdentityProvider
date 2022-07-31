@@ -11,8 +11,8 @@
             <nav>
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-wellKnown-tab" data-bs-toggle="tab" data-bs-target="#nav-wellKnown" type="button" role="tab" aria-controls="nav-wellKnown" aria-selected="true">Well Known</button>
+                    <button class="nav-link" id="nav-jwks-tab" data-bs-toggle="tab" data-bs-target="#nav-jwks" type="button" role="tab" aria-controls="nav-jwks" aria-selected="false">JWKS</button>
                     <button class="nav-link" id="nav-authenticate-tab" data-bs-toggle="tab" data-bs-target="#nav-authenticate" type="button" role="tab" aria-controls="nav-authenticate" aria-selected="false">Authenticate</button>
-                    <button class="nav-link" id="nav-contact-tab" data-bs-toggle="tab" data-bs-target="#nav-contact" type="button" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</button>
                 </div>
             </nav>
             <div class="tab-content" id="nav-tabContent">
@@ -85,6 +85,13 @@
                     </form>
 
                 </div>
+                <div class="tab-pane fade show active" id="nav-jwks" role="tabpanel" aria-labelledby="nav-jwks-tab">
+                    <form id="JWKS">
+                        <button type="button" class="btn btn-primary" v-on:click="getJWKS" :disabled="jwksDisabled">Load JWKS</button>
+                        <div class="form-group">
+                        </div>
+                    </form>
+                </div>
                 <div class="tab-pane fade" id="nav-authenticate" role="tabpanel" aria-labelledby="nav-authenticate-tab">
                     <form id="LoginForm">
                         <div class="form-group">
@@ -112,7 +119,7 @@
                             <label for="loginPassword">Password</label>
                             <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="loginScreen.password">
                         </div>
-                        <button type="button" class="btn btn-primary" v-on:click="authenticate">Authenticate</button>
+                        <button type="button" class="btn btn-primary" v-on:click="authenticate" :disabled="authDisabled">Authenticate</button>
                     </form>
 
                 </div>
@@ -242,6 +249,12 @@
                 }
             },
             computed: {
+                jwksDisabled: function() {
+                    return (this.wellKnownData.jwks_uri == undefined || this.wellKnownData.jwks_uri == "");
+                },
+                authDisabled: function() {
+                    return (this.wellKnownData.authorization_endpoint == undefined || this.wellKnownData.authorization_endpoint == "");
+                },
                 decodedToken: function() {
                     if (this.token != undefined && this.token != "") {
                         var result = parseJwt(this.token);
