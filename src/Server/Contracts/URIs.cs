@@ -26,9 +26,4 @@
 
         public const string end_session_endpoint = "logout";
     }
-
-    public class CORS
-    {
-        public const string Origins = "_myAllowSpecificOrigins";
-    }
 }
