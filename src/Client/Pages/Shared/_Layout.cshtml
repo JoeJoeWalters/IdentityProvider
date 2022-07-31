@@ -41,15 +41,16 @@
                         <div class="card-body">
                             <h5 class="card-title">JWT Token</h5>
                             <pre><code>{{ token }}</code></pre>
+                            <p>Expires: <b>{{ tokenExpires }}</b></p>
                         </div>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item">Cras justo odio</li>
-                            <li class="list-group-item">Dapibus ac facilisis in</li>
-                            <li class="list-group-item">Vestibulum at eros</li>
-                        </ul>
+                        <div class="card-body">
+                            <h5 class="card-title">Decoded</h5>
+                            <pre><code>{{ decodedToken }}</code></pre>
+                        </div>                        
                         <div class="card-body">
                             <h5 class="card-title">Refresh Token</h5>
                             <pre><code>{{ refreshToken }}</code></pre>
+                            <p>Expires: <b>{{ refreshTokenExpires }}</b></p>
                         </div>
                     </div>
                 </div>

@@ -110,7 +110,7 @@ namespace Server.Controllers
                             TokenType = "bearer"
                         });
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
                     return new BadRequestObjectResult(
                         new OAuthTokenFailure()
@@ -131,7 +131,7 @@ namespace Server.Controllers
                     // Generate a new JWT Header to wrap the token
                     JwtHeader header = new JwtHeader(_signingCredentials);
                     header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
-                    
+
                     // Combine the claims list to a standard claim array for the JWT payload
                     List<Claim> claims = new List<Claim>()
                     {
@@ -217,27 +217,32 @@ namespace Server.Controllers
                 if ((type.IsNullOrEmpty() ? "JWT" : type) == request.token_type_hint)
                     return new OkObjectResult(
                         JsonConvert.SerializeObject(
-                            new TokenIntrospectionResponse() { active = true, scope = token.Claims.Where(claim => claim.Type.ToLower() == "scope").FirstOrDefault().Value, exp = token.Payload.Exp }, 
-                            Formatting.Indented, 
+                            new TokenIntrospectionResponse() { active = true, scope = token.Claims.Where(claim => claim.Type.ToLower() == "scope").FirstOrDefault().Value, exp = token.Payload.Exp },
+                            Formatting.Indented,
                             new JsonSerializerSettings
                             {
                                 NullValueHandling = NullValueHandling.Ignore
                             }));
             }
-            catch(SecurityTokenInvalidAudienceException audEx)
-            {
-            }
-            catch(SecurityTokenInvalidAlgorithmException algEx)
+            catch (SecurityTokenInvalidAudienceException audEx)
             {
 
             }
-            catch(SecurityTokenInvalidIssuerException issEx)
+            catch (SecurityTokenInvalidAlgorithmException algEx)
             {
 
             }
-            catch(SecurityTokenInvalidSignatureException sigEx)
+            catch (SecurityTokenInvalidIssuerException issEx)
             {
-                
+
+            }
+            catch (SecurityTokenInvalidSignatureException sigEx)
+            {
+
+            }
+            catch (SecurityTokenInvalidLifetimeException expEx)
+            {
+
             }
             catch (Exception ex)
             {
@@ -245,8 +250,8 @@ namespace Server.Controllers
 
             return new UnauthorizedObjectResult(
                 JsonConvert.SerializeObject(
-                    new TokenIntrospectionResponse() { active = false }, 
-                    Formatting.Indented, 
+                    new TokenIntrospectionResponse() { active = false },
+                    Formatting.Indented,
                     new JsonSerializerSettings
                     {
                         NullValueHandling = NullValueHandling.Ignore
