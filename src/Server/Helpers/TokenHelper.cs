@@ -13,6 +13,8 @@ namespace Server.Helpers
     /// </summary>
     public static class TokenHelper
     {
+        private static List<string> dontCloneClaims = new List<string>() { "aud", "iat" };
+
         /// <summary>
         /// Generate the refresh token from the security token
         /// </summary>
@@ -31,11 +33,15 @@ namespace Server.Helpers
                 clonedHeader["typ"] = "Refresh"; // Change the token type from JWT to Refresh to avoid token re-use
                 clonedHeader.Add("kid", serverSettings.PublicKey.ComputeSha1Hash());
 
+                long unixTime = (new DateTimeOffset(issuedTime)).ToUnixTimeSeconds();
+                List<Claim> mergedClaims = new List<Claim>(token.Claims.Where(claim => !dontCloneClaims.Contains(claim.Type)));
+                mergedClaims.Add(new Claim("ait", unixTime.ToString())); // Creation Time claim
+
                 JwtPayload clonedPayload = new JwtPayload(
                         token.Issuer,
                         token.Audiences.First(),
-                        new List<Claim>(token.Claims.Where(claim => claim.Type != "aud")),
-                        issuedTime,
+                        mergedClaims,
+                        issuedTime.AddSeconds(-1), // 1 second off to avoid bots
                         issuedTime.AddSeconds(expiry));
                 return new JwtSecurityToken(clonedHeader, clonedPayload);
             }
@@ -60,11 +66,15 @@ namespace Server.Helpers
                 JwtHeader clonedHeader = new JwtHeader(signingCredentials);
                 clonedHeader.Add("kid", serverSettings.PublicKey.ComputeSha1Hash());
 
+                long unixTime = (new DateTimeOffset(issuedTime)).ToUnixTimeSeconds();
+                List<Claim> mergedClaims = new List<Claim>(token.Claims.Where(claim => !dontCloneClaims.Contains(claim.Type)));
+                mergedClaims.Add(new Claim("ait", unixTime.ToString())); // Creation Time claim
+
                 JwtPayload clonedPayload = new JwtPayload(
                         token.Issuer,
                         token.Audiences.First(),
-                        new List<Claim>(token.Claims.Where(claim => claim.Type != "aud")),
-                        issuedTime,
+                        mergedClaims,
+                        issuedTime.AddSeconds(-1), // 1 second off to avoid bots
                         issuedTime.AddSeconds(expiry));
                 return new JwtSecurityToken(clonedHeader, clonedPayload);
             }

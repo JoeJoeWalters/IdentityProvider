@@ -81,6 +81,7 @@ namespace Server.Controllers
         public ActionResult Authorisation([FromQuery] OAuthTokenRequest request)
         {
             DateTime now = DateTime.UtcNow; // Fixed point in time
+            long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
 
             var handler = new JwtSecurityTokenHandler();
 
@@ -127,7 +128,6 @@ namespace Server.Controllers
                 SecurityUser securityUser = _userAuthenticator.AuthenticateOAuth(request);
                 if (securityUser != null)
                 {
-
                     // Generate a new JWT Header to wrap the token
                     JwtHeader header = new JwtHeader(_signingCredentials);
                     header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
@@ -139,13 +139,14 @@ namespace Server.Controllers
                     };
                     claims.AddRange(securityUser.Claims);
                     claims.Add(new Claim("sub", securityUser.Id)); // Add the user id as the subject (sub claim) 
+                    claims.Add(new Claim("ait", unixTime.ToString())); // Creation Time claim
 
                     // Create the content of the JWT Token with the appropriate expiry date
                     JwtPayload secPayload = new JwtPayload(
                         _serverSettings.Issuer,
                         request.Audience.IsNullOrEmpty() ? _serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name : request.Audience,
                         claims,
-                        now,
+                        now.AddSeconds(-1), // For the bots
                         now.AddSeconds(_accessTokenExpiry));
 
                     // Generate the final tokem from the header and it's payload
