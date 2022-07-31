@@ -8,6 +8,7 @@ using System.Text;
 using Server.Helpers;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Cors;
+using Server.Contracts.Tokens;
 
 namespace Server.Controllers
 {
@@ -47,14 +48,14 @@ namespace Server.Controllers
             {
                 authorization_endpoint = new Uri($"{baseUri}{URIs.authorization_endpoint}"),
                 end_session_endpoint = new Uri($"{baseUri}{URIs.end_session_endpoint}"),
-                grant_types_supported = new List<string>() { },
+                grant_types_supported = new List<string>() { GrantTypes.AuthorisationCode, GrantTypes.RefreshToken, GrantTypes.Password, GrantTypes.ClientCredentials },
                 introspection_endpoint = new Uri($"{baseUri}{URIs.introspection_endpoint}"),
                 issuer = _serverSettings.Issuer,
                 jwks_uri = new Uri($"{baseUri}{URIs.jwks_uri}"),
                 pushed_authorization_request_endpoint = new Uri($"{baseUri}{URIs.pushed_authorization_request_endpoint}"),
                 registration_endpoint = new Uri($"{baseUri}{URIs.registration_endpoint}"),
-                response_modes_supported = new List<string>() { },
-                response_types_supported = new List<string>() { },
+                response_modes_supported = new List<string>() { "query", "fragment" },
+                response_types_supported = new List<string>() { "code", "token", "id_token" },
                 revocation_endpoint = new Uri($"{baseUri}{URIs.revocation_endpoint}"),
                 token_endpoint = new Uri($"{baseUri}{URIs.token_endpoint}"),
                 userinfo_endpoint = new Uri($"{baseUri}{URIs.userinfo_endpoint}")
@@ -88,7 +89,7 @@ namespace Server.Controllers
             // Strip the PEM down to a format where we can export it and also so we can then compute the thumbprint hash
             string strippedKey = _serverSettings.PublicKey.StripPEM();
             string sha1Hash = strippedKey.ComputeSha1Hash();
-         
+
             // Get the exponent and modulus by importing to the RSA object and then exporting the parameters
             RSA imported = RSA.Create();
             imported.ImportFromPem(_serverSettings.PublicKey);
@@ -96,10 +97,10 @@ namespace Server.Controllers
 
             JWKS returnSet = new JWKS()
             {
-                 Keys = new List<JWKSKey>() 
-                 { 
+                Keys = new List<JWKSKey>()
+                 {
                     new JWKSKey()
-                    { 
+                    {
                         alg = "RS256",
                         e = Convert.ToBase64String(properties.Exponent),
                         kid = sha1Hash,

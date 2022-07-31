@@ -23,6 +23,7 @@
                             <input type="text" class="form-control" id="wellKnownUri" aria-describedby="jwksUriHelp" placeholder="Enter Uri" v-model="wellKnownScreen.wellKnownUri">
                             <small id="jwksUriHelp" class="form-text text-muted">Please enter the Well Known Uri of the Identity Provider.</small>
                         </div>
+                        <button type="button" class="btn btn-primary" v-on:click="getWellKnown">Get Well Known Data</button>
                         <div class="form-group">
                             <label for="loginUsername">Issuer</label>
                             <input type="text" class="form-control" readonly="readonly" id="issuer" v-model="wellKnownData.issuer">
@@ -31,22 +32,56 @@
                             <label for="loginUsername">JWKS</label>
                             <input type="text" class="form-control" readonly="readonly" id="jwks" v-model="wellKnownData.jwks_uri">
                         </div>
-                        <!--
-                        issuer
-                        jwks_uri
-                        registration_endpoint
-                        pushed_authorization_request_endpoint
-                        authorization_endpoint
-                        token_endpoint
-                        introspection_endpoint
-                        revocation_endpoint
-                        userinfo_endpoint
-                        end_session_endpoint
-                        grant_types_supported
-                        response_types_supported
-                        response_modes_supported
-                        -->
-                        <button type="button" class="btn btn-primary" v-on:click="getWellKnown">Get Well Known Data</button>
+                        <div class="form-group">
+                            <label for="loginUsername">Registration</label>
+                            <input type="text" class="form-control" readonly="readonly" id="registration_endpoint" v-model="wellKnownData.registration_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Pushed Authorization Requests</label>
+                            <input type="text" class="form-control" readonly="readonly" id="pushed_authorization_request_endpoint" v-model="wellKnownData.pushed_authorization_request_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Authorization</label>
+                            <input type="text" class="form-control" readonly="readonly" id="authorization_endpoint" v-model="wellKnownData.authorization_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Token</label>
+                            <input type="text" class="form-control" readonly="readonly" id="token_endpoint" v-model="wellKnownData.token_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Token Introspection</label>
+                            <input type="text" class="form-control" readonly="readonly" id="introspection_endpoint" v-model="wellKnownData.introspection_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Token Revocation</label>
+                            <input type="text" class="form-control" readonly="readonly" id="revocation_endpoint" v-model="wellKnownData.revocation_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">User Information</label>
+                            <input type="text" class="form-control" readonly="readonly" id="userinfo_endpoint" v-model="wellKnownData.userinfo_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">End Session</label>
+                            <input type="text" class="form-control" readonly="readonly" id="end_session_endpoint" v-model="wellKnownData.end_session_endpoint">
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Supported Grant Types</label>
+                            <select class="form-control" readonly="readonly" multiple="multiple">
+                                <option v-for="item in wellKnownData.grant_types_supported" :value="item">{{item}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Supported Response Types</label>
+                            <select class="form-control" readonly="readonly" multiple="multiple">
+                                <option v-for="item in wellKnownData.response_types_supported" :value="item">{{item}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginUsername">Supported Modes</label>
+                            <select class="form-control" readonly="readonly" multiple="multiple">
+                                <option v-for="item in wellKnownData.response_modes_supported" :value="item">{{item}}</option>
+                            </select>
+                        </div>
                     </form>
 
                 </div>
