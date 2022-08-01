@@ -1,8 +1,14 @@
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors();
+
+builder.Services.AddControllers();
+
 // Add services to the container.
-builder.Services.AddRazorPages()
+builder.Services.AddMvc();
+builder.Services
+    .AddRazorPages()
     .AddRazorRuntimeCompilation();
 
 var app = builder.Build();
@@ -16,12 +22,21 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
-
-app.UseRouting();
 
 app.UseAuthorization();
 
+app.UseRouting();
+
+app.MapControllers();
+
 app.MapRazorPages();
+
+app.UseStaticFiles();
+
+// global cors policy
+app.UseCors(x => x
+    .AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader());
 
 app.Run();

@@ -1,6 +1,9 @@
 ﻿@page
+@using Server.Contracts
 @model Server.Views.Authorisation.IndexModel
 @{
     Layout = "_Layout";
-    <p>Modal elements for logging in go here</p>
+    <form id="WellKnown" method="post" action="@URIs.authorization_endpoint">
+            <input type="submit" id="callback" name="callback" class="btn btn-primary" value="Authenticate">
+    </form>
 }

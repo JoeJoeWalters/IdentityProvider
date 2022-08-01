@@ -19,26 +19,14 @@ namespace Server.Controllers
             return View(model);
         }
 
-        // GET: AuthorisationController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: AuthorisationController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: AuthorisationController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        [Route(URIs.authorization_endpoint)]
+        public ActionResult Post(IFormCollection collection)
         {
             try
             {
-                return RedirectToAction(nameof(Index));
+                string url = "https://localhost:7053/authorizeCallback";
+                return new RedirectResult(url);
             }
             catch
             {
