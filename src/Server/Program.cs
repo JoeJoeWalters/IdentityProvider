@@ -78,6 +78,8 @@ namespace Server
             builder.Services.AddSwaggerGen(
                 options =>
                 {
+                    options.ResolveConflictingActions(apiDescriptions => apiDescriptions.First());
+
                     options.SwaggerDoc("v1", new OpenApiInfo
                     {
                         Version = "v1",
@@ -100,6 +102,8 @@ namespace Server
                     options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
                 });
 
+            builder.Services.AddMvc();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -113,7 +117,11 @@ namespace Server
 
             app.UseAuthorization();
 
+            app.UseRouting();
+
             app.MapControllers();
+
+            app.MapRazorPages();
 
             // global cors policy
             app.UseCors(x => x
