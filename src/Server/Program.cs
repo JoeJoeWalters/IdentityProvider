@@ -126,6 +126,8 @@ namespace Server
 
             app.MapRazorPages();
 
+            app.UseStaticFiles();
+
             // global cors policy
             app.UseCors(x => x
                 .AllowAnyOrigin()
