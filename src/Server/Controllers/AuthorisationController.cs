@@ -14,7 +14,7 @@ namespace Server.Controllers
         [Route(URIs.authorization_endpoint)]
         public ActionResult Index()
         {
-            var model = new Server.Views.Authorisation.IndexModel();
+            var model = new Views.Authorisation.IndexModel();
 
             return View(model);
         }

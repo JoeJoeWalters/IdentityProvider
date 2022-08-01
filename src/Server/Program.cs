@@ -103,6 +103,9 @@ namespace Server
                 });
 
             builder.Services.AddMvc();
+            builder.Services
+                .AddRazorPages()
+                .AddRazorRuntimeCompilation();
 
             var app = builder.Build();
 
