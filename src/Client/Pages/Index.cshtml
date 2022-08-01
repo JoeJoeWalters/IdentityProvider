@@ -12,6 +12,7 @@
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-wellKnown-tab" data-bs-toggle="tab" data-bs-target="#nav-wellKnown" type="button" role="tab" aria-controls="nav-wellKnown" aria-selected="true">Well Known</button>
                     <button class="nav-link" v-if="!jwksDisabled" id="nav-jwks-tab" data-bs-toggle="tab" data-bs-target="#nav-jwks" type="button" role="tab" aria-controls="nav-jwks" aria-selected="false">JWKS</button>
+                    <button class="nav-link" v-if="!authenticationDisabled" id="nav-authentication-tab" data-bs-toggle="tab" data-bs-target="#nav-authentication" type="button" role="tab" aria-controls="nav-authentication" aria-selected="false">Authentication</button>
                     <button class="nav-link" v-if="!tokenDisabled" id="nav-token-tab" data-bs-toggle="tab" data-bs-target="#nav-token" type="button" role="tab" aria-controls="nav-token" aria-selected="false">Token</button>
                     <button class="nav-link" v-if="!introspectDisabled" id="nav-introspection-tab" data-bs-toggle="tab" data-bs-target="#nav-introspection" type="button" role="tab" aria-controls="nav-introspection" aria-selected="false">Introspection</button>
                 </div>
@@ -123,6 +124,33 @@
                         </div>
                     </form>
                 </div>
+                <div v-if="!authDisabled" class="tab-pane fade" id="nav-authentication" role="tabpanel" aria-labelledby="nav-authentication-tab">
+                    <form id="TokenForm">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#authenticationModel" data-bs-toggle="modal" data-bs-target="#authenticationModel">
+                            Launch Authentication (From Server)
+                        </button>
+
+                        <!-- Auhentication Modal -->
+                        <div class="modal fade" id="authenticationModel" tabindex="-1" role="dialog" aria-labelledby="authenticationModel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLongTitle">Authentication</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <iframe src="https://localhost:7198/authorize" style="width:100%; height: 100%; overflow: auto"></iframe>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-token" role="tabpanel" aria-labelledby="nav-token-tab">
                     <form id="TokenForm">
                         <div class="form-group">
@@ -227,6 +255,9 @@
                 }
             return str.join("&");
         }
+        $('.modal').on('shown.bs.modal',function(){
+            $(this).find('iframe').attr('src','http://www.google.com')
+        })
 
         // Make an API call with the given parameters
         function apiCall(url, method, request, callback) {
@@ -321,6 +352,9 @@
                     return (this.wellKnownData.jwks_uri == undefined || this.wellKnownData.jwks_uri == "");
                 },
                 tokenDisabled: function() {
+                    return (this.wellKnownData.token_endpoint == undefined || this.wellKnownData.token_endpoint == "");
+                },
+                authenticationDisabled: function() {
                     return (this.wellKnownData.token_endpoint == undefined || this.wellKnownData.token_endpoint == "");
                 },
                 introspectDisabled: function() {

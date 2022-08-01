@@ -9,7 +9,7 @@ namespace Server.Contracts.Tokens
     /// https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
     /// </summary>
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class OAuthTokenFailure
+    public class TokenFailure
     {
         /// <summary>
         /// List of standard error reason types

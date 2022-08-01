@@ -21,10 +21,10 @@ namespace Server.Authentication
 
         public TokenValidationParameters JWTValidationParams { get; internal set; }
 
-        public SecurityUser AuthenticateOAuth(OAuthTokenRequest tokenRequest)
+        public SecurityUser AuthenticateOAuth(TokenRequest tokenRequest)
             => Task.Run(() => AuthenticateOAuthAsync(tokenRequest)).Result;
 
-        public async Task<SecurityUser> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest)
+        public async Task<SecurityUser> AuthenticateOAuthAsync(TokenRequest tokenRequest)
         {
             SecurityUser result = null;
 

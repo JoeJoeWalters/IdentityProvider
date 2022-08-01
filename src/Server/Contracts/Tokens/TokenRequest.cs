@@ -11,7 +11,7 @@ namespace Server.Contracts.Tokens
     /// https://www.oauth.com/oauth2-servers/access-tokens/password-grant/
     /// </summary>
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class OAuthTokenRequest
+    public class TokenRequest
     {
         // https://stackoverflow.com/questions/45876960/how-to-specify-audience-for-an-oauth2-access-token
         /// <summary>

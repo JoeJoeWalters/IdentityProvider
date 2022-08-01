@@ -8,7 +8,7 @@ namespace Server.Contracts.Tokens
     /// https://www.oauth.com/oauth2-servers/access-tokens/access-token-response/
     /// </summary>
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class OAuthTokenSuccess
+    public class TokenSuccess
     {
         [JsonProperty(Required = Required.Always, PropertyName = "access_token")]
         public String AccessToken { get; set; }

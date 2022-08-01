@@ -26,8 +26,8 @@ namespace Server.Authentication
         /// </summary>
         /// <param name="tokenRequest">OAuth Request Payload</param>
         /// <returns>The user that was found and validated, a null will be returned if no user was validated</returns>
-        SecurityUser AuthenticateOAuth(OAuthTokenRequest tokenRequest);
-        Task<SecurityUser> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest);
+        SecurityUser AuthenticateOAuth(TokenRequest tokenRequest);
+        Task<SecurityUser> AuthenticateOAuthAsync(TokenRequest tokenRequest);
         
         /// <summary>
         /// Refresh the list of cached users that are validated against

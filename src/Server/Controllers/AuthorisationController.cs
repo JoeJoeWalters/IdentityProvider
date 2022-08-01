@@ -78,7 +78,7 @@ namespace Server.Controllers
         /// <returns></returns> 
         [HttpGet]
         [Route(URIs.token_endpoint)]
-        public ActionResult Token([FromQuery] OAuthTokenRequest request)
+        public ActionResult Token([FromQuery] TokenRequest request)
         {
             DateTime now = DateTime.UtcNow; // Fixed point in time
             long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
@@ -102,7 +102,7 @@ namespace Server.Controllers
                 {
 
                     return new OkObjectResult(
-                        new OAuthTokenSuccess()
+                        new TokenSuccess()
                         {
                             AccessToken = handler.WriteToken(token),
                             ExpiresIn = _accessTokenExpiry,
@@ -114,9 +114,9 @@ namespace Server.Controllers
                 catch (Exception ex)
                 {
                     return new BadRequestObjectResult(
-                        new OAuthTokenFailure()
+                        new TokenFailure()
                         {
-                            Reason = OAuthTokenFailure.ReasonType.invalid_request,
+                            Reason = TokenFailure.ReasonType.invalid_request,
                             ReasonDescription = "Could not process given refresh token",
                             ReasonUri = ""
                         });
@@ -154,7 +154,7 @@ namespace Server.Controllers
                     JwtSecurityToken refreshToken = token.GenerateRefreshToken(_refreshTokenExpiry, now, _signingCredentials, _serverSettings);
 
                     return new OkObjectResult(
-                        new OAuthTokenSuccess()
+                        new TokenSuccess()
                         {
                             AccessToken = handler.WriteToken(token),
                             ExpiresIn = _accessTokenExpiry,
@@ -166,9 +166,9 @@ namespace Server.Controllers
                 else
                 {
                     return new BadRequestObjectResult(
-                        new OAuthTokenFailure()
+                        new TokenFailure()
                         {
-                            Reason = OAuthTokenFailure.ReasonType.unauthorized_client,
+                            Reason = TokenFailure.ReasonType.unauthorized_client,
                             ReasonDescription = "Reason for the failure here",
                             ReasonUri = ""
                         });
@@ -183,9 +183,16 @@ namespace Server.Controllers
         /// <returns></returns> 
         [HttpGet]
         [Route(URIs.authorization_endpoint)]
-        public ActionResult Authorisation()
+        public ActionResult Authorisation([FromQuery]AuthoriseRequest request)
         {
-            return new OkResult();
+            return new OkObjectResult(
+                JsonConvert.SerializeObject(
+                    new AuthoriseResponse() { },
+                    Formatting.Indented,
+                    new JsonSerializerSettings
+                    {
+                        NullValueHandling = NullValueHandling.Ignore
+                    }));
         }
 
         // https://datatracker.ietf.org/doc/html/rfc7662#section-2.1
