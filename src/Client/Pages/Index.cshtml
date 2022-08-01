@@ -12,7 +12,7 @@
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-wellKnown-tab" data-bs-toggle="tab" data-bs-target="#nav-wellKnown" type="button" role="tab" aria-controls="nav-wellKnown" aria-selected="true">Well Known</button>
                     <button class="nav-link" v-if="!jwksDisabled" id="nav-jwks-tab" data-bs-toggle="tab" data-bs-target="#nav-jwks" type="button" role="tab" aria-controls="nav-jwks" aria-selected="false">JWKS</button>
-                    <button class="nav-link" v-if="!authDisabled" id="nav-authenticate-tab" data-bs-toggle="tab" data-bs-target="#nav-authenticate" type="button" role="tab" aria-controls="nav-authenticate" aria-selected="false">Authenticate</button>
+                    <button class="nav-link" v-if="!tokenDisabled" id="nav-token-tab" data-bs-toggle="tab" data-bs-target="#nav-token" type="button" role="tab" aria-controls="nav-token" aria-selected="false">Token</button>
                     <button class="nav-link" v-if="!introspectDisabled" id="nav-introspection-tab" data-bs-toggle="tab" data-bs-target="#nav-introspection" type="button" role="tab" aria-controls="nav-introspection" aria-selected="false">Introspection</button>
                 </div>
             </nav>
@@ -123,18 +123,18 @@
                         </div>
                     </form>
                 </div>
-                <div v-if="!authDisabled" class="tab-pane fade" id="nav-authenticate" role="tabpanel" aria-labelledby="nav-authenticate-tab">
-                    <form id="LoginForm">
+                <div v-if="!authDisabled" class="tab-pane fade" id="nav-token" role="tabpanel" aria-labelledby="nav-token-tab">
+                    <form id="TokenForm">
                         <div class="form-group">
                             <label for="loginAudience">Audience</label>
-                            <select class="form-control" id="loginAudience" v-model="loginScreen.audience">
+                            <select class="form-control" id="loginAudience" v-model="tokenScreen.audience">
                                 <option>System A</option>
                                 <option>System B</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="loginType">Type</label>
-                            <select class="form-control" id="loginType" v-model="loginScreen.type">
+                            <select class="form-control" id="loginType" v-model="tokenScreen.type">
                                 <option value="authorization_code">Authorization Code</option>
                                 <option value="client_credentials">Client Credentials</option>
                                 <option value="password">Password</option>
@@ -143,14 +143,14 @@
                         </div>
                         <div class="form-group">
                             <label for="loginUsername">Username</label>
-                            <input type="text" class="form-control" id="loginUsername" aria-describedby="usernameHelp" placeholder="Enter Username" v-model="loginScreen.username">
+                            <input type="text" class="form-control" id="loginUsername" aria-describedby="usernameHelp" placeholder="Enter Username" v-model="tokenScreen.username">
                             <small id="usernameHelp" class="form-text text-muted">Please enter your username.</small>
                         </div>
                         <div class="form-group">
                             <label for="loginPassword">Password</label>
-                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="loginScreen.password">
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="tokenScreen.password">
                         </div>
-                        <button type="button" class="btn btn-primary" v-on:click="getAuthorized" :disabled="authDisabled">Authenticate</button>
+                        <button type="button" class="btn btn-primary" v-on:click="getToken" :disabled="tokenDisabled">Retrieve Token</button>
                     </form>
                 </div>
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-introspection" role="tabpanel" aria-labelledby="nav-introspection-tab">
@@ -285,7 +285,7 @@
                     token: "",
                     refreshToken: "",
                     tokenExpires: "",
-                    loginScreen: {
+                    tokenScreen: {
                         audience: "System B",
                         type: "password",
                         username: "",
@@ -320,8 +320,8 @@
                 jwksDisabled: function() {
                     return (this.wellKnownData.jwks_uri == undefined || this.wellKnownData.jwks_uri == "");
                 },
-                authDisabled: function() {
-                    return (this.wellKnownData.authorization_endpoint == undefined || this.wellKnownData.authorization_endpoint == "");
+                tokenDisabled: function() {
+                    return (this.wellKnownData.token_endpoint == undefined || this.wellKnownData.token_endpoint == "");
                 },
                 introspectDisabled: function() {
                     return (this.token == "" && this.refreshToken == "");
@@ -365,14 +365,14 @@
                 callbackJWKS(success, response) {
                     this.jwksData = response; // Copy over existing object (same properties anyway)
                 },
-                getAuthorized() {
+                getToken() {
                     var request;
-                    if (this.loginScreen.type == "password") {
-                        request = { audience: this.loginScreen.audience, type: "password", username: this.loginScreen.username, password: this.loginScreen.password };
+                    if (this.tokenScreen.type == "password") {
+                        request = { audience: this.tokenScreen.audience, type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password };
                     }
-                    apiCall(this.wellKnownData.authorization_endpoint, "GET", request, this.callbackAuthorized);
+                    apiCall(this.wellKnownData.token_endpoint, "GET", request, this.callbackToken);
                 },
-                callbackAuthorized(success, response) {
+                callbackToken(success, response) {
                     if (success) {
                         this.token = response.accessToken;
                         this.refreshToken = response.refreshToken;

@@ -71,14 +71,14 @@ namespace Server.Controllers
             return new OkResult();
         }
 
-        // https://connect2id.com/products/server/docs/api/authorization
+        // https://connect2id.com/products/server/docs/api/token
         /// <summary>
-        /// The client sends the end-user's browser here to request the user's authentication and consent. This endpoint is used in the code and implicit OAuth 2.0 flows which require end-user interaction.
+        /// Post an OAuth 2.0 grant (code, refresh token, resource owner password credentials, client credentials) to obtain an ID and / or access token.
         /// </summary>
         /// <returns></returns> 
         [HttpGet]
-        [Route(URIs.authorization_endpoint)]
-        public ActionResult Authorisation([FromQuery] OAuthTokenRequest request)
+        [Route(URIs.token_endpoint)]
+        public ActionResult Token([FromQuery] OAuthTokenRequest request)
         {
             DateTime now = DateTime.UtcNow; // Fixed point in time
             long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
@@ -176,14 +176,14 @@ namespace Server.Controllers
             }
         }
 
-        // https://connect2id.com/products/server/docs/api/token
+        // https://connect2id.com/products/server/docs/api/authorization
         /// <summary>
-        /// Post an OAuth 2.0 grant (code, refresh token, resource owner password credentials, client credentials) to obtain an ID and / or access token.
+        /// The client sends the end-user's browser here to request the user's authentication and consent. This endpoint is used in the code and implicit OAuth 2.0 flows which require end-user interaction.
         /// </summary>
         /// <returns></returns> 
-        [HttpPost]
-        [Route(URIs.token_endpoint)]
-        public ActionResult Token()
+        [HttpGet]
+        [Route(URIs.authorization_endpoint)]
+        public ActionResult Authorisation()
         {
             return new OkResult();
         }
