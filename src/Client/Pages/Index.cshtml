@@ -174,7 +174,7 @@
                             <div class="modal-dialog modal-dialog-scrollable" role="document">
                                 <div class="modal-content">
                                     <div class="modal-body">
-                                        <iframe id="authenticationIframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" scrolling="no" style="width:100%; height: 400px; overflow:auto"></iframe>
+                                        <iframe id="authenticationIframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-modals" scrolling="no" style="width:100%; height: 400px; overflow:auto"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -246,7 +246,13 @@
                 <pre><code>{{ client_secret }}</code></pre>
             </div>
         </div>
-        <div class="card">
+        <div class="card mt-1">
+            <div class="card-body">
+                <h5 class="card-title">Authorization Code</h5>
+                <pre><code>{{ authorization_code }}</code></pre>
+            </div>
+        </div>
+        <div class="card mt-1">
             <div class="card-body">
                 <h5 class="card-title">JWT Token</h5>
                 <pre><code>{{ token }}</code></pre>
@@ -355,6 +361,7 @@
                 return {
                     client_id: "7ac39504-53f1-47f5-96b9-3c2682962b8b",
                     client_secret: "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
+                    authorization_code: "-",
                     token: "",
                     refreshToken: "",
                     tokenExpires: "",
@@ -511,6 +518,25 @@
 
                     // Send the payload to the server inside the iframe
                     $("#authenticationIframe").attr('src', "https://localhost:7198/authorize?" + serialisedData);
+
+                    // Selfcalling check function to reach in to the frame to see if conditions have been met yet
+                    // as child can't call parent we need to monitor it
+
+                    var checkFor = this.authenticationScreen.redirect_uri;
+                    function deepCheck() {
+
+                        // https://stackoverflow.com/questions/25098021/securityerror-blocked-a-frame-with-origin-from-accessing-a-cross-origin-frame
+                        // Now on the redirect Uri?
+                        debugger;
+                        var frameLocation = $("#authenticationIframe")[0].contentWindow.location.href;
+                        var isCallback = (frameLocation.indexOf(checkFor) == 0);
+                        if (!isCallback) { setTimeout(deepCheck, 1000); }
+                        else {
+                            var childWindow = $("#authenticationIframe");
+                        }
+                    };
+
+                    deepCheck();
                 }
             },
         }).mount('#app');
