@@ -1,4 +1,14 @@
 {
+  "Clients": [
+    {
+      "Id": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
+      "Secret": "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
+      "Name": "Example Client",
+      "RedirectUris": [
+        "https://localhost:7053/authorizeCallback"
+      ]
+    }
+  ]
   "Users": [
     {
       "Audience": "System A",
@@ -7,8 +17,7 @@
       "Authentication": [ "basic", "apikey", "oauth" ],
       "Username": "admin_a",
       "Password": "password",
-      "ClientId": "clientid123",
-      "ClientSecret": "clientsecret123",
+      "ClientId": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Claims": [
         /*
         {
@@ -28,8 +37,7 @@
       "Authentication": [ "basic", "apikey", "oauth" ],
       "Username": "admin_b",
       "Password": "password",
-      "ClientId": "clientid456",
-      "ClientSecret": "clientsecret456",
+      "ClientId": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Claims": [
         /*
         {

@@ -1,14 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json;
 using Server.Authentication;
+using Server.Contracts;
 using Server.Contracts.Tokens;
+using Server.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using System.Text;
 using System.Security.Cryptography;
-using Server.Contracts;
-using Server.Helpers;
-using Newtonsoft.Json;
 
 namespace Server.Controllers
 {

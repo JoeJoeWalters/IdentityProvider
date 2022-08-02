@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Server.Contracts;
+using Server.Contracts.Tokens;
+using Server.Views.Authorisation;
 
 namespace Server.Controllers
 {
@@ -12,10 +14,9 @@ namespace Server.Controllers
         // GET: AuthorisationController
         [HttpGet]
         [Route(URIs.authorization_endpoint)]
-        public ActionResult Index()
+        public ActionResult Index(AuthoriseRequest request)
         {
-            var model = new Views.Authorisation.IndexModel();
-
+            IndexModel model = new IndexModel() { Request = request };
             return View(model);
         }
 

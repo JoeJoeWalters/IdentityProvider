@@ -125,26 +125,56 @@
                     </form>
                 </div>
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-authentication" role="tabpanel" aria-labelledby="nav-authentication-tab">
-                    <form id="TokenForm">
-                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#authenticationModel" data-bs-toggle="modal" data-bs-target="#authenticationModel">
+                    <form id="AuthenticationForm">
+                        <div class="form-group">
+                            <label for="response_type">Response Type</label>
+                            <select class="form-control" id="response_type" v-model="authenticationScreen.response_type">
+                                <option selected="selected">code</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="response_mode">Response Mode</label>
+                            <select class="form-control" id="response_type" v-model="authenticationScreen.response_mode">
+                                <option selected="selected">query</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="client_id">Client ID</label>
+                            <input type="text" readonly="readonly" class="form-control" id="client_id" v-model="client_id">
+                        </div>
+                        <div class="form-group">
+                            <label for="redirect_uri">Redirect Uri</label>
+                            <input type="text" readonly="readonly" class="form-control" id="redirect_uri" v-model="authenticationScreen.redirect_uri">
+                        </div>
+                        <div class="form-group">
+                            <label for="scope">Scope</label>
+                            <input type="text" class="form-control" id="scope" v-model="authenticationScreen.scope">
+                        </div>
+                        <div class="form-group">
+                            <label for="state">State</label>
+                            <input type="text" class="form-control" id="state" v-model="authenticationScreen.state">
+                        </div>
+                        <!-- PKCE -->
+                        <div class="form-group">
+                            <label for="code_challenge">Code Challenge</label>
+                            <input type="text" class="form-control" id="code_challenge" v-model="authenticationScreen.code_challenge">
+                        </div>
+                        <div class="form-group">
+                            <label for="code_challenge_method">Code Challenge Method</label>
+                            <input type="text" class="form-control" id="code_challenge_method" v-model="authenticationScreen.code_challenge_method">
+                        </div>
+
+                        <button type="button" class="btn btn-primary" data-toggle="modal" v-on:click="launchAuthenticate">
+                            <!-- data-target="#authenticationModel" data-bs-toggle="modal" data-bs-target="#authenticationModel"> -->
                             Launch Authentication (From Server)
                         </button>
 
                         <!-- Auhentication Modal -->
                         <div class="modal fade" id="authenticationModel" tabindex="-1" role="dialog" aria-labelledby="authenticationModel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-dialog modal-dialog-scrollable" role="document">
                                 <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="exampleModalLongTitle">Authentication</h5>
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span>
-                                        </button>
-                                    </div>
                                     <div class="modal-body">
-                                        <iframe sandbox="allow-same-origin allow-scripts allow-popups allow-forms" src="https://localhost:7198/authorize" style="width:100%; height: 100%; overflow: auto"></iframe>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <!--<button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>-->
+                                        <iframe id="authenticationIframe" sandbox="allow-same-origin allow-scripts allow-popups allow-forms" scrolling="no" style="width:100%; height: 400px; overflow:auto"></iframe>
                                     </div>
                                 </div>
                             </div>
@@ -208,6 +238,16 @@
     <div class="col col-sm-4">
         <div class="card">
             <div class="card-body">
+                <h5 class="card-title">Client Id</h5>
+                <pre><code>{{ client_id }}</code></pre>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Client Secret</h5>
+                <pre><code>{{ client_secret }}</code></pre>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
                 <h5 class="card-title">JWT Token</h5>
                 <pre><code>{{ token }}</code></pre>
                 <p>Expires: <b>{{ tokenExpires }}</b></p>
@@ -255,8 +295,8 @@
                 }
             return str.join("&");
         }
-        $('.modal').on('shown.bs.modal',function(){
-            $(this).find('iframe').attr('src','http://www.google.com')
+        $('.modal').on('shown.bs.modal', function() {
+            $(this).find('iframe').attr('src', 'http://www.google.com')
         })
 
         // Make an API call with the given parameters
@@ -313,6 +353,8 @@
         const app = createApp({
             data() {
                 return {
+                    client_id: "7ac39504-53f1-47f5-96b9-3c2682962b8b",
+                    client_secret: "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
                     token: "",
                     refreshToken: "",
                     tokenExpires: "",
@@ -324,6 +366,17 @@
                     },
                     wellKnownScreen: {
                         wellKnownUri: "https://localhost:7198/.well-known/openid-configuration"
+                    },
+                    authenticationScreen: {
+                        response_type: "code",
+                        response_mode: "query",
+                        redirect_uri: "https://localhost:7053/authorizeCallback",
+                        scope: "",
+                        state: "1234567890",
+
+                        // PKCE
+                        code_challenge: "",
+                        code_challenge_method: ""
                     },
                     introspectionScreen: {
                         token: "",
@@ -437,6 +490,27 @@
                 },
                 callbackIntrospection(success, response) {
                     debugger;
+                },
+                launchAuthenticate() {
+
+                    // Build the authorise request
+                    var data = {
+                        client_id: this.client_id,
+                        response_type: this.authenticationScreen.response_type,
+                        response_mode: this.authenticationScreen.response_mode,
+                        redirect_uri: this.authenticationScreen.redirect_uri,
+                        scope: this.authenticationScreen.scope,
+                        state: this.authenticationScreen.state,
+                        code_challenge: this.authenticationScreen.code_challenge,
+                        code_challenge_method: this.authenticationScreen.code_challenge_method
+                    };
+                    var serialisedData = serialize(data); // Cast it to a querystring
+
+                    // Pop up the authentication screen
+                    $("#authenticationModel").modal('show');
+
+                    // Send the payload to the server inside the iframe
+                    $("#authenticationIframe").attr('src', "https://localhost:7198/authorize?" + serialisedData);
                 }
             },
         }).mount('#app');

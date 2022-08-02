@@ -1,5 +1,8 @@
 ﻿namespace Server.Contracts.MetaData
 {
+    /// <summary>
+    /// Data returned by the Well Known endpoint
+    /// </summary>
     public class OpenIDMetaData
     {
         /// <summary>

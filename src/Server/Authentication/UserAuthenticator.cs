@@ -42,7 +42,6 @@ namespace Server.Authentication
                                 return
                                     user.Audience == tokenRequest.Audience &&
                                     user.ClientId == tokenRequest.ClientId &&
-                                    user.ClientSecret == tokenRequest.ClientSecret &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
                             }).FirstOrDefault();
 
@@ -58,6 +57,7 @@ namespace Server.Authentication
                                     user.Audience == tokenRequest.Audience &&
                                     user.Username == tokenRequest.Username &&
                                     user.Password == tokenRequest.Password &&
+                                    user.ClientId == tokenRequest.ClientId &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
                             }).FirstOrDefault();
 

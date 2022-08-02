@@ -3,27 +3,17 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Authorisation</title>
+    <title>@ViewData["Title"] - Client</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Client.styles.css" asp-append-version="true" />
 </head>
-<body style="border: 2px red dashed;">
-    <header>
-        <img src="~/images/clients/logos/default.png" />
-    </header>
-    <div class="container" id="app" >
+<body>
+    <div class="container" id="app">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-        <p class="alert-warning">The highlighted section is rendered by the server, not the client</p>
     </div>
-
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-        </div>
-    </footer>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

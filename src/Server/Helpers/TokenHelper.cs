@@ -2,8 +2,6 @@
 using Server.Authentication;
 using Server.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
-using System.Runtime.Serialization;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 
 namespace Server.Helpers

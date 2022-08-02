@@ -1,11 +1,9 @@
-using System.Runtime.CompilerServices;
-using System;
 using Microsoft.AspNetCore.Mvc.Versioning;
-using System.Reflection;
-using Microsoft.OpenApi.Models;
-using System.Diagnostics.CodeAnalysis;
-using Server.Authentication;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Server.Authentication;
+using System.Diagnostics.CodeAnalysis;
+using System.Reflection;
 using System.Text;
 
 namespace Server

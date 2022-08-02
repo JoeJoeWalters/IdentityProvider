@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using Server.Authentication;
 using Server.Contracts;
 using Server.Contracts.MetaData;
-using System.Security.Cryptography;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using Server.Helpers;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Cors;
 using Server.Contracts.Tokens;
+using Server.Helpers;
+using System.Security.Cryptography;
 
 namespace Server.Controllers
 {

@@ -36,9 +36,6 @@ namespace Server.Authentication
         [JsonProperty(Required = Required.Default)]
         public String ClientId { get; set; } = String.Empty;
 
-        [JsonProperty(Required = Required.Default)]
-        public String ClientSecret { get; set; } = String.Empty;
-
         [JsonProperty("Authentication", ItemConverterType = typeof(StringEnumConverter))]
         public List<AuthenticationType> Authentication { get; set; }
 
