@@ -40,8 +40,7 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
-                                    user.Audience == tokenRequest.Audience &&
-                                    user.ClientId == tokenRequest.ClientId &&
+                                    user.ClientId == tokenRequest.Client_Id &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
                             }).FirstOrDefault();
 
@@ -54,10 +53,9 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
-                                    user.Audience == tokenRequest.Audience &&
                                     user.Username == tokenRequest.Username &&
                                     user.Password == tokenRequest.Password &&
-                                    user.ClientId == tokenRequest.ClientId &&
+                                    user.ClientId == tokenRequest.Client_Id &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
                             }).FirstOrDefault();
 
@@ -70,8 +68,8 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
-                                    user.Audience == tokenRequest.Audience &&
                                     user.Key == tokenRequest.Code &&
+                                    user.ClientId == tokenRequest.Client_Id &&
                                     user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
                             }).FirstOrDefault();
 

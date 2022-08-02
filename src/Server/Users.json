@@ -8,7 +8,7 @@
         "https://localhost:7053/authorizeCallback"
       ]
     }
-  ]
+  ],
   "Users": [
     {
       "Audience": "System A",

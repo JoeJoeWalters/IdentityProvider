@@ -92,7 +92,7 @@ namespace Server.Controllers
                 // Go look up the corresponding given token and refresh it, add to the expiry and hand back again
 
                 // Generate the new token from the refresh token as that holds the same data that was previously agreed
-                JwtSecurityToken token = (new JwtSecurityToken(request.RefreshToken)).GenerateFromRefreshToken(_accessTokenExpiry, now, _signingCredentials, _serverSettings);
+                JwtSecurityToken token = (new JwtSecurityToken(request.Refresh_Token)).GenerateFromRefreshToken(_accessTokenExpiry, now, _signingCredentials, _serverSettings);
 
                 // Generate the new refresh token from the generated token
                 JwtSecurityToken refreshToken = token.GenerateRefreshToken(_refreshTokenExpiry, now, _signingCredentials, _serverSettings);

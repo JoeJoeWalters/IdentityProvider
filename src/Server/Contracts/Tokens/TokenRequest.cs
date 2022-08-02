@@ -27,10 +27,10 @@ namespace Server.Contracts.Tokens
         public String Type { get; set; } = GrantTypes.ClientCredentials;
 
         [JsonProperty(Required = Required.Default, PropertyName = "client_id")]
-        public String ClientId { get; set; } = String.Empty;
+        public String Client_Id { get; set; } = String.Empty;
 
         [JsonProperty(Required = Required.Default, PropertyName = "client_secret")]
-        public String ClientSecret { get; set; } = String.Empty;
+        public String Client_Secret { get; set; } = String.Empty;
 
         [JsonProperty(Required = Required.Default, PropertyName = "username")]
         public String Username { get; set; } = String.Empty;
@@ -42,7 +42,7 @@ namespace Server.Contracts.Tokens
         /// Required when the grant_type is refresh_token
         /// </summary>
         [JsonProperty(Required = Required.Default, PropertyName = "refresh_token")]
-        public String RefreshToken { get; set; } = String.Empty;
+        public String Refresh_Token { get; set; } = String.Empty;
 
         /// <summary>
         /// How long the new token should be valid for in Seconds up to a Max of 2592000 (30 Days), default is 60 (1 minute)

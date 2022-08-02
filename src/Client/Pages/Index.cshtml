@@ -455,7 +455,7 @@
                 getToken() {
                     var request;
                     if (this.tokenScreen.type == "password") {
-                        request = { audience: this.tokenScreen.audience, type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password };
+                        request = { audience: this.tokenScreen.audience, type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password, client_id: this.client_id };
                     }
                     apiCall(this.wellKnownData.token_endpoint, "GET", request, this.callbackToken);
                 },
