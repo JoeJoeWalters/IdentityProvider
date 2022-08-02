@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Server.Contracts;
 using Server.Contracts.Tokens;
+using Server.Helpers;
 using Server.Views.Authorisation;
 
 namespace Server.Controllers
@@ -22,11 +23,14 @@ namespace Server.Controllers
 
         [HttpPost]
         [Route(URIs.authorization_endpoint)]
-        public ActionResult Post(IFormCollection collection)
+        public ActionResult Post()
         {
             try
             {
-                string url = "https://localhost:7053/authorizeCallback";
+                AuthoriseResponse response = new AuthoriseResponse() { code = Guid.NewGuid().ToString(), state = "" };
+                String queryString = response.ToQueryString<AuthoriseResponse>();
+
+                string url = $"https://localhost:7053/authorizeCallback?{queryString}";
                 return new RedirectResult(url);
             }
             catch
