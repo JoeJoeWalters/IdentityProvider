@@ -246,13 +246,13 @@
                 <pre><code>{{ client_secret }}</code></pre>
             </div>
         </div>
-        <div class="card mt-1">
+        <div class="card mt-1" v-if="authCodeVisible">
             <div class="card-body">
                 <h5 class="card-title">Authorization Code</h5>
                 <pre><code>{{ authorization_code }}</code></pre>
             </div>
         </div>
-        <div class="card mt-1">
+        <div class="card mt-1" v-if="tokenVisible">
             <div class="card-body">
                 <h5 class="card-title">JWT Token</h5>
                 <pre><code>{{ token }}</code></pre>
@@ -361,7 +361,7 @@
                 return {
                     client_id: "7ac39504-53f1-47f5-96b9-3c2682962b8b",
                     client_secret: "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
-                    authorization_code: "-",
+                    authorization_code: "",
                     token: "",
                     refreshToken: "",
                     tokenExpires: "",
@@ -408,6 +408,12 @@
                 }
             },
             computed: {
+                tokenVisible: function() {
+                    return (this.token != undefined && this.token != "");
+                },
+                authCodeVisible: function() {
+                    return (this.authorization_code != undefined && this.authorization_code != "");
+                },
                 jwksDisabled: function() {
                     return (this.wellKnownData.jwks_uri == undefined || this.wellKnownData.jwks_uri == "");
                 },
