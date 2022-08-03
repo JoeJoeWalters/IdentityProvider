@@ -539,24 +539,6 @@
                     // Send the payload to the server inside the iframe
                     $("#authenticationIframe").attr('src', "https://localhost:7198/authorize?" + serialisedData);
 
-                    // Selfcalling check function to reach in to the frame to see if conditions have been met yet
-                    // as child can't call parent we need to monitor it
-                    /*
-                    var checkFor = this.authenticationScreen.redirect_uri;
-                    function deepCheck() {
-
-                        // https://stackoverflow.com/questions/25098021/securityerror-blocked-a-frame-with-origin-from-accessing-a-cross-origin-frame
-                        // Now on the redirect Uri?
-                        debugger;
-                        var frameLocation = $("#authenticationIframe")[0].contentWindow.location.href;
-                        var isCallback = (frameLocation.indexOf(checkFor) == 0);
-                        if (!isCallback) { setTimeout(deepCheck, 1000); }
-                        else {
-                            var childWindow = $("#authenticationIframe");
-                        }
-                    };
-
-                    deepCheck();*/
                 }
             },
         }).mount('#app');
