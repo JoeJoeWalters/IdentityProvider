@@ -550,9 +550,11 @@
                   return;
                 */
 
-                try {
+                try 
+                {
                     var decoded = JSON.parse(event.data);
-                    app.$data.authorization_code = decoded.code;                                    }
+                    app.$data.authorization_code = decoded.code;                                    
+                }
                 catch
                 {
                     alert('Failed to assign reponse back to client');
