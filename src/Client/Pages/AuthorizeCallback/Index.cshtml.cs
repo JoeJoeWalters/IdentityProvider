@@ -14,6 +14,8 @@ namespace Client.Pages.AuthorizeCallback
         /// </summary>
         public AuthoriseResponse ServerResponse { get; set; }
 
+        public String ServerResponseEncoded { get; set; }
+
         public void OnGet()
         {
         }

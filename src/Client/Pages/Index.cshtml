@@ -521,7 +521,7 @@
 
                     // Selfcalling check function to reach in to the frame to see if conditions have been met yet
                     // as child can't call parent we need to monitor it
-
+                    /*
                     var checkFor = this.authenticationScreen.redirect_uri;
                     function deepCheck() {
 
@@ -536,10 +536,33 @@
                         }
                     };
 
-                    deepCheck();
+                    deepCheck();*/
                 }
             },
         }).mount('#app');
+        window.app = app; // Expose app to javascript inside functions
+
+        $(function() {
+            // https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+            // Listen for incoming messages from frames (mainly the authorize frame which is loaded and redirected by the server)
+            window.addEventListener("message", (event) => {
+                /*if (event.origin !== "http://example.org:8080")
+                  return;
+                */
+
+                try {
+                    var decoded = JSON.parse(event.data);
+                    app.$data.authorization_code = decoded.code;                                    }
+                catch
+                {
+                    alert('Failed to assign reponse back to client');
+                }
+                
+                // Hide the authentication screen
+                $("#authenticationModel").modal('hide');
+
+            }, false);
+        });
     </script>
 
 

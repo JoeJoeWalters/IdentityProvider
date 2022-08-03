@@ -1,13 +1,21 @@
 ﻿@page
+@using Newtonsoft.Json
 @model Client.Pages.AuthorizeCallback.IndexModel
 @{
     Layout = "_BlankLayout";
-    // https://stackoverflow.com/questions/2161388/calling-a-parent-window-function-from-an-iframe
+
     <b>Callback success!</b>
+ 
+    @Html.HiddenFor(x => x.ServerResponseEncoded, new { @id = "response" })
+}
+  
+@section Scripts {
 
     <script language="javascript">
-
+        $(function() {
+            // Send the data to the parent frame as it can't be accessed directtly
+            var destination = window.parent.window;
+            destination.postMessage($("#response").val(), "*");
+        });
     </script>
-
-    @Html.HiddenFor(x => x.ServerResponse.code, new { @id = "code" })
 }
