@@ -184,13 +184,6 @@
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-token" role="tabpanel" aria-labelledby="nav-token-tab">
                     <form id="TokenForm">
                         <div class="form-group">
-                            <label for="loginAudience">Audience</label>
-                            <select class="form-control" id="loginAudience" v-model="tokenScreen.audience">
-                                <option>System A</option>
-                                <option>System B</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
                             <label for="loginType">Type</label>
                             <select class="form-control" id="loginType" v-model="tokenScreen.type">
                                 <option value="authorization_code">Authorization Code</option>
@@ -366,7 +359,6 @@
                     refreshToken: "",
                     tokenExpires: "",
                     tokenScreen: {
-                        audience: "System B",
                         type: "password",
                         username: "",
                         password: ""
@@ -468,7 +460,7 @@
                 getToken() {
                     var request;
                     if (this.tokenScreen.type == "password") {
-                        request = { audience: this.tokenScreen.audience, type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password, client_id: this.client_id };
+                        request = { type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password, client_id: this.client_id };
                     }
                     apiCall(this.wellKnownData.token_endpoint, "GET", request, this.callbackToken);
                 },
