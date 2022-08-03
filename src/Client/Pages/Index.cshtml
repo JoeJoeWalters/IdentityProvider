@@ -192,14 +192,30 @@
                                 <option value="refresh_token">Refresh Token</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" v-if="tokenScreen.type == 'password'">
                             <label for="loginUsername">Username</label>
                             <input type="text" class="form-control" id="loginUsername" aria-describedby="usernameHelp" placeholder="Enter Username" v-model="tokenScreen.username">
                             <small id="usernameHelp" class="form-text text-muted">Please enter your username.</small>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" v-if="tokenScreen.type == 'password'">
                             <label for="loginPassword">Password</label>
                             <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="tokenScreen.password">
+                        </div>
+                        <div class="form-group" v-if="tokenScreen.type == 'authorization_code'">
+                            <label for="loginPassword">Code</label>
+                            <input type="text" class="form-control" id="loginAuthCode" readonly="readonly" v-model="authorization_code">
+                        </div>
+                        <div class="form-group" v-if="tokenScreen.type == 'refresh_token'">
+                            <label for="loginPassword">Refresh Token</label>
+                            <input type="text" class="form-control" id="loginRefreshToken" readonly="readonly" v-model="refreshToken">
+                        </div>
+                        <div class="form-group" v-if="tokenScreen.type == 'client_credentials'">
+                            <label for="loginPassword">Client ID</label>
+                            <input type="text" class="form-control" id="loginClientId" readonly="readonly" v-model="client_id">
+                        </div>
+                        <div class="form-group" v-if="tokenScreen.type == 'client_credentials'">
+                            <label for="loginPassword">Client Secret</label>
+                            <input type="text" class="form-control" id="loginClientSecret" readonly="readonly" v-model="client_secret">
                         </div>
                         <button type="button" class="btn btn-primary" v-on:click="getToken" :disabled="tokenDisabled">Retrieve Token</button>
                     </form>
@@ -461,6 +477,15 @@
                     var request;
                     if (this.tokenScreen.type == "password") {
                         request = { type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password, client_id: this.client_id };
+                    }
+                    else if (this.tokenScreen.type == "authorization_code") {
+                        request = { type: "authorization_code", code: this.authorization_code, client_id: this.client_id };
+                    }
+                    else if (this.tokenScreen.type == "client_credentials") {
+                        request = { type: "client_credentials", client_id: this.client_id, client_secret: this.client_secret };
+                    }
+                    else if (this.tokenScreen.type == "refresh_token") {
+                        request = { type: "refresh_token", refresh_token: this.refreshToken, client_id: this.client_id };
                     }
                     apiCall(this.wellKnownData.token_endpoint, "GET", request, this.callbackToken);
                 },
