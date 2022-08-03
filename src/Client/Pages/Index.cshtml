@@ -129,13 +129,13 @@
                         <div class="form-group">
                             <label for="response_type">Response Type</label>
                             <select class="form-control" id="response_type" v-model="authenticationScreen.response_type">
-                                <option selected="selected">code</option>
+                                <option v-for="item in wellKnownData.response_types_supported" :value="item">{{item}}</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label for="response_mode">Response Mode</label>
                             <select class="form-control" id="response_type" v-model="authenticationScreen.response_mode">
-                                <option selected="selected">query</option>
+                                <option v-for="item in wellKnownData.response_modes_supported" :value="item">{{item}}</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -186,10 +186,7 @@
                         <div class="form-group">
                             <label for="loginType">Type</label>
                             <select class="form-control" id="loginType" v-model="tokenScreen.type">
-                                <option value="authorization_code">Authorization Code</option>
-                                <option value="client_credentials">Client Credentials</option>
-                                <option value="password">Password</option>
-                                <option value="refresh_token">Refresh Token</option>
+                                <option v-for="item in wellKnownData.grant_types_supported" :value="item">{{item}}</option>
                             </select>
                         </div>
                         <div class="form-group" v-if="tokenScreen.type == 'password'">
@@ -229,14 +226,15 @@
                                 <option>refresh</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="introspectionToken">Token</label>
-                            <input type="text" class="form-control" id="introspectionToken" aria-describedby="tokenHelp" placeholder="Enter Token" v-model="introspectionScreen.token">
-                            <small id="tokenHelp" class="form-text text-muted">Please enter your token.</small>
+                        <div class="form-group" v-if="introspectionScreen.token_type_hint == 'jwt'">
+                            <label for="introspectionToken">JWT Token</label>
+                            <input type="text" class="form-control" id="introspectionJWTToken" v-model="token" readonly="readonly">
+                        </div>
+                        <div class="form-group" v-if="introspectionScreen.token_type_hint == 'refresh'">
+                            <label for="introspectionToken">Refresh Token</label>
+                            <input type="text" class="form-control" id="introspectionRefreshToken" v-model="refreshToken" readonly="readonly">
                         </div>
                         <div class="btn-toolbar">
-                            <button type="button" class="btn btn-info" v-on:click="copyIntrospectionJWT" :disabled="introspectDisabled">Take Access Token</button>&nbsp;
-                            <button type="button" class="btn btn-info" v-on:click="copyIntrospectionRefresh" :disabled="introspectDisabled">Take Refresh Token</button>&nbsp;
                             <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
                         </div>
                     </form>
@@ -394,8 +392,7 @@
                         code_challenge_method: ""
                     },
                     introspectionScreen: {
-                        token: "",
-                        token_type_hint: ""
+                        token_type_hint: "jwt"
                     },
                     wellKnownData: {
                         issuer: "",
@@ -506,17 +503,17 @@
                         this.refreshTokenExpires = "";
                     }
                 },
-                copyIntrospectionJWT() {
-                    this.introspectionScreen.token_type_hint = "jwt";
-                    this.introspectionScreen.token = this.token;
-                },
-                copyIntrospectionRefresh() {
-                    this.introspectionScreen.token_type_hint = "refresh";
-                    this.introspectionScreen.token = this.refreshToken;
-                },
                 getIntrospection() {
                     // Post but with query params (I know right!)
-                    apiCall(this.wellKnownData.introspection_endpoint + "?" + serialize({ token: this.introspectionScreen.token, token_type_hint: this.introspectionScreen.token_type_hint }), "POST", {}, this.callbackIntrospection);
+                    var tokenToUse;
+                    if (this.introspectionScreen.token_type_hint == "jwt") {
+                        tokenToUse = this.token;
+                    }
+                    else {
+                        tokenToUse = this.refreshToken;
+                    }
+
+                    apiCall(this.wellKnownData.introspection_endpoint + "?" + serialize({ token: tokenToUse, token_type_hint: this.introspectionScreen.token_type_hint }), "POST", {}, this.callbackIntrospection);
                 },
                 callbackIntrospection(success, response) {
                     debugger;
@@ -573,16 +570,15 @@
                   return;
                 */
 
-                try 
-                {
+                try {
                     var decoded = JSON.parse(event.data);
-                    app.$data.authorization_code = decoded.code;                                    
+                    app.$data.authorization_code = decoded.code;
                 }
                 catch
                 {
                     alert('Failed to assign reponse back to client');
                 }
-                
+
                 // Hide the authentication screen
                 $("#authenticationModel").modal('hide');
 
