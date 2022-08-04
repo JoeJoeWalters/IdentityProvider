@@ -11,7 +11,7 @@ namespace Server.Helpers
     /// </summary>
     public static class TokenHelper
     {
-        private static List<string> dontCloneClaims = new List<string>() { "aud", "iat" };
+        private static List<string> dontCloneClaims = new List<string>() { "aud", "ait" };
 
         /// <summary>
         /// Generate the refresh token from the security token

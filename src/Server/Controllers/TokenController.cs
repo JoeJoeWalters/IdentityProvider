@@ -143,7 +143,7 @@ namespace Server.Controllers
                     // Create the content of the JWT Token with the appropriate expiry date
                     JwtPayload secPayload = new JwtPayload(
                         _serverSettings.Issuer,
-                        request.Audience.IsNullOrEmpty() ? _serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name : request.Audience,
+                        request.Audience.IsNullOrEmpty() ? _serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name : request.Audience, // Audience from request probably needs removing as it's non-standard
                         claims,
                         now.AddSeconds(-1), // For the bots
                         now.AddSeconds(_accessTokenExpiry));
