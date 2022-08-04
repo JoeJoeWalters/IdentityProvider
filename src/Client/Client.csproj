@@ -37,6 +37,9 @@
     <Content Update="wwwroot\Documents\RFC\rfc7636.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="wwwroot\Documents\RFC\rfc7662.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Update="wwwroot\Documents\RFC\rfc8414.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
