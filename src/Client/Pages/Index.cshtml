@@ -21,15 +21,11 @@
                 <div class="tab-pane fade show active" id="nav-wellKnown" role="tabpanel" aria-labelledby="nav-wellKnown-tab">
 
                     <!-- Start Documentation -->
-                    <div class="col-md-12">
-                      <button class="btn btn-info btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoProviderMetadata" aria-expanded="false" aria-controls="collapseExample">
-                        Info
-                      </button>
-                    </div>
+                    <a data-bs-toggle="collapse" data-bs-target="#collapseInfoProviderMetadata" aria-expanded="false" aria-controls="collapseInfoProviderMetadata"><i class="fa-solid fa-circle-question"></i></a>
                     <div class="collapse" id="collapseInfoProviderMetadata">
-                      <div class="card card-body">
-                        <iframe src="/documents/rfc/rfc8414.txt" style="width:100%; height: 400px"></iframe>
-                      </div>
+                        <div class="card card-body">
+                            <iframe src="/documents/rfc/rfc8414.txt" style="width:100%; height: 400px"></iframe>
+                        </div>
                     </div>
                     <!-- End Documentation -->
 
@@ -104,15 +100,11 @@
                 <div v-if="!jwksDisabled" class="tab-pane fade" id="nav-jwks" role="tabpanel" aria-labelledby="nav-jwks-tab">
 
                     <!-- Start Documentation -->
-                    <div class="col-md-12">
-                      <button class="btn btn-info btn-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInfoProviderMetadata" aria-expanded="false" aria-controls="collapseExample">
-                        Info
-                      </button>
-                    </div>
-                    <div class="collapse" id="collapseInfoProviderMetadata">
-                      <div class="card card-body">
-                        <iframe src="/documents/rfc/rfc7517.txt" style="width:100%; height: 400px"></iframe>
-                      </div>
+                    <a data-bs-toggle="collapse" data-bs-target="#collapseInfoJWKS" aria-expanded="false" aria-controls="collapseInfoJWKS"><i class="fa-solid fa-circle-question"></i></a>
+                    <div class="collapse" id="collapseInfoJWKS">
+                        <div class="card card-body">
+                            <iframe src="/documents/rfc/rfc7517.txt" style="width:100%; height: 400px"></iframe>
+                        </div>
                     </div>
                     <!-- End Documentation -->
 
@@ -153,6 +145,16 @@
                     </form>
                 </div>
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-authentication" role="tabpanel" aria-labelledby="nav-authentication-tab">
+
+                    <!-- Start Documentation -->
+                    <a data-bs-toggle="collapse" data-bs-target="#collapseInfoAuth" aria-expanded="false" aria-controls="collapseInfoAuth"><i class="fa-solid fa-circle-question"></i></a>
+                    <div class="collapse" id="collapseInfoAuth">
+                        <div class="card card-body">
+                            <iframe src="/documents/rfc/rfc6749.txt" style="width:100%; height: 400px"></iframe>
+                        </div>
+                    </div>
+                    <!-- End Documentation -->
+
                     <form id="AuthenticationForm">
                         <div class="form-group">
                             <label for="response_type">Response Type</label>
@@ -182,7 +184,17 @@
                             <label for="state">State</label>
                             <input type="text" class="form-control" id="state" v-model="authenticationScreen.state">
                         </div>
-                        <!-- PKCE -->
+
+                        <h5>PKCE <a data-bs-toggle="collapse" data-bs-target="#collapseInfoPKCE" aria-expanded="false" aria-controls="collapseInfoPKCE"><i class="fa-solid fa-circle-question"></i></a></h5>
+
+                        <!-- Start Documentation -->
+                        <div class="collapse" id="collapseInfoPKCE">
+                            <div class="card card-body">
+                                <iframe src="/documents/rfc/rfc7636.txt" style="width:100%; height: 400px"></iframe>
+                            </div>
+                        </div>
+                        <!-- End Documentation -->
+
                         <div class="form-group">
                             <label for="code_challenge">Code Challenge</label>
                             <input type="text" class="form-control" id="code_challenge" v-model="authenticationScreen.code_challenge">
@@ -210,6 +222,16 @@
                     </form>
                 </div>
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-token" role="tabpanel" aria-labelledby="nav-token-tab">
+
+                    <!-- Start Documentation -->
+                    <a data-bs-toggle="collapse" data-bs-target="#collapseInfoToken" aria-expanded="false" aria-controls="collapseInfoToken"><i class="fa-solid fa-circle-question"></i></a>
+                    <div class="collapse" id="collapseInfoToken">
+                        <div class="card card-body">
+                            <iframe src="/documents/rfc/rfc6750.txt" style="width:100%; height: 400px"></iframe>
+                        </div>
+                    </div>
+                    <!-- End Documentation -->
+
                     <form id="TokenForm">
                         <div class="form-group">
                             <label for="loginType">Type</label>
@@ -246,6 +268,16 @@
                     </form>
                 </div>
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-introspection" role="tabpanel" aria-labelledby="nav-introspection-tab">
+
+                    <!-- Start Documentation -->
+                    <a data-bs-toggle="collapse" data-bs-target="#collapseInfoIntrospection" aria-expanded="false" aria-controls="collapseInfoIntrospection"><i class="fa-solid fa-circle-question"></i></a>
+                    <div class="collapse" id="collapseInfoIntrospection">
+                        <div class="card card-body">
+                            <iframe src="/documents/rfc/rfc7636.txt" style="width:100%; height: 400px"></iframe>
+                        </div>
+                    </div>
+                    <!-- End Documentation -->
+
                     <form id="IntrospectionForm">
                         <div class="form-group">
                             <label for="token_type_hint">Type</label>
@@ -289,7 +321,7 @@
         </div>
         <div class="card mt-1" v-if="tokenVisible">
             <div class="card-body">
-                <h5 class="card-title">JWT Token</h5>
+                <h5 class="card-title">JWT Token <a href="/documents/rfc/rfc7519.txt" target="_blank"><i class="fa-solid fa-circle-question"></i></a></h5>
                 <pre><code>{{ token }}</code></pre>
                 <p>Expires: <b>{{ tokenExpires }}</b></p>
             </div>
