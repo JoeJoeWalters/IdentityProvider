@@ -61,7 +61,7 @@ namespace Server.Controllers
                     {
                         Client_Id = "7ac39504-53f1-47f5-96b9-3c2682962b8b",
                         Type = CustomGrantTypes.Pin,
-                        Username = "admin_a",
+                        Username = model.TokenRequest.Username,
                         Pin = new List<KeyValuePair<int, string>>()
                     {
                         new KeyValuePair<int, string>( 0, "A" ),

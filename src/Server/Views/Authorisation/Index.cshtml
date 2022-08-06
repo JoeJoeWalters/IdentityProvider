@@ -1,5 +1,4 @@
-﻿
-@using Server.Contracts
+﻿@using Server.Contracts
 @using Server.Views.Authorisation
 @model Server.Views.Authorisation.IndexModel
 
@@ -15,8 +14,7 @@
 
             <div class="form-group">
                 <label for="Username">Username</label>
-                <input type="text" class="form-control" id="Username" name="Username" aria-describedby="UsernameHelp" placeholder="Enter Username">
-                <small id="UsernameHelp" class="form-text text-muted">Please enter your username.</small>
+                @Html.TextBoxFor(model => model.TokenRequest.Username,  new { @class="form-control" })
             </div>
             <!--
             <div class="form-group">
@@ -37,11 +35,27 @@
 
         case @AuthoriseStep.SelectMethod:
 
+            <div class="form-group">
+                <label for="Username">Username</label>
+                @Html.TextBoxFor(model => model.TokenRequest.Username,  new { @readonly = true, @class="form-control" })
+            </div>
+            <div class="form-group">
+                <label for="Method">Method</label>
+                <select class="form-control" readonly="readonly">
+                    <option value="Pin" selected="selected">Pin</option>
+                </select>
+            </div>
+
             <button type="submit" class="btn btn-primary">Proceed</button>
 
             break;
 
         case @AuthoriseStep.MethodEntry:
+
+            <div class="form-group">
+                <label for="Username">Username</label>
+                @Html.TextBoxFor(model => model.TokenRequest.Username,  new { @readonly = true, @class="form-control" })
+            </div>
 
             <button type="submit" class="btn btn-primary">Authorise</button>
 
