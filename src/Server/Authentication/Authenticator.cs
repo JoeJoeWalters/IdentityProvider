@@ -43,9 +43,19 @@ namespace Server.Authentication
             RefreshAccessList(); // Get the new access control list
         }
 
+        /// <summary>
+        /// Custom grant type fulfillment
+        /// </summary>
+        /// <param name="tokenRequest"></param>
+        /// <returns></returns>
         public JwtSecurityToken AuthenticateCustom(CustomTokenRequest tokenRequest)
             => Task.Run(() => AuthenticateCustomAsync(tokenRequest)).Result;
 
+        /// <summary>
+        /// Custom grant type fulfillment
+        /// </summary>
+        /// <param name="tokenRequest"></param>
+        /// <returns></returns>
         public async Task<JwtSecurityToken> AuthenticateCustomAsync(CustomTokenRequest tokenRequest)
         {
             SecurityData data = null;
@@ -63,9 +73,19 @@ namespace Server.Authentication
             return await GenerateTokenFromSecurityData(data, now);
         }
 
+        /// <summary>
+        /// OAuth grant type mode fulfillment
+        /// </summary>
+        /// <param name="tokenRequest"></param>
+        /// <returns></returns>
         public JwtSecurityToken AuthenticateOAuth(OAuthTokenRequest tokenRequest)
             => Task.Run(() => AuthenticateOAuthAsync(tokenRequest)).Result;
 
+        /// <summary>
+        /// OAuth grant type mode fulfillment
+        /// </summary>
+        /// <param name="tokenRequest"></param>
+        /// <returns></returns>
         public async Task<JwtSecurityToken> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest)
         {
             SecurityData data = null;
