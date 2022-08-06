@@ -18,14 +18,14 @@ namespace Server.Controllers
     {
         private readonly ITokenStorage _tokenStorage;
         private readonly IAuthenticator _authenticator;
-        private readonly IPinService _pinService;
+        private readonly IPasscodeService _passcodeService;
         private readonly ServerSettings _serverSettings;
 
-        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator, IPinService pinService, ServerSettings serverSettings)
+        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator, IPasscodeService passcodeService, ServerSettings serverSettings)
         {
             _tokenStorage = tokenStorage;
             _authenticator = authenticator;
-            _pinService = pinService;
+            _passcodeService = passcodeService;
             _serverSettings = serverSettings;
         }
 
@@ -62,7 +62,7 @@ namespace Server.Controllers
 
                     // Ask the pin service which positions we should be asking for by asking for X digits of the Y that are available
 #warning 3 is an arbitory number right now, make a service setting
-                    List<int> positions = _pinService.RandomPositions(entryData.Pin, 3);
+                    List<int> positions = _passcodeService.RandomPositions(entryData.Passcode, 3);
 
                     // Map the positions to the model
                     List<string> pinDigitsSetup = new List<string>();

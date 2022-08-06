@@ -42,7 +42,7 @@
             <div class="form-group">
                 <label for="Method">Method</label>
                 <select class="form-control" readonly="readonly">
-                    <option value="Pin" selected="selected">Pin</option>
+                    <option value="Passcode" selected="selected">Passcode</option>
                 </select>
             </div>
 
@@ -62,7 +62,7 @@
                 <div class="input-group mb-3">
                     @for (int i = 0; i < Model.PinDigits.Count; i++)
                     {
-                        @Html.TextBoxFor(x=>Model.PinDigits[i], !Model.PinDigitsActive[i] ? new {@readonly = "readonly", @class="form-control" } : new { @class="form-control" })
+                        @Html.PasswordFor(x=>Model.PinDigits[i], !Model.PinDigitsActive[i] ? new {@readonly = "readonly", @class="form-control" } : new { @class="form-control" })
                         @Html.HiddenFor(x=> Model.PinDigitsActive[i])
                     }
                 </div>

@@ -23,7 +23,7 @@ namespace Server.Authentication
 
         private readonly ServerSettings _serverSettings;
         private readonly SigningCredentials _signingCredentials;
-        private readonly IPinService _pinService;
+        private readonly IPasscodeService _pinService;
         private readonly IHashService _hashService;
         private readonly ITokenStorage _tokenStorage;
 
@@ -41,7 +41,7 @@ namespace Server.Authentication
             SigningCredentials signingCredentials,
             ServerSettings serverSettings,
             IHashService hashService,
-            IPinService pinService,
+            IPasscodeService pinService,
             ITokenStorage tokenStorage)
         {
             this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
@@ -81,7 +81,7 @@ namespace Server.Authentication
                             {
                                 return
                                     user.Username == tokenRequest.Username &&
-                                    _pinService.CompareHashedDigits(tokenRequest.Pin, user.Id, user.Pin) &&
+                                    _pinService.CompareHashedDigits(tokenRequest.Pin, user.Id, user.Passcode) &&
                                     user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
 

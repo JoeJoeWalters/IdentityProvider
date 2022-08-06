@@ -30,7 +30,7 @@ namespace Server.Authentication
         public String Password { get; set; } = String.Empty;
 
         [JsonProperty(Required = Required.Default)]
-        public PinData Pin { get; set; } = new PinData() { };
+        public PasscodeData Passcode { get; set; } = new PasscodeData() { };
 
         [JsonProperty(Required = Required.AllowNull)]
         public List<Claim> Claims { get; set; }
@@ -43,7 +43,7 @@ namespace Server.Authentication
     /// Object for storing a pin number for the credentials
     /// </summary>
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore, MemberSerialization = MemberSerialization.OptOut)]
-    public class PinData
+    public class PasscodeData
     {
         /// <summary>
         /// The plain text version of the Pin

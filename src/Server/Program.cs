@@ -33,8 +33,8 @@ namespace Server
                 IHashService hashService = new HashService();
                 builder.Services.AddSingleton<IHashService>(hashService);
 
-                IPinService pinService = new PinService(hashService);
-                builder.Services.AddSingleton<IPinService>(pinService);
+                IPasscodeService pinService = new PasscodeService(hashService);
+                builder.Services.AddSingleton<IPasscodeService>(pinService);
 
                 // Add the private and public keys for signing to the settings collection before adding for DI
                 settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
