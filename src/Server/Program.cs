@@ -65,6 +65,7 @@ namespace Server
                                                                 }, 
                                                                 signingCredentials,
                                                                 settings,
+                                                                hashService,
                                                                 pinService);
                     authenticator.RefreshAccessList(accessControlStream); // Pass the user / client registrations file to the authenticator to pre-load them
                     builder.Services.AddSingleton<IAuthenticator>(authenticator);

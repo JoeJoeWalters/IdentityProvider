@@ -24,6 +24,7 @@ namespace Server.Authentication
         private readonly ServerSettings _serverSettings;
         private readonly SigningCredentials _signingCredentials;
         private readonly IPinService _pinService;
+        private readonly IHashService _hashService;
 
         public TokenValidationParameters JWTValidationParams { get; internal set; }
 
@@ -38,11 +39,13 @@ namespace Server.Authentication
             TokenValidationParameters tokenValidationParameters,
             SigningCredentials signingCredentials,
             ServerSettings serverSettings,
+            IHashService hashService,
             IPinService pinService)
         {
             this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
             _serverSettings = serverSettings;
             _signingCredentials = signingCredentials;
+            _hashService = hashService;
             _pinService = pinService;
             RefreshAccessList(); // Get the new access control list
         }
@@ -114,13 +117,14 @@ namespace Server.Authentication
 
                     case GrantTypes.Password:
 
+#warning This is not efficient, creating the hash on the fly because we are using userid of the comparer for the hash salt so revisit later (it's only a sandbox service for now)
                         data = accessControl
                             .Users
                             .Where(user =>
                             {
                                 return
                                     user.Username == tokenRequest.Username &&
-                                    user.Password == tokenRequest.Password &&
+                                    user.Password == _hashService.CreateHash($"{user.Id}{tokenRequest.Password}") &&
                                     user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
 
@@ -319,14 +323,18 @@ namespace Server.Authentication
         public Boolean RefreshAccessList(AccessControl accessControl)
         {
             // Do any test data infill (e.g. if no hashed digits for plain text passcode)
+            /*
             if (accessControl?.Users != null)
             {
                 foreach (SecurityData data in accessControl.Users)
                 {
+                    //data.Password = _hashService.CreateHash($"{data.Id}{data.Password}");
+
                     if ((data.Pin.Value ?? String.Empty) != String.Empty && data.Pin.HashedDigits.Count == 0)
                         data.Pin.HashedDigits = _pinService.ToHashedDigits(data.Pin.Value ?? String.Empty, data.Id);
                 }
             }
+            */
             this.accessControl = accessControl ?? new AccessControl() { };
 
             return true;
