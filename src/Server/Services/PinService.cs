@@ -29,7 +29,7 @@ namespace Server.Services
             List<string> hashedValues = new List<string>();
 
             // Loop the string by number as we need the position of the digit to be hashed too
-            for(int position = 0; position < value.Length; position ++)
+            for (int position = 0; position < value.Length; position++)
             {
                 hashedValues.Add(_hashService.CreateHash($"{position}{salt}{value[position]}")); // Position + Salt + Actual Value then hashed
             }
@@ -54,6 +54,36 @@ namespace Server.Services
             }
 
             return true;
+        }
+
+        /// <summary>
+        /// Generate a list of random numbers related to the pin data available 
+        /// </summary>
+        /// <param name="data">The user's pin data</param>
+        /// <param name="totalRequired">The amount of positions needed</param>
+        /// <returns>A list of positions in that data</returns>
+        public List<int> RandomPositions(PinData data, int totalRequired)
+        {
+            List<int> result = new List<int>();
+
+            if (data.HashedDigits?.Count >= totalRequired)
+            {
+                Random random = new Random();
+                while (result.Count < totalRequired)
+                {
+                    int position = random.Next(0, data.HashedDigits.Count); // Get a random position between the bounds
+                    if (!result.Contains(position)) // Make sure don't already have this position stored (don't want to ask for it twice, looks weird on the screen)
+                        result.Add(position);
+                }
+            }
+            else
+            {
+                // Not enough digits in the passcode to give you what you need to give all the positions possible instead 
+                for (var i = 0; i < data.HashedDigits?.Count; i++)
+                    result.Add(i);
+            }
+
+            return result.OrderBy(x => x).ToList();
         }
     }
 }

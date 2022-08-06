@@ -23,5 +23,13 @@ namespace Server.Services
         /// <param name="data">The pin data for a user to compare against</param>
         /// <returns>Success or failure</returns>
         Boolean CompareHashedDigits(List<KeyValuePair<int, string>> digitsAndPositions, string salt, PinData data);
+
+        /// <summary>
+        /// Generate a list of random numbers related to the pin data available 
+        /// </summary>
+        /// <param name="data">The user's pin data</param>
+        /// <param name="totalRequired">The amount of positions needed</param>
+        /// <returns>A list of positions in that data</returns>
+        List<int> RandomPositions(PinData data, int totalRequired);
     }
 }
