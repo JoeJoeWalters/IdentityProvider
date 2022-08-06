@@ -7,6 +7,7 @@ using Server.Contracts.Tokens;
 using Server.Helpers;
 using Server.Services;
 using Server.Views.Authorisation;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Server.Controllers
 {
@@ -39,8 +40,20 @@ namespace Server.Controllers
         {
             try
             {
-                CustomTokenRequest request = new CustomTokenRequest() { };
-                SecurityToken result = _authenticator.AuthenticateCustom(request);
+                CustomTokenRequest request = new CustomTokenRequest()
+                {
+                    Client_Id = "7ac39504-53f1-47f5-96b9-3c2682962b8b",                    
+                    Type = CustomGrantTypes.Pin,
+                    Username = "admin_a",
+                    Pin = new List<KeyValuePair<int, string>>()
+                    {
+                        new KeyValuePair<int, string>( 0, "A" ),
+                        new KeyValuePair<int, string>(  2, "2" ),
+                        new KeyValuePair<int, string>(  5, "5" )
+                    },
+                    RedirectUri = $"https://localhost:7053/authorizeCallback",
+                };
+                JwtSecurityToken result = _authenticator.AuthenticateCustom(request);
 
                 if (result != null)
                 {
@@ -49,7 +62,7 @@ namespace Server.Controllers
                     AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
                     String queryString = response.ToQueryString<AuthoriseResponse>();
 
-                    string url = $"https://localhost:7053/authorizeCallback?{queryString}";
+                    string url = $"{request.RedirectUri}?{queryString}";
                     return new RedirectResult(url);
                 }
                 else

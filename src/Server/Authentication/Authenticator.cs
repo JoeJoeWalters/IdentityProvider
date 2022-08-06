@@ -25,6 +25,7 @@ namespace Server.Authentication
         private readonly SigningCredentials _signingCredentials;
         private readonly IPinService _pinService;
         private readonly IHashService _hashService;
+        private readonly ITokenStorage _tokenStorage;
 
         public TokenValidationParameters JWTValidationParams { get; internal set; }
 
@@ -40,13 +41,15 @@ namespace Server.Authentication
             SigningCredentials signingCredentials,
             ServerSettings serverSettings,
             IHashService hashService,
-            IPinService pinService)
+            IPinService pinService,
+            ITokenStorage tokenStorage)
         {
             this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
             _serverSettings = serverSettings;
             _signingCredentials = signingCredentials;
             _hashService = hashService;
             _pinService = pinService;
+            _tokenStorage = tokenStorage;
             RefreshAccessList(); // Get the new access control list
         }
 
@@ -72,7 +75,15 @@ namespace Server.Authentication
             {
                 case CustomGrantTypes.Pin:
 
-
+                    data = accessControl
+                            .Users
+                            .Where(user =>
+                            {
+                                return
+                                    user.Username == tokenRequest.Username &&
+                                    _pinService.CompareHashedDigits(tokenRequest.Pin, user.Id, user.Pin) &&
+                                    user.ClientId == tokenRequest.Client_Id;
+                            }).FirstOrDefault();
 
                     break;
             }
@@ -96,6 +107,7 @@ namespace Server.Authentication
         public async Task<JwtSecurityToken> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest)
         {
             SecurityData data = null;
+            JwtSecurityToken response = null;
             DateTime now = DateTime.UtcNow; // Fixed point in time
 
             try
@@ -113,6 +125,8 @@ namespace Server.Authentication
                                     client.Secret == tokenRequest.Client_Secret;
                             }).Select(client => new SecurityData() { ClientId = client.Id }).FirstOrDefault();
 
+                        response = await GenerateTokenFromSecurityData(data, now);
+
                         break;
 
                     case GrantTypes.Password:
@@ -128,18 +142,13 @@ namespace Server.Authentication
                                     user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
 
+                        response = await GenerateTokenFromSecurityData(data, now);
+
                         break;
 
                     case GrantTypes.AuthorisationCode:
 
-                        data = accessControl
-                            .Users
-                            .Where(user =>
-                            {
-                                return
-                                    user.Key == tokenRequest.Code &&
-                                    user.ClientId == tokenRequest.Client_Id;
-                            }).FirstOrDefault();
+                        response = _tokenStorage.Retrieve(tokenRequest.Code);
 
                         break;
 
@@ -152,7 +161,7 @@ namespace Server.Authentication
             {
             };
 
-            return await GenerateTokenFromSecurityData(data, now);
+            return response;
 
         }
 

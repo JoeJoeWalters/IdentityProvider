@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 
 namespace Server.Services
 {
@@ -8,14 +9,14 @@ namespace Server.Services
     public class TokenStorage : ITokenStorage
     {
         // Storage for the security tokens
-        private readonly Dictionary<string, SecurityToken> _tokens;
+        private readonly Dictionary<string, JwtSecurityToken> _tokens;
 
         /// <summary>
         /// Construct the token storage
         /// </summary>
         public TokenStorage()
         {
-            _tokens = new Dictionary<string, SecurityToken>();
+            _tokens = new Dictionary<string, JwtSecurityToken>();
         }
 
         /// <summary>
@@ -23,9 +24,9 @@ namespace Server.Services
         /// </summary>
         /// <param name="token">The security token to store</param>
         /// <returns>Identifier for the token</returns>
-        public string Add(SecurityToken token)
+        public string Add(JwtSecurityToken token)
         {
-            string id = new Guid().ToString();
+            string id = Guid.NewGuid().ToString();
             _tokens.Add(id, token);
             return id;
         }
@@ -35,9 +36,9 @@ namespace Server.Services
         /// </summary>
         /// <param name="id">The token identifier</param>
         /// <returns>The security token</returns>
-        public SecurityToken Retrieve(string id)
+        public JwtSecurityToken Retrieve(string id)
         {
-            SecurityToken token = _tokens[id];
+            JwtSecurityToken token = _tokens[id];
             _tokens.Remove(id);
             return token;
         }

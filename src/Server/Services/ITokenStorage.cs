@@ -1,4 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using System.IdentityModel.Tokens.Jwt;
 
 namespace Server.Services
 {
@@ -12,13 +12,13 @@ namespace Server.Services
         /// </summary>
         /// <param name="token">The security token to store</param>
         /// <returns>Identifier for the token</returns>
-        string Add(SecurityToken token);
+        string Add(JwtSecurityToken token);
 
         /// <summary>
         /// Exchange an identifier for the security token
         /// </summary>
         /// <param name="id">The token identifier</param>
         /// <returns>The security token</returns>
-        SecurityToken Retrieve(string id);
+        JwtSecurityToken Retrieve(string id);
     }
 }

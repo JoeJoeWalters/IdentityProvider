@@ -20,7 +20,7 @@ namespace Server.Contracts.Tokens
         public String Username { get; set; } = String.Empty;
 
         [JsonProperty(Required = Required.Default, PropertyName = "pin")]
-        public String Pin { get; set; } = String.Empty;
+        public List<KeyValuePair<int, string>> Pin { get; set; } = new List<KeyValuePair<int, string>>();
 
         [JsonProperty(Required = Required.Default, PropertyName = "redirect_uri")]
         public String RedirectUri { get; set; } = String.Empty;
