@@ -348,5 +348,17 @@ namespace Server.Authentication
 
             return true;
         }
+
+        /// <summary>
+        /// Get the security data of a credential based on the username (for choosing what authentication options to display etc.)
+        /// </summary>
+        /// <returns></returns>
+        public SecurityData GetByUsername(string username)
+            => accessControl
+                .Users
+                .Where(user =>
+                {
+                    return user.Username == username;
+                }).FirstOrDefault();
     }
 }

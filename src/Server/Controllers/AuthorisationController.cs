@@ -18,11 +18,15 @@ namespace Server.Controllers
     {
         private readonly ITokenStorage _tokenStorage;
         private readonly IAuthenticator _authenticator;
+        private readonly IPinService _pinService;
+        private readonly ServerSettings _serverSettings;
 
-        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator)
+        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator, IPinService pinService, ServerSettings serverSettings)
         {
             _tokenStorage = tokenStorage;
             _authenticator = authenticator;
+            _pinService = pinService;
+            _serverSettings = serverSettings;
         }
 
         // GET: AuthorisationController
@@ -46,13 +50,30 @@ namespace Server.Controllers
             {
                 case AuthoriseStep.UserEntry:
 
+                    SecurityData methodData = _authenticator.GetByUsername(model.TokenRequest.Username); // Get the credential properties based on the username so we can determine the types of authrication it can use
+
                     IndexModel selectMethodModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.SelectMethod, TokenRequest = model.TokenRequest };
                     return View("~/Views/Authorisation/Index.cshtml", selectMethodModel);
 
 
                 case AuthoriseStep.SelectMethod:
 
-                    IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, TokenRequest = model.TokenRequest, PinDigits = new List<string>() {"", "", "", "", "", ""}, PinDigitsActive = new List<bool>() { true, false, true, false, true, false } };
+                    SecurityData entryData = _authenticator.GetByUsername(model.TokenRequest.Username); // Get the credential properties based on the username so we can determine the types of authrication it can use
+
+                    // Ask the pin service which positions we should be asking for by asking for X digits of the Y that are available
+#warning 3 is an arbitory number right now, make a service setting
+                    List<int> positions = _pinService.RandomPositions(entryData.Pin, 3);
+
+                    // Map the positions to the model
+                    List<string> pinDigitsSetup = new List<string>();
+                    List<Boolean> pinDigitsActiveSetup = new List<bool>();
+                    for (int pos = 0; pos < _serverSettings.PinSize; pos++)
+                    {
+                        pinDigitsSetup.Add("");
+                        pinDigitsActiveSetup.Add(positions.Contains(pos));
+                    }
+
+                    IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, TokenRequest = model.TokenRequest, PinDigits = pinDigitsSetup, PinDigitsActive = pinDigitsActiveSetup };
                     return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
 
                 case AuthoriseStep.MethodEntry:
