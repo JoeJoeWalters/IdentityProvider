@@ -36,6 +36,9 @@ namespace Server
                 IPasscodeService pinService = new PasscodeService(hashService);
                 builder.Services.AddSingleton<IPasscodeService>(pinService);
 
+                IOTPService otpService = new OTPService();
+                builder.Services.AddSingleton<IOTPService>(otpService);
+
                 // Add the private and public keys for signing to the settings collection before adding for DI
                 settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
                 settings.PublicKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "public.pem"), Encoding.UTF8);
