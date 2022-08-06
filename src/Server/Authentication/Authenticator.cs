@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Server.Contracts.Tokens;
 using Server.Helpers;
+using Server.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -22,6 +23,7 @@ namespace Server.Authentication
 
         private readonly ServerSettings _serverSettings;
         private readonly SigningCredentials _signingCredentials;
+        private readonly IPinService _pinService;
 
         public TokenValidationParameters JWTValidationParams { get; internal set; }
 
@@ -35,11 +37,13 @@ namespace Server.Authentication
         public Authenticator(
             TokenValidationParameters tokenValidationParameters,
             SigningCredentials signingCredentials,
-            ServerSettings serverSettings)
+            ServerSettings serverSettings,
+            IPinService pinService)
         {
             this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
             _serverSettings = serverSettings;
             _signingCredentials = signingCredentials;
+            _pinService = pinService;
             RefreshAccessList(); // Get the new access control list
         }
 
@@ -314,7 +318,17 @@ namespace Server.Authentication
 
         public Boolean RefreshAccessList(AccessControl accessControl)
         {
+            // Do any test data infill (e.g. if no hashed digits for plain text passcode)
+            if (accessControl?.Users != null)
+            {
+                foreach (SecurityData data in accessControl.Users)
+                {
+                    if ((data.Pin.Value ?? String.Empty) != String.Empty && data.Pin.HashedDigits.Count == 0)
+                        data.Pin.HashedDigits = _pinService.ToHashedDigits(data.Pin.Value ?? String.Empty, data.Id);
+                }
+            }
             this.accessControl = accessControl ?? new AccessControl() { };
+
             return true;
         }
     }

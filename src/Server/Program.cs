@@ -30,7 +30,11 @@ namespace Server
                 builder.Services.AddSingleton<ITokenStorage>(tokenStorage);
 
                 // Create services for comparison and hashing
-                builder.Services.AddSingleton<IHashService>(new HashService());
+                IHashService hashService = new HashService();
+                builder.Services.AddSingleton<IHashService>(hashService);
+
+                IPinService pinService = new PinService(hashService);
+                builder.Services.AddSingleton<IPinService>(pinService);
 
                 // Add the private and public keys for signing to the settings collection before adding for DI
                 settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
@@ -60,7 +64,8 @@ namespace Server
                                                                     ValidAudiences = settings.Audiences.Select(aud => aud.Name)
                                                                 }, 
                                                                 signingCredentials,
-                                                                settings);
+                                                                settings,
+                                                                pinService);
                     authenticator.RefreshAccessList(accessControlStream); // Pass the user / client registrations file to the authenticator to pre-load them
                     builder.Services.AddSingleton<IAuthenticator>(authenticator);
                 }

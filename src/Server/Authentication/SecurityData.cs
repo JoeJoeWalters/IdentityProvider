@@ -29,56 +29,32 @@ namespace Server.Authentication
         [JsonProperty(Required = Required.Default)]
         public String Password { get; set; } = String.Empty;
 
+        [JsonProperty(Required = Required.Default)]
+        public PinData Pin { get; set; } = new PinData() { };
+
         [JsonProperty(Required = Required.AllowNull)]
         public List<Claim> Claims { get; set; }
 
-        [JsonProperty("Claims", Required = Required.AllowNull)]
+        [JsonProperty("Scopes", Required = Required.AllowNull)]
         public List<String> Scopes { get; set; }
     }
 
     /// <summary>
-    /// Custom converter for serialising and deserialising claims
+    /// Object for storing a pin number for the credentials
     /// </summary>
-    public class ClaimConverter : JsonConverter
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore, MemberSerialization = MemberSerialization.OptOut)]
+    public class PinData
     {
-        public override bool CanConvert(Type objectType)
-        {
-            return (objectType == typeof(Claim));
-        }
+        /// <summary>
+        /// The plain text version of the Pin
+        /// </summary>
+        [JsonProperty(Required = Required.AllowNull)]
+        public String Value { get; set; } = String.Empty;
 
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-            JObject jo = JObject.Load(reader);
-            string type = (string)jo["Type"];
-            string value = (string)jo["Value"];
-            string valueType = (string)jo["ValueType"];
-            string issuer = (string)jo["Issuer"];
-            string originalIssuer = (string)jo["OriginalIssuer"];
-            return new Claim(type, value, valueType, issuer, originalIssuer);
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            var claim = (Claim)value;
-            JObject jo = new JObject();
-            jo.Add("Type", claim.Type);
-            jo.Add("Value", IsJson(claim.Value) ? new JRaw(claim.Value) : new JValue(claim.Value));
-            jo.Add("ValueType", claim.ValueType);
-            jo.Add("Issuer", claim.Issuer);
-            jo.Add("OriginalIssuer", claim.OriginalIssuer);
-            jo.WriteTo(writer);
-        }
-
-        private bool IsJson(string val)
-        {
-            return (val != null &&
-                    (val.StartsWith("[") && val.EndsWith("]")) ||
-                    (val.StartsWith("{") && val.EndsWith("}")));
-        }
-
-        public override bool CanWrite
-        {
-            get { return true; }
-        }
+        /// <summary>
+        /// An array of the digits in the Pin with a hash
+        /// </summary>
+        [JsonProperty("HashedDigits", Required = Required.AllowNull)]
+        public List<String> HashedDigits { get; set; } = new List<string>();
     }
 }

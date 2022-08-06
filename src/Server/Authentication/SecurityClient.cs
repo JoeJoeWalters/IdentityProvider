@@ -26,7 +26,7 @@ namespace Server.Authentication
         [JsonProperty("Claims", Required = Required.AllowNull)]
         public List<String> Claims { get; set; }
 
-        [JsonProperty("Claims", Required = Required.AllowNull)]
+        [JsonProperty("Scopes", Required = Required.AllowNull)]
         public List<String> Scopes { get; set; }
     }
 
