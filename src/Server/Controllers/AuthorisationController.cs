@@ -30,48 +30,63 @@ namespace Server.Controllers
         [Route(URIs.authorization_endpoint)]
         public ActionResult Index(AuthoriseRequest request)
         {
-            IndexModel model = new IndexModel() { Request = request };
-            return View(model);
+            IndexModel model = new IndexModel() { Request = request, Step = AuthoriseStep.UserEntry, TokenRequest = new CustomTokenRequest() { RedirectUri = request.redirect_uri, Username = String.Empty, Client_Id = request.client_id } };
+            return View("~/Views/Authorisation/Index.cshtml", model);
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         [Route(URIs.authorization_endpoint)]
-        public ActionResult Post()
+        public ActionResult Post(IndexModel model)
         {
-            try
+            ModelState.Clear(); // To stop the model value sticking we clear the state so they are not re-populated and overwrite our changes
+
+            // Which stage are we at?
+            switch (model.Step)
             {
-                CustomTokenRequest request = new CustomTokenRequest()
-                {
-                    Client_Id = "7ac39504-53f1-47f5-96b9-3c2682962b8b",                    
-                    Type = CustomGrantTypes.Pin,
-                    Username = "admin_a",
-                    Pin = new List<KeyValuePair<int, string>>()
+                case AuthoriseStep.UserEntry:
+
+                    IndexModel selectMethodModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.SelectMethod, TokenRequest = model.TokenRequest };
+                    return View("~/Views/Authorisation/Index.cshtml", selectMethodModel);
+
+
+                case AuthoriseStep.SelectMethod:
+
+                    IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, TokenRequest = model.TokenRequest };
+                    return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
+
+                case AuthoriseStep.MethodEntry:
+
+                    CustomTokenRequest request = new CustomTokenRequest()
+                    {
+                        Client_Id = "7ac39504-53f1-47f5-96b9-3c2682962b8b",
+                        Type = CustomGrantTypes.Pin,
+                        Username = "admin_a",
+                        Pin = new List<KeyValuePair<int, string>>()
                     {
                         new KeyValuePair<int, string>( 0, "A" ),
                         new KeyValuePair<int, string>(  2, "2" ),
                         new KeyValuePair<int, string>(  5, "5" )
                     },
-                    RedirectUri = $"https://localhost:7053/authorizeCallback",
-                };
-                JwtSecurityToken result = _authenticator.AuthenticateCustom(request);
+                        RedirectUri = $"https://localhost:7053/authorizeCallback",
+                    };
+                    JwtSecurityToken result = _authenticator.AuthenticateCustom(request);
 
-                if (result != null)
-                {
-                    string code = _tokenStorage.Add(result);
+                    if (result != null)
+                    {
+                        string code = _tokenStorage.Add(result);
 
-                    AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
-                    String queryString = response.ToQueryString<AuthoriseResponse>();
+                        AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
+                        String queryString = response.ToQueryString<AuthoriseResponse>();
 
-                    string url = $"{request.RedirectUri}?{queryString}";
-                    return new RedirectResult(url);
-                }
-                else
-                    return View();
+                        string url = $"{request.RedirectUri}?{queryString}";
+                        return new RedirectResult(url);
+                    }
+
+                    break;
             }
-            catch
-            {
-                return View();
-            }
+
+            return View();
         }
 
         // GET: AuthorisationController/Edit/5

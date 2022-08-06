@@ -1,27 +1,52 @@
-﻿@page
+﻿
 @using Server.Contracts
+@using Server.Views.Authorisation
 @model Server.Views.Authorisation.IndexModel
-@{
+
+@using (Html.BeginForm())
+{
     Layout = "_Layout";
-    <form id="WellKnown" method="post" action="@URIs.authorization_endpoint">
-        <form id="WellKnown">
+
+    @Html.AntiForgeryToken()
+
+    @switch (Model.Step)
+    {
+        case @AuthoriseStep.UserEntry:
+
             <div class="form-group">
                 <label for="Username">Username</label>
                 <input type="text" class="form-control" id="Username" name="Username" aria-describedby="UsernameHelp" placeholder="Enter Username">
                 <small id="UsernameHelp" class="form-text text-muted">Please enter your username.</small>
             </div>
+            <!--
             <div class="form-group">
-                <label for="Method">Method</label>
-                <select class="form-control" readonly="readonly">
-                    <option value="Pin" selected="selected">Pin</option>
-                </select>
+            <label for="Method">Method</label>
+            <select class="form-control" readonly="readonly">
+            <option value="Pin" selected="selected">Pin</option>
+            </select>
             </div>
             <div class="form-group">
-                <label for="Pin">Pin</label>
-                <input type="text" class="form-control" id="Pin" name="Pin" aria-describedby="PinHelp" placeholder="Enter Pin Number">
-                <small id="PinHelp" class="form-text text-muted">Please enter your Pin Number.</small>
+            <label for="Pin">Pin</label>
+            <input type="text" class="form-control" id="Pin" name="Pin" aria-describedby="PinHelp" placeholder="Enter Pin Number">
+            <small id="PinHelp" class="form-text text-muted">Please enter your Pin Number.</small>
             </div>
-            <button type="submit" class="btn btn-primary">Authenticate</button>
-        </form>
-    </form>
+            -->
+            <button type="submit" class="btn btn-primary">Proceed</button>
+
+            break;
+
+        case @AuthoriseStep.SelectMethod:
+
+            <button type="submit" class="btn btn-primary">Proceed</button>
+
+            break;
+
+        case @AuthoriseStep.MethodEntry:
+
+            <button type="submit" class="btn btn-primary">Authorise</button>
+
+            break;
+    }
+
+    @Html.HiddenFor(model => model.Step)
 }
