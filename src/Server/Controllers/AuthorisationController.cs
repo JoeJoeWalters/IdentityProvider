@@ -52,25 +52,24 @@ namespace Server.Controllers
 
                 case AuthoriseStep.SelectMethod:
 
-                    IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, TokenRequest = model.TokenRequest };
+                    IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, TokenRequest = model.TokenRequest, PinDigits = new List<string>() {"", "", "", "", "", ""}, PinDigitsActive = new List<bool>() { true, false, true, false, true, false } };
                     return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
 
                 case AuthoriseStep.MethodEntry:
 
-                    CustomTokenRequest request = new CustomTokenRequest()
+                    // Convert input fields in to format accepted by the service
+                    List<KeyValuePair<int, string>> pinDigits = new List<KeyValuePair<int, string>>();
+                    for (int pos = 0; pos < model.PinDigits.Count; pos ++)
                     {
-                        Client_Id = "7ac39504-53f1-47f5-96b9-3c2682962b8b",
-                        Type = CustomGrantTypes.Pin,
-                        Username = model.TokenRequest.Username,
-                        Pin = new List<KeyValuePair<int, string>>()
-                    {
-                        new KeyValuePair<int, string>( 0, "A" ),
-                        new KeyValuePair<int, string>(  2, "2" ),
-                        new KeyValuePair<int, string>(  5, "5" )
-                    },
-                        RedirectUri = $"https://localhost:7053/authorizeCallback",
-                    };
-                    JwtSecurityToken result = _authenticator.AuthenticateCustom(request);
+                        if (model.PinDigitsActive[pos])
+                        {
+                            pinDigits.Add(new KeyValuePair<int, string>(pos, model.PinDigits[pos]));
+                        }
+                    }
+
+                    // Create the custom request to pass to the authentication service
+                    model.TokenRequest.Pin = pinDigits;
+                    JwtSecurityToken result = _authenticator.AuthenticateCustom(model.TokenRequest);
 
                     if (result != null)
                     {
@@ -79,7 +78,7 @@ namespace Server.Controllers
                         AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
                         String queryString = response.ToQueryString<AuthoriseResponse>();
 
-                        string url = $"{request.RedirectUri}?{queryString}";
+                        string url = $"{model.TokenRequest.RedirectUri}?{queryString}";
                         return new RedirectResult(url);
                     }
 

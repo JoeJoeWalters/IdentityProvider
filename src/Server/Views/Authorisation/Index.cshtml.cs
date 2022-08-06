@@ -38,5 +38,15 @@ namespace Server.Views.Authorisation
         /// The eventual token request which we can build up over time from the screens
         /// </summary>
         public CustomTokenRequest TokenRequest { get; set; } = new CustomTokenRequest() { };
+
+        /// <summary>
+        /// Pin entries with strict naming due to the way 
+        /// </summary>
+        public List<string> PinDigits { get; set; } = new List<string>();
+
+        /// <summary>
+        /// If certain digits are active or not (for rendering)
+        /// </summary>
+        public List<Boolean> PinDigitsActive { get; set; } = new List<Boolean>();
     }
 }
