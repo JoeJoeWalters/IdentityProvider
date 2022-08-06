@@ -23,8 +23,11 @@ namespace Server.Authentication
         [JsonProperty(Required = Required.Default)]
         public String Name { get; set; } = String.Empty;
 
-        [JsonProperty("Authentication", ItemConverterType = typeof(StringEnumConverter))]
-        public List<String> RedirectURis { get; set; }
+        [JsonProperty("Claims", Required = Required.AllowNull)]
+        public List<String> Claims { get; set; }
+
+        [JsonProperty("Claims", Required = Required.AllowNull)]
+        public List<String> Scopes { get; set; }
     }
 
 }

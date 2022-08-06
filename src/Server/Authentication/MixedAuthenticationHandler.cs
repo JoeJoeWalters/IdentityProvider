@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Net.Http.Headers;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
@@ -12,7 +13,7 @@ namespace Server.Authentication
         /// <summary>
         /// Local reference to the user authenticator
         /// </summary>
-        private IUserAuthenticator userAuthenticator;
+        private IAuthenticator userAuthenticator;
 
         /// <summary>
         /// Default constructor
@@ -22,7 +23,7 @@ namespace Server.Authentication
             ILoggerFactory loggerFactory,
             UrlEncoder encoder,
             ISystemClock clock,
-            IUserAuthenticator userAuthenticator
+            IAuthenticator userAuthenticator
             ) : base(options, loggerFactory, encoder, clock)
         {
             // Assign the user authenticator to use (could be database, json file etc.)
@@ -39,7 +40,7 @@ namespace Server.Authentication
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
             // The security user that is found from the authentication process
-            SecurityUser user = null;
+            JwtSecurityToken data = null;
 
             // Is there an authorisation header to cehck against?
             if (!Request.Headers.ContainsKey("Authorization"))
@@ -59,7 +60,7 @@ namespace Server.Authentication
                 }
 
                 // Do the authentication by passing it to the supplied user authenticator implementation
-                user = userAuthenticator.AuthenticateToken(header);
+                data = userAuthenticator.AuthenticateToken(header);
             }
             catch (Exception ex)
             {
@@ -68,21 +69,11 @@ namespace Server.Authentication
             }
 
             // No user was found / authenticated
-            if (user == null)
-                return AuthenticateResult.Fail("Could Authenticate The Given Credentials");
+            if (data == null)
+                return AuthenticateResult.Fail("Couldn't Authenticate The Given Credentials");
 
             // Generate a new identity and inject the claims in to the identity
-            var identity = new ClaimsIdentity(user.Claims, Scheme.Name) { };
-
-            // Set up the claims user and identifier for the system to use
-            // Add the standard claim entries if they don't already exist
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
-            identity.AddClaim(new Claim(ClaimTypes.Name, user.Username));
-            identity.AddClaim(new Claim(ClaimTypes.Sid, user.Key));
-            identity.AddClaim(new Claim(ClaimTypes.AuthenticationMethod,
-                            String.Join(",",
-                                user.Authentication.Select(auth => auth.ToString()) ??
-                                new List<string>() { })));
+            var identity = new ClaimsIdentity(data.Claims, Scheme.Name) { };
 
             // Create the ticket required
             var principal = new ClaimsPrincipal(identity);

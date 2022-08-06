@@ -1,6 +1,7 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Server.Contracts.Tokens;
+using Server.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -12,65 +13,104 @@ namespace Server.Authentication
     /// <summary>
     /// Standard user authenticator that reads from a Json file in a given location
     /// </summary>
-    public class UserAuthenticator : IUserAuthenticator
+    public class Authenticator : IAuthenticator
     {
         /// <summary>
         /// Local cached list of users
         /// </summary>
         private AccessControl accessControl = new AccessControl() { };
 
+        private readonly ServerSettings _serverSettings;
+        private readonly SigningCredentials _signingCredentials;
+
         public TokenValidationParameters JWTValidationParams { get; internal set; }
 
-        public SecurityUser AuthenticateOAuth(TokenRequest tokenRequest)
+        /// <summary>
+        /// Default Constructor
+        /// </summary>
+        /// <param name="tokenValidationParameters">Validation parameters for the JWT Tokens</param>
+        public Authenticator()
+            => RefreshAccessList(); // Get the new access control list
+
+        public Authenticator(
+            TokenValidationParameters tokenValidationParameters,
+            SigningCredentials signingCredentials,
+            ServerSettings serverSettings)
+        {
+            this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
+            _serverSettings = serverSettings;
+            _signingCredentials = signingCredentials;
+            RefreshAccessList(); // Get the new access control list
+        }
+
+        public JwtSecurityToken AuthenticateCustom(CustomTokenRequest tokenRequest)
+            => Task.Run(() => AuthenticateCustomAsync(tokenRequest)).Result;
+
+        public async Task<JwtSecurityToken> AuthenticateCustomAsync(CustomTokenRequest tokenRequest)
+        {
+            SecurityData data = null;
+            DateTime now = DateTime.UtcNow; // Fixed point in time
+
+            switch (tokenRequest.Type)
+            {
+                case CustomGrantTypes.Pin:
+
+
+
+                    break;
+            }
+
+            return await GenerateTokenFromSecurityData(data, now);
+        }
+
+        public JwtSecurityToken AuthenticateOAuth(OAuthTokenRequest tokenRequest)
             => Task.Run(() => AuthenticateOAuthAsync(tokenRequest)).Result;
 
-        public async Task<SecurityUser> AuthenticateOAuthAsync(TokenRequest tokenRequest)
+        public async Task<JwtSecurityToken> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest)
         {
-            SecurityUser result = null;
+            SecurityData data = null;
+            DateTime now = DateTime.UtcNow; // Fixed point in time
 
-            // Not a JWT encoded bearer so compare to the API Key instead
             try
             {
                 switch (tokenRequest.Type)
                 {
                     case GrantTypes.ClientCredentials:
 
-                        result = accessControl
-                            .Users
-                            .Where(user =>
+                        data = accessControl
+                            .Clients
+                            .Where(client =>
                             {
                                 return
-                                    user.ClientId == tokenRequest.Client_Id &&
-                                    user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
-                            }).FirstOrDefault();
+                                    client.Id == tokenRequest.Client_Id &&
+                                    client.Secret == tokenRequest.Client_Secret;
+                            }).Select(client => new SecurityData() { ClientId = client.Id }).FirstOrDefault();
 
                         break;
 
                     case GrantTypes.Password:
 
-                        result = accessControl
+                        data = accessControl
                             .Users
                             .Where(user =>
                             {
                                 return
                                     user.Username == tokenRequest.Username &&
                                     user.Password == tokenRequest.Password &&
-                                    user.ClientId == tokenRequest.Client_Id &&
-                                    user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
+                                    user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
 
                         break;
 
                     case GrantTypes.AuthorisationCode:
 
-                        result = accessControl
+                        data = accessControl
                             .Users
                             .Where(user =>
                             {
                                 return
                                     user.Key == tokenRequest.Code &&
-                                    user.ClientId == tokenRequest.Client_Id &&
-                                    user.Authentication.Contains(SecurityUser.AuthenticationType.oauth);
+                                    user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
 
                         break;
@@ -80,11 +120,52 @@ namespace Server.Authentication
                         break;
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
             };
 
-            return await Task.FromResult<SecurityUser>(result);
+            return await GenerateTokenFromSecurityData(data, now);
+
+        }
+
+        private async Task<JwtSecurityToken> GenerateTokenFromSecurityData(SecurityData data, DateTime now)
+        {
+            long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
+
+            if (data != null)
+            {
+                // Generate a new JWT Header to wrap the token
+                JwtHeader header = new JwtHeader(_signingCredentials);
+                header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
+
+                // Combine the claims list to a standard claim array for the JWT payload
+                List<Claim> claims = new List<Claim>()
+                {
+                    new Claim("scope", "test")
+                };
+                claims.AddRange(data.Claims);
+                claims.Add(new Claim("sub", data.Id)); // Add the user id as the subject (sub claim) 
+                claims.Add(new Claim("ait", unixTime.ToString())); // Creation Time claim
+
+                // Create the content of the JWT Token with the appropriate expiry date
+                JwtPayload secPayload = new JwtPayload(
+                    _serverSettings.Issuer,
+                    _serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name,
+                    claims,
+                    now.AddSeconds(-1), // For the bots
+                    now.AddSeconds(_serverSettings.AccessTokenExpiry));
+
+                // Generate the final tokem from the header and it's payload
+                JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
+
+                return await Task.FromResult<JwtSecurityToken>(token);
+            }
+            else
+            {
+            }
+
+#warning "TODO"
+            throw new Exception();
         }
 
         /// <summary>
@@ -93,13 +174,13 @@ namespace Server.Authentication
         /// </summary>
         /// <param name="securityToken">The security token, usually from the header</param>
         /// <returns>The user that was found and validated, a null will be returned if no user was validated</returns>
-        public SecurityUser AuthenticateToken(String securityToken)
+        public JwtSecurityToken AuthenticateToken(String securityToken)
             => Task.Run(() => AuthenticateTokenAsync(securityToken)).Result;
 
-        public async Task<SecurityUser> AuthenticateTokenAsync(String securityToken)
+        public async Task<JwtSecurityToken> AuthenticateTokenAsync(String securityToken)
         {
             // Not authorised by default
-            SecurityUser result = null;
+            SecurityData result = null;
 
             // The time the token started to validate so it is consistent
             DateTime tokenReceivedTime = DateTime.UtcNow;
@@ -107,7 +188,7 @@ namespace Server.Authentication
             try
             {
                 // Basic authentication requested
-                AuthenticationHeaderValue authHeader = null;
+                AuthenticationHeaderValue authHeader;
                 try
                 {
                     authHeader = AuthenticationHeaderValue.Parse(securityToken);
@@ -159,71 +240,16 @@ namespace Server.Authentication
                             }
                             catch { }
 
-                            // Did we gain a principal?
+                            // Did we get a principal?
                             if (principal != null && validatedToken != null)
                             {
-                                // Transpose the principal and the token details to the user
-                                return new SecurityUser()
-                                {
-                                    Id = jwtSecurityToken.Claims.Where(claim => claim.Type == ClaimTypes.NameIdentifier).FirstOrDefault().Value,
-                                    Key = String.Empty,
-                                    Username = String.Empty,
-                                    Authentication = new List<SecurityUser.AuthenticationType>()
-                                    {
-                                        SecurityUser.AuthenticationType.oauth
-                                    },
-                                    Claims = jwtSecurityToken.Claims.ToList()
-                                };
+                                return await Task.FromResult<JwtSecurityToken>((JwtSecurityToken)validatedToken);
                             }
                         }
                         else
                         {
-                            // Not a JWT encoded bearer so compare to the API Key instead
-                            result = accessControl
-                                .Users
-                                .Where(user =>
-                                {
-                                    return
-                                        user.Key == token &&
-                                        user.Authentication.Contains(SecurityUser.AuthenticationType.apikey);
-                                }).FirstOrDefault();
+                            throw new Exception("Not a JWT token");
                         }
-
-                        break;
-
-                    case "basic":
-
-                        // Get the credentials from the basic authentication paramater part
-                        var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
-
-                        // Split up the credentials in the parameter and check the length being the correct size
-                        var credentials = Encoding.UTF8.GetString(credentialBytes).Split(':');
-                        if (credentials.Length == 2)
-                        {
-                            // Authorised?
-                            result = accessControl
-                                .Users
-                                .Where(user =>
-                                {
-                                    return
-                                        user.Password == credentials[1] &&
-                                        user.Username == credentials[0] &&
-                                        user.Authentication.Contains(SecurityUser.AuthenticationType.basic);
-                                }).FirstOrDefault();
-                        }
-
-                        break;
-
-                    case "apikey":
-
-                        result = accessControl
-                            .Users
-                            .Where(user =>
-                            {
-                                return
-                                    user.Key == token &&
-                                    user.Authentication.Contains(SecurityUser.AuthenticationType.apikey);
-                            }).FirstOrDefault();
 
                         break;
 
@@ -237,21 +263,8 @@ namespace Server.Authentication
                 throw ex;
             }
 
-            return await Task.FromResult<SecurityUser>(result);
-        }
-
-
-        /// <summary>
-        /// Default Constructor
-        /// </summary>
-        /// <param name="tokenValidationParameters">Validation parameters for the JWT Tokens</param>
-        public UserAuthenticator()
-            => RefreshAccessList(); // Get the new access control list
-
-        public UserAuthenticator(TokenValidationParameters tokenValidationParameters)
-        {
-            this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
-            RefreshAccessList(); // Get the new access control list
+#warning "TODO"
+            throw new Exception();
         }
 
         /// <summary>

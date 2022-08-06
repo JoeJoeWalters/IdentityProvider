@@ -6,7 +6,9 @@
       "Name": "Example Client",
       "RedirectUris": [
         "https://localhost:7053/authorizeCallback"
-      ]
+      ],
+      "Claims": [],
+      "Scopes": []
     }
   ],
   "Users": [
@@ -14,41 +16,21 @@
       "Audience": "System A",
       "Id": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Key": "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
-      "Authentication": [ "basic", "apikey", "oauth" ],
       "Username": "admin_a",
       "Password": "password",
       "ClientId": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
-      "Claims": [
-        /*
-        {
-          "Type": "admin",
-          "Value": "full"
-        },
-        {
-          "Type": "finance",
-          "Value": "readonly"
-        }*/
-      ]
+      "Claims": [],
+      "Scopes": []
     },
     {
       "Audience": "System B",
       "Id": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Key": "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
-      "Authentication": [ "basic", "apikey", "oauth" ],
       "Username": "admin_b",
       "Password": "password",
       "ClientId": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
-      "Claims": [
-        /*
-        {
-          "Type": "admin",
-          "Value": "full"
-        },
-        {
-          "Type": "finance",
-          "Value": "readonly"
-        }*/
-      ]
+      "Claims": [],
+      "Scopes": []
     }
   ]
 }

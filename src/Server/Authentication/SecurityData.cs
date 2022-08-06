@@ -12,15 +12,8 @@ namespace Server.Authentication
     /// of a potential user login
     /// </summary>
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore, MemberSerialization = MemberSerialization.OptOut)]
-    public class SecurityUser
+    public class SecurityData
     {
-        public enum AuthenticationType
-        {
-            basic,
-            oauth,
-            apikey
-        }
-
         [JsonProperty(Required = Required.Always)]
         public String Id { get; set; }
 
@@ -30,17 +23,17 @@ namespace Server.Authentication
         [JsonProperty(Required = Required.Default)]
         public String ClientId { get; set; } = String.Empty;
 
-        [JsonProperty("Authentication", ItemConverterType = typeof(StringEnumConverter))]
-        public List<AuthenticationType> Authentication { get; set; }
-
         [JsonProperty(Required = Required.Always)]
         public String Username { get; set; } = String.Empty;
 
         [JsonProperty(Required = Required.Default)]
         public String Password { get; set; } = String.Empty;
 
-        [JsonProperty(Required = Required.Default, ItemReferenceLoopHandling = ReferenceLoopHandling.Ignore, ItemConverterType = typeof(ClaimConverter))]
+        [JsonProperty(Required = Required.AllowNull)]
         public List<Claim> Claims { get; set; }
+
+        [JsonProperty("Claims", Required = Required.AllowNull)]
+        public List<String> Scopes { get; set; }
     }
 
     /// <summary>

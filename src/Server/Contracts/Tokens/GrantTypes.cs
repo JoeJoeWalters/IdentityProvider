@@ -7,4 +7,9 @@
         public const string Password = "password";
         public const string RefreshToken = "refresh_token";
     }
+
+    public class CustomGrantTypes
+    {
+        public const string Pin = "pin";
+    }
 }

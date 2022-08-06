@@ -15,6 +15,6 @@ namespace Server.Authentication
         public List<SecurityClient> Clients { get; set; }
 
         [JsonProperty(Required = Required.Default)]
-        public List<SecurityUser> Users { get; set; }
+        public List<SecurityData> Users { get; set; }
     }
 }

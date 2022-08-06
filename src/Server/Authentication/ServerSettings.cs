@@ -8,6 +8,10 @@
 
     public class ServerSettings
     {
+        // Defaults
+        public Int16 AccessTokenExpiry { get => 60; }
+        public Int16 RefreshTokenExpiry { get => 3600; }
+
         public string PublicKey { get; set; }
         public string PrivateKey { get; set; }
         public string Issuer { get; set; }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Server.Authentication;
 using Server.Contracts;
 using Server.Contracts.Tokens;
 using Server.Helpers;
@@ -12,6 +14,15 @@ namespace Server.Controllers
     /// </summary>
     public class AuthorisationController : Controller
     {
+        private readonly ITokenStorage _tokenStorage;
+        private readonly IAuthenticator _authenticator;
+
+        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator)
+        {
+            _tokenStorage = tokenStorage;
+            _authenticator = authenticator;
+        }
+
         // GET: AuthorisationController
         [HttpGet]
         [Route(URIs.authorization_endpoint)]
@@ -27,11 +38,21 @@ namespace Server.Controllers
         {
             try
             {
-                AuthoriseResponse response = new AuthoriseResponse() { code = Guid.NewGuid().ToString(), state = "" };
-                String queryString = response.ToQueryString<AuthoriseResponse>();
+                CustomTokenRequest request = new CustomTokenRequest() { };
+                SecurityToken result = _authenticator.AuthenticateCustom(request);
 
-                string url = $"https://localhost:7053/authorizeCallback?{queryString}";
-                return new RedirectResult(url);
+                if (result != null)
+                {
+                    string code = _tokenStorage.Add(result);
+
+                    AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
+                    String queryString = response.ToQueryString<AuthoriseResponse>();
+
+                    string url = $"https://localhost:7053/authorizeCallback?{queryString}";
+                    return new RedirectResult(url);
+                }
+                else
+                    return View();
             }
             catch
             {

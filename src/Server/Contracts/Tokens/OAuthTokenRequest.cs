@@ -11,15 +11,8 @@ namespace Server.Contracts.Tokens
     /// https://www.oauth.com/oauth2-servers/access-tokens/password-grant/
     /// </summary>
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
-    public class TokenRequest
+    public class OAuthTokenRequest
     {
-        // https://stackoverflow.com/questions/45876960/how-to-specify-audience-for-an-oauth2-access-token
-        /// <summary>
-        /// (Extended) Audience is not normally part of the auth request but indicates the partition key (e.g. logins for System A or System B)
-        /// </summary>
-        [JsonProperty(Required = Required.Always, PropertyName = "audience")]
-        public String Audience { get; set; } = String.Empty;
-
         /// <summary>
         /// authorization_code, client_credentials, password, refresh_token
         /// </summary>

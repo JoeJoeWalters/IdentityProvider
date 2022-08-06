@@ -18,11 +18,8 @@ namespace Server.Controllers
     public class TokenController : ControllerBase
     {
         private readonly ILogger<SessionController> _logger;
-        private readonly IUserAuthenticator _userAuthenticator;
+        private readonly IAuthenticator _userAuthenticator;
         private readonly ServerSettings _serverSettings;
-
-        private Int16 _accessTokenExpiry { get => 60; }
-        private Int16 _refreshTokenExpiry { get => 3600; }
 
         // https://vmsdurano.com/-net-core-3-1-signing-jwt-with-rsa/
         private SigningCredentials _signingCredentials { get; set; }
@@ -34,10 +31,12 @@ namespace Server.Controllers
         /// <param name="logger"></param>
         /// <param name="userAuthenticator"></param>
         /// <param name="serverSettings"></param>
+        /// <param name="signingCredentials"></param>
         public TokenController(
             ILogger<SessionController> logger,
-            IUserAuthenticator userAuthenticator,
-            ServerSettings serverSettings)
+            IAuthenticator userAuthenticator,
+            ServerSettings serverSettings,
+            SigningCredentials signingCredentials)
         {
             // Assign the logger family
             _logger = logger;
@@ -48,14 +47,7 @@ namespace Server.Controllers
             // Set up the signing credentials for tokens
             _serverSettings = serverSettings;
 
-            //RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048);
-            RSA rsa = RSA.Create();
-            rsa.ImportFromPem(_serverSettings.PrivateKey.ToCharArray());
-
-            _signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256Signature, SecurityAlgorithms.Sha256Digest)
-            {
-                CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
-            };
+            _signingCredentials = signingCredentials;
         }
 
         // https://connect2id.com/products/server/docs/api/par
@@ -77,7 +69,7 @@ namespace Server.Controllers
         /// <returns></returns> 
         [HttpGet]
         [Route(URIs.token_endpoint)]
-        public ActionResult Token([FromQuery] TokenRequest request)
+        public ActionResult Token([FromQuery] OAuthTokenRequest request)
         {
             DateTime now = DateTime.UtcNow; // Fixed point in time
             long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
@@ -92,19 +84,19 @@ namespace Server.Controllers
                 // Go look up the corresponding given token and refresh it, add to the expiry and hand back again
 
                 // Generate the new token from the refresh token as that holds the same data that was previously agreed
-                JwtSecurityToken token = (new JwtSecurityToken(request.Refresh_Token)).GenerateFromRefreshToken(_accessTokenExpiry, now, _signingCredentials, _serverSettings);
+                JwtSecurityToken token = (new JwtSecurityToken(request.Refresh_Token)).GenerateFromRefreshToken(_serverSettings.AccessTokenExpiry, now, _signingCredentials, _serverSettings);
 
                 // Generate the new refresh token from the generated token
-                JwtSecurityToken refreshToken = token.GenerateRefreshToken(_refreshTokenExpiry, now, _signingCredentials, _serverSettings);
+                JwtSecurityToken refreshToken = token.GenerateRefreshToken(_serverSettings.RefreshTokenExpiry, now, _signingCredentials, _serverSettings);
 
                 try
                 {
 
                     return new OkObjectResult(
-                        new TokenSuccess()
+                        new OAuthTokenSuccess()
                         {
                             AccessToken = handler.WriteToken(token),
-                            ExpiresIn = _accessTokenExpiry,
+                            ExpiresIn = _serverSettings.AccessTokenExpiry,
                             RefreshToken = handler.WriteToken(refreshToken),
                             Scope = "",
                             TokenType = "bearer"
@@ -123,40 +115,18 @@ namespace Server.Controllers
             }
             else
             {
+
                 // Check the client id and secret being asked for;
-                SecurityUser securityUser = _userAuthenticator.AuthenticateOAuth(request);
-                if (securityUser != null)
+                JwtSecurityToken token = _userAuthenticator.AuthenticateOAuth(request);
+                if (token != null)
                 {
-                    // Generate a new JWT Header to wrap the token
-                    JwtHeader header = new JwtHeader(_signingCredentials);
-                    header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
-
-                    // Combine the claims list to a standard claim array for the JWT payload
-                    List<Claim> claims = new List<Claim>()
-                    {
-                        new Claim("scope", "test")
-                    };
-                    claims.AddRange(securityUser.Claims);
-                    claims.Add(new Claim("sub", securityUser.Id)); // Add the user id as the subject (sub claim) 
-                    claims.Add(new Claim("ait", unixTime.ToString())); // Creation Time claim
-
-                    // Create the content of the JWT Token with the appropriate expiry date
-                    JwtPayload secPayload = new JwtPayload(
-                        _serverSettings.Issuer,
-                        request.Audience.IsNullOrEmpty() ? _serverSettings.Audiences.Where(aud => aud.Primary).FirstOrDefault().Name : request.Audience, // Audience from request probably needs removing as it's non-standard
-                        claims,
-                        now.AddSeconds(-1), // For the bots
-                        now.AddSeconds(_accessTokenExpiry));
-
-                    // Generate the final tokem from the header and it's payload
-                    JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
-                    JwtSecurityToken refreshToken = token.GenerateRefreshToken(_refreshTokenExpiry, now, _signingCredentials, _serverSettings);
+                    JwtSecurityToken refreshToken = token.GenerateRefreshToken(_serverSettings.RefreshTokenExpiry, now, _signingCredentials, _serverSettings);
 
                     return new OkObjectResult(
-                        new TokenSuccess()
+                        new OAuthTokenSuccess()
                         {
                             AccessToken = handler.WriteToken(token),
-                            ExpiresIn = _accessTokenExpiry,
+                            ExpiresIn = _serverSettings.AccessTokenExpiry,
                             RefreshToken = handler.WriteToken(refreshToken),
                             Scope = "",
                             TokenType = "bearer"
@@ -198,7 +168,7 @@ namespace Server.Controllers
 
             try
             {
-                ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out SecurityToken jsonToken);
+                ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out Microsoft.IdentityModel.Tokens.SecurityToken jsonToken);
                 JwtSecurityToken token = jsonToken as JwtSecurityToken;
 
                 string type = token.Header["typ"].ToString().ToLower();

@@ -1,5 +1,7 @@
-﻿using Server.Contracts.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
+using Server.Contracts.Tokens;
 using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -10,7 +12,7 @@ namespace Server.Authentication
     /// User authenticators handle the authentication of users when a request
     /// is made to the api
     /// </summary>
-    public interface IUserAuthenticator
+    public interface IAuthenticator
     {
         /// <summary>
         /// Take an OAuth grant request (usually from the auth token in the header) and validate the
@@ -18,17 +20,25 @@ namespace Server.Authentication
         /// </summary>
         /// <param name="token">The security token, usually from the header</param>
         /// <returns>The user that was found and validated, a null will be returned if no user was validated</returns>
-        SecurityUser AuthenticateToken(String token);
-        Task<SecurityUser> AuthenticateTokenAsync(String token);
+        JwtSecurityToken AuthenticateToken(String token);
+        Task<JwtSecurityToken> AuthenticateTokenAsync(String token);
 
         /// <summary>
         /// Authenticate the client id and secret against the "users" (clients in their own right essentially)
         /// </summary>
         /// <param name="tokenRequest">OAuth Request Payload</param>
         /// <returns>The user that was found and validated, a null will be returned if no user was validated</returns>
-        SecurityUser AuthenticateOAuth(TokenRequest tokenRequest);
-        Task<SecurityUser> AuthenticateOAuthAsync(TokenRequest tokenRequest);
-        
+        JwtSecurityToken AuthenticateOAuth(OAuthTokenRequest tokenRequest);
+        Task<JwtSecurityToken> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest);
+
+        /// <summary>
+        /// Authenticate via custom methods (pin / face etc. from the authorize endpoint)
+        /// </summary>
+        /// <param name="tokenRequest">OAuth Request Payload</param>
+        /// <returns>The user that was found and validated, a null will be returned if no user was validated</returns>
+        JwtSecurityToken AuthenticateCustom(CustomTokenRequest tokenRequest);
+        Task<JwtSecurityToken> AuthenticateCustomAsync(CustomTokenRequest tokenRequest);
+
         /// <summary>
         /// Refresh the list of cached users that are validated against
         /// </summary>

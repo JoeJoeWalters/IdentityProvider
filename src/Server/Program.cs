@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Server.Authentication;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Server
@@ -35,19 +36,33 @@ namespace Server
                 string path = Path.Combine(Environment.CurrentDirectory, "users.json");
                 using (FileStream accessControlStream = File.OpenRead(path))
                 {
+                    ITokenStorage tokenStorage = new TokenStorage();
+                    builder.Services.AddSingleton<ITokenStorage>(tokenStorage);
+
+                    //RSACryptoServiceProvider rsa = new RSACryptoServiceProvider(2048);
+                    RSA rsa = RSA.Create();
+                    rsa.ImportFromPem(settings.PrivateKey.ToCharArray());
+
+                    SigningCredentials signingCredentials = new SigningCredentials(new RsaSecurityKey(rsa), SecurityAlgorithms.RsaSha256Signature, SecurityAlgorithms.Sha256Digest)
+                    {
+                        CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false }
+                    };
+                    builder.Services.AddSingleton<SigningCredentials>(signingCredentials);
+
                     // Set up the authentication service with the appropriate authenticator implementation
-                    IUserAuthenticator userAuthenticator = new UserAuthenticator(
-                                                                new TokenValidationParameters()
+                    IAuthenticator authenticator = new Authenticator(new TokenValidationParameters()
                                                                 {
                                                                     ValidateLifetime = true,
                                                                     ValidateAudience = true,
                                                                     ValidateIssuer = true,
                                                                     ValidIssuer = settings.Issuer,
                                                                     ValidAudiences = settings.Audiences.Select(aud => aud.Name)
-                                                                });
+                                                                }, 
+                                                                signingCredentials,
+                                                                settings);
 
-                    userAuthenticator.RefreshAccessList(accessControlStream);
-                    builder.Services.AddSingleton<IUserAuthenticator>(userAuthenticator);
+                    authenticator.RefreshAccessList(accessControlStream);
+                    builder.Services.AddSingleton<IAuthenticator>(authenticator);
                 }
 
             }
