@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Server.Authentication;
 using Server.Contracts;
+using Server.Contracts.Services;
 using Server.Contracts.Tokens;
 using Server.Helpers;
 using Server.Services;
@@ -20,14 +21,16 @@ namespace Server.Controllers
         private readonly ITokenStorage _tokenStorage;
         private readonly IAuthenticator _authenticator;
         private readonly IPasscodeService _passcodeService;
+        private readonly IOTPService _otpService;
         private readonly ServerSettings _serverSettings;
 
-        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator, IPasscodeService passcodeService, ServerSettings serverSettings)
+        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator, IPasscodeService passcodeService, IOTPService otpService, ServerSettings serverSettings)
         {
             _tokenStorage = tokenStorage;
             _authenticator = authenticator;
             _passcodeService = passcodeService;
             _serverSettings = serverSettings;
+            _otpService = otpService;
         }
 
         // GET: AuthorisationController
@@ -42,7 +45,7 @@ namespace Server.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Route(URIs.authorization_endpoint)]
-        public ActionResult Post(IndexModel model)
+        public async Task<ActionResult> Post(IndexModel model)
         {
             ModelState.Clear(); // To stop the model value sticking we clear the state so they are not re-populated and overwrite our changes
 
@@ -92,11 +95,65 @@ namespace Server.Controllers
                         case CustomGrantTypes.OTP:
 
                             methodEntryModel.AuthOptions.Add(new SelectListItem("OTP", CustomGrantTypes.OTP));
+
+                            methodEntryModel.OTPDeliveryOptions = new List<SelectListItem>();
+                            methodEntryModel.OTPDeliveryOptions.Add(new SelectListItem("SMS (+440*******89)", "SMS:+4407123456789"));
+                            methodEntryModel.OTPDeliveryOptions.Add(new SelectListItem("Email (j**@****.com)", "Email:joe@email.com"));
+                            methodEntryModel.Step = AuthoriseStep.SelectDeliveryMedium;
+
                             return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
                     }
 
                     break;
 
+
+                case AuthoriseStep.SelectDeliveryMedium:
+
+                    IndexModel mediumEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, AuthOptions = new List<SelectListItem>(), TokenRequest = model.TokenRequest };
+
+                    switch (model.TokenRequest.Type)
+                    {
+                        case CustomGrantTypes.Passcode:
+
+                            break;
+
+                        case CustomGrantTypes.OTP:
+
+                            String[] splitOtpOption = model.OTPDeliveryOption.Split(':');
+                            SendOTPDeliveryMethod deliveryMethod = SendOTPDeliveryMethod.SMS;
+                            switch (splitOtpOption[0].ToLower())
+                            {
+                                case "sms":
+                                    deliveryMethod = SendOTPDeliveryMethod.SMS;
+                                    break;
+                                case "email":
+                                    deliveryMethod = SendOTPDeliveryMethod.Email;
+                                    break;
+                                case "voice":
+                                    deliveryMethod = SendOTPDeliveryMethod.Voice;
+                                    break;
+                            }
+                            String deliveryValue = splitOtpOption[1];
+                            String otpIdentifier = Guid.NewGuid().ToString();
+
+                            SendOTPResponse response = await _otpService.SendOTP(new SendOTPRequest() { DeliveryMethod = deliveryMethod, DeliveryValue = deliveryValue, Identifier = otpIdentifier });
+                            if (response.Success)
+                            {
+                                mediumEntryModel.AuthOptions.Add(new SelectListItem("OTP", CustomGrantTypes.OTP));
+
+                                mediumEntryModel.OTPDeliveryOptions = new List<SelectListItem>();
+                                mediumEntryModel.OTPDeliveryOptions.Add(new SelectListItem("SMS (+440*******89)", "SMS:+4407123456789"));
+                                mediumEntryModel.OTPDeliveryOptions.Add(new SelectListItem("Email (j**@****.com)", "Email:joe@email.com"));
+                                mediumEntryModel.TokenRequest.OTPIdentifier = otpIdentifier;
+
+                                return View("~/Views/Authorisation/Index.cshtml", mediumEntryModel);
+                            }
+
+                            break;
+
+                    }
+
+                    break;
 
                 case AuthoriseStep.MethodEntry:
 
@@ -116,11 +173,11 @@ namespace Server.Controllers
 
                             // Create the custom request to pass to the authentication service
                             model.TokenRequest.Passcode = passcodeDigits;
-                            JwtSecurityToken result = _authenticator.AuthenticateCustom(model.TokenRequest);
+                            JwtSecurityToken passcodeResult = _authenticator.AuthenticateCustom(model.TokenRequest);
 
-                            if (result != null)
+                            if (passcodeResult != null)
                             {
-                                string code = _tokenStorage.Add(result);
+                                string code = _tokenStorage.Add(passcodeResult);
 
                                 AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
                                 String queryString = response.ToQueryString<AuthoriseResponse>();
@@ -133,8 +190,20 @@ namespace Server.Controllers
 
                         case CustomGrantTypes.OTP:
 
-                            break;
+                            JwtSecurityToken otpResult = _authenticator.AuthenticateCustom(model.TokenRequest);
 
+                            if (otpResult != null)
+                            {
+                                string code = _tokenStorage.Add(otpResult);
+
+                                AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
+                                String queryString = response.ToQueryString<AuthoriseResponse>();
+
+                                string url = $"{model.TokenRequest.RedirectUri}?{queryString}";
+                                return new RedirectResult(url);
+                            }
+
+                            break;
                     }
 
                     break;

@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Server.Contracts.Services;
 using Server.Contracts.Tokens;
 using Server.Helpers;
 using Server.Services;
@@ -24,6 +25,7 @@ namespace Server.Authentication
         private readonly ServerSettings _serverSettings;
         private readonly SigningCredentials _signingCredentials;
         private readonly IPasscodeService _pinService;
+        private readonly IOTPService _otpService;
         private readonly IHashService _hashService;
         private readonly ITokenStorage _tokenStorage;
 
@@ -42,6 +44,7 @@ namespace Server.Authentication
             ServerSettings serverSettings,
             IHashService hashService,
             IPasscodeService pinService,
+            IOTPService otpService,
             ITokenStorage tokenStorage)
         {
             this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
@@ -49,6 +52,7 @@ namespace Server.Authentication
             _signingCredentials = signingCredentials;
             _hashService = hashService;
             _pinService = pinService;
+            _otpService = otpService;
             _tokenStorage = tokenStorage;
             RefreshAccessList(); // Get the new access control list
         }
@@ -84,6 +88,22 @@ namespace Server.Authentication
                                     _pinService.CompareHashedDigits(tokenRequest.Passcode, user.Id, user.Passcode) &&
                                     user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
+
+                    break;
+
+                case CustomGrantTypes.OTP:
+
+                    if (await _otpService.VerifyOTP(new VerifyOTPRequest() { Identifier = tokenRequest.OTPIdentifier, Value = tokenRequest.OTP }))
+                    {
+                        data = accessControl
+                                .Users
+                                .Where(user =>
+                                {
+                                    return
+                                        user.Username == tokenRequest.Username &&
+                                        user.ClientId == tokenRequest.Client_Id;
+                                }).FirstOrDefault();
+                    }
 
                     break;
             }

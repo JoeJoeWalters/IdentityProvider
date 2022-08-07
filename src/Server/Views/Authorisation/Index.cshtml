@@ -35,6 +35,24 @@
 
             break;
 
+        case @AuthoriseStep.SelectDeliveryMedium:
+
+            <div class="form-group">
+                <label for="Username">Username</label>
+                @Html.TextBoxFor(model => model.TokenRequest.Username,  new { @readonly = "readonly", @class="form-control" })
+            </div>
+            <div class="form-group">
+                <label for="Method">Method</label>
+                @Html.DropDownListFor(ddl => ddl.TokenRequest.Type, Model.AuthOptions, new { @readonly = "readonly", @class="form-control" })
+            </div>
+            <div class="form-group">
+                <label for="Method">Deliver To</label>
+                @Html.DropDownListFor(ddl => ddl.OTPDeliveryOption, Model.OTPDeliveryOptions, new { @class="form-control" })
+            </div>
+            <button type="submit" class="btn btn-primary">Send</button>
+
+            break;
+
         case @AuthoriseStep.MethodEntry:
 
             <div class="form-group">
@@ -64,6 +82,16 @@
                     break;
 
                 case @CustomGrantTypes.OTP:
+
+                    <div class="form-group">
+                        <label for="Method">Deliver To</label>
+                        @Html.DropDownListFor(ddl => ddl.OTPDeliveryOption, Model.OTPDeliveryOptions, new { @readonly = "readonly", @class="form-control" })
+                    </div>
+                    <div class="form-group">
+                        <label for="Username">OTP</label>
+                        @Html.PasswordFor(model => model.TokenRequest.OTP,  new { @class="form-control" })
+                        @Html.HiddenFor(model => model.TokenRequest.OTPIdentifier)
+                    </div>
 
                     break;
             }

@@ -15,5 +15,10 @@
         /// </summary>
         public string Value { get; set; } = string.Empty;
 
+        /// <summary>
+        /// If no identifier was sent in then this is the generated Id
+        /// </summary>
+        public string Identifier { get; set; } = string.Empty;
+
     }
 }

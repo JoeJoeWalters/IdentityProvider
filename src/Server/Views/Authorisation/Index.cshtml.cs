@@ -12,7 +12,8 @@ namespace Server.Views.Authorisation
     {
         UserEntry = 0,
         SelectMethod = 1,
-        MethodEntry = 2
+        SelectDeliveryMedium = 2,
+        MethodEntry = 3
     }
 
     /// <summary>
@@ -54,5 +55,15 @@ namespace Server.Views.Authorisation
         /// Drop down list of the authentication options
         /// </summary>
         public List<SelectListItem> AuthOptions { get; set; } = new List<SelectListItem>();
+
+        /// <summary>
+        /// Selected OTP Delivery option in the screen (thrown away later)
+        /// </summary>
+        public String OTPDeliveryOption { get; set; } = String.Empty;
+
+        /// <summary>
+        /// Drop down list of the OTP Delivery options
+        /// </summary>
+        public List<SelectListItem> OTPDeliveryOptions { get; set; } = new List<SelectListItem>();
     }
 }

@@ -70,6 +70,7 @@ namespace Server
                                                                 settings,
                                                                 hashService,
                                                                 pinService,
+                                                                otpService,
                                                                 tokenStorage);
                     authenticator.RefreshAccessList(accessControlStream); // Pass the user / client registrations file to the authenticator to pre-load them
                     builder.Services.AddSingleton<IAuthenticator>(authenticator);

@@ -22,6 +22,12 @@ namespace Server.Contracts.Tokens
         [JsonProperty(Required = Required.Default, PropertyName = "passcode")]
         public List<KeyValuePair<int, string>> Passcode { get; set; } = new List<KeyValuePair<int, string>>();
 
+        [JsonProperty(Required = Required.Default, PropertyName = "otp_identifier")]
+        public String OTPIdentifier { get; set; } = String.Empty;
+
+        [JsonProperty(Required = Required.Default, PropertyName = "otp")]
+        public String OTP { get; set; } = String.Empty;
+
         [JsonProperty(Required = Required.Default, PropertyName = "redirect_uri")]
         public String RedirectUri { get; set; } = String.Empty;
     }

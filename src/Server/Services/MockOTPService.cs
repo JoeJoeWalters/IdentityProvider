@@ -32,7 +32,7 @@ namespace Server.Services
             // Store the OTP for verification later
             _otpRequests.Add(request.Identifier, request);
 
-            SendOTPResponse result = new SendOTPResponse() { Success = true, Value = request.Value };
+            SendOTPResponse result = new SendOTPResponse() { Success = true, Value = request.Value, Identifier = request.Identifier };
 
             return await Task.FromResult(result);
         }
