@@ -10,6 +10,7 @@
 
     public class CustomGrantTypes
     {
-        public const string Pin = "pin";
+        public const string Passcode = "passcode";
+        public const string OTP = "otp";
     }
 }

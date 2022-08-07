@@ -14,7 +14,7 @@
 
         public string PublicKey { get; set; }
         public string PrivateKey { get; set; }
-        public int PinSize { get; set; }
+        public int PasscodeSize { get; set; }
         public string Issuer { get; set; }
         public List<Audience> Audiences { get; set; }
     }

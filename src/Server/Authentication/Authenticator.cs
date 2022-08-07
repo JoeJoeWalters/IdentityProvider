@@ -73,7 +73,7 @@ namespace Server.Authentication
 
             switch (tokenRequest.Type)
             {
-                case CustomGrantTypes.Pin:
+                case CustomGrantTypes.Passcode:
 
                     data = accessControl
                             .Users
@@ -81,7 +81,7 @@ namespace Server.Authentication
                             {
                                 return
                                     user.Username == tokenRequest.Username &&
-                                    _pinService.CompareHashedDigits(tokenRequest.Pin, user.Id, user.Passcode) &&
+                                    _pinService.CompareHashedDigits(tokenRequest.Passcode, user.Id, user.Passcode) &&
                                     user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
 

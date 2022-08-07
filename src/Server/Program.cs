@@ -36,7 +36,7 @@ namespace Server
                 IPasscodeService pinService = new PasscodeService(hashService);
                 builder.Services.AddSingleton<IPasscodeService>(pinService);
 
-                IOTPService otpService = new OTPService();
+                IOTPService otpService = new MockOTPService();
                 builder.Services.AddSingleton<IOTPService>(otpService);
 
                 // Add the private and public keys for signing to the settings collection before adding for DI

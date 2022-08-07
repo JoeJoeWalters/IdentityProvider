@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
 using Server.Authentication;
@@ -52,55 +53,88 @@ namespace Server.Controllers
 
                     SecurityData methodData = _authenticator.GetByUsername(model.TokenRequest.Username); // Get the credential properties based on the username so we can determine the types of authrication it can use
 
-                    IndexModel selectMethodModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.SelectMethod, TokenRequest = model.TokenRequest };
-                    return View("~/Views/Authorisation/Index.cshtml", selectMethodModel);
+                    List<SelectListItem> authOptions = new List<SelectListItem>()
+                    {
+                        new SelectListItem("Passcode", CustomGrantTypes.Passcode),
+                        new SelectListItem("OTP", CustomGrantTypes.OTP)
+                    };
 
+                    IndexModel selectMethodModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.SelectMethod, AuthOptions = authOptions, TokenRequest = model.TokenRequest };
+                    return View("~/Views/Authorisation/Index.cshtml", selectMethodModel);
 
                 case AuthoriseStep.SelectMethod:
 
                     SecurityData entryData = _authenticator.GetByUsername(model.TokenRequest.Username); // Get the credential properties based on the username so we can determine the types of authrication it can use
+                    IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, AuthOptions = new List<SelectListItem>(), TokenRequest = model.TokenRequest };
 
-                    // Ask the pin service which positions we should be asking for by asking for X digits of the Y that are available
-#warning 3 is an arbitory number right now, make a service setting
-                    List<int> positions = _passcodeService.RandomPositions(entryData.Passcode, 3);
-
-                    // Map the positions to the model
-                    List<string> pinDigitsSetup = new List<string>();
-                    List<Boolean> pinDigitsActiveSetup = new List<bool>();
-                    for (int pos = 0; pos < _serverSettings.PinSize; pos++)
+                    switch (model.TokenRequest.Type)
                     {
-                        pinDigitsSetup.Add("");
-                        pinDigitsActiveSetup.Add(positions.Contains(pos));
+                        case CustomGrantTypes.Passcode:
+
+                            // Ask the pin service which positions we should be asking for by asking for X digits of the Y that are available
+#warning 3 is an arbitory number right now, make a service setting
+                            List<int> positions = _passcodeService.RandomPositions(entryData.Passcode, 3);
+
+                            // Map the positions to the model
+                            List<string> passcodeDigitsSetup = new List<string>();
+                            List<Boolean> passcodeDigitsActiveSetup = new List<bool>();
+                            for (int pos = 0; pos < _serverSettings.PasscodeSize; pos++)
+                            {
+                                passcodeDigitsSetup.Add("");
+                                passcodeDigitsActiveSetup.Add(positions.Contains(pos));
+                            }
+
+                            methodEntryModel.PasscodeDigits = passcodeDigitsSetup;
+                            methodEntryModel.PasscodeDigitsActive = passcodeDigitsActiveSetup;
+                            methodEntryModel.AuthOptions.Add(new SelectListItem("Passcode", CustomGrantTypes.Passcode));
+                            return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
+
+                        case CustomGrantTypes.OTP:
+
+                            methodEntryModel.AuthOptions.Add(new SelectListItem("OTP", CustomGrantTypes.OTP));
+                            return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
                     }
 
-                    IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, TokenRequest = model.TokenRequest, PinDigits = pinDigitsSetup, PinDigitsActive = pinDigitsActiveSetup };
-                    return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
+                    break;
+
 
                 case AuthoriseStep.MethodEntry:
 
-                    // Convert input fields in to format accepted by the service
-                    List<KeyValuePair<int, string>> pinDigits = new List<KeyValuePair<int, string>>();
-                    for (int pos = 0; pos < model.PinDigits.Count; pos ++)
+                    switch (model.TokenRequest.Type)
                     {
-                        if (model.PinDigitsActive[pos])
-                        {
-                            pinDigits.Add(new KeyValuePair<int, string>(pos, model.PinDigits[pos]));
-                        }
-                    }
+                        case CustomGrantTypes.Passcode:
 
-                    // Create the custom request to pass to the authentication service
-                    model.TokenRequest.Pin = pinDigits;
-                    JwtSecurityToken result = _authenticator.AuthenticateCustom(model.TokenRequest);
+                            // Convert input fields in to format accepted by the service
+                            List<KeyValuePair<int, string>> passcodeDigits = new List<KeyValuePair<int, string>>();
+                            for (int pos = 0; pos < model.PasscodeDigits.Count; pos++)
+                            {
+                                if (model.PasscodeDigitsActive[pos])
+                                {
+                                    passcodeDigits.Add(new KeyValuePair<int, string>(pos, model.PasscodeDigits[pos]));
+                                }
+                            }
 
-                    if (result != null)
-                    {
-                        string code = _tokenStorage.Add(result);
+                            // Create the custom request to pass to the authentication service
+                            model.TokenRequest.Passcode = passcodeDigits;
+                            JwtSecurityToken result = _authenticator.AuthenticateCustom(model.TokenRequest);
 
-                        AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
-                        String queryString = response.ToQueryString<AuthoriseResponse>();
+                            if (result != null)
+                            {
+                                string code = _tokenStorage.Add(result);
 
-                        string url = $"{model.TokenRequest.RedirectUri}?{queryString}";
-                        return new RedirectResult(url);
+                                AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
+                                String queryString = response.ToQueryString<AuthoriseResponse>();
+
+                                string url = $"{model.TokenRequest.RedirectUri}?{queryString}";
+                                return new RedirectResult(url);
+                            }
+
+                            break;
+
+                        case CustomGrantTypes.OTP:
+
+                            break;
+
                     }
 
                     break;

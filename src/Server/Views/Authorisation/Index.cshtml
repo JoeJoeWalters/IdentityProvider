@@ -1,4 +1,5 @@
 ﻿@using Server.Contracts
+@using Server.Contracts.Tokens
 @using Server.Views.Authorisation
 @model Server.Views.Authorisation.IndexModel
 
@@ -16,19 +17,6 @@
                 <label for="Username">Username</label>
                 @Html.TextBoxFor(model => model.TokenRequest.Username,  new { @class="form-control" })
             </div>
-            <!--
-            <div class="form-group">
-            <label for="Method">Method</label>
-            <select class="form-control" readonly="readonly">
-            <option value="Pin" selected="selected">Pin</option>
-            </select>
-            </div>
-            <div class="form-group">
-            <label for="Pin">Pin</label>
-            <input type="text" class="form-control" id="Pin" name="Pin" aria-describedby="PinHelp" placeholder="Enter Pin Number">
-            <small id="PinHelp" class="form-text text-muted">Please enter your Pin Number.</small>
-            </div>
-            -->
             <button type="submit" class="btn btn-primary">Proceed</button>
 
             break;
@@ -41,11 +29,8 @@
             </div>
             <div class="form-group">
                 <label for="Method">Method</label>
-                <select class="form-control" readonly="readonly">
-                    <option value="Passcode" selected="selected">Passcode</option>
-                </select>
+                @Html.DropDownListFor(ddl => ddl.TokenRequest.Type, Model.AuthOptions,  new { @class="form-control" })
             </div>
-
             <button type="submit" class="btn btn-primary">Proceed</button>
 
             break;
@@ -56,18 +41,32 @@
                 <label for="Username">Username</label>
                 @Html.TextBoxFor(model => model.TokenRequest.Username,  new { @readonly = "readonly", @class="form-control" })
             </div>
-
             <div class="form-group">
-                <label for="Pin">Pin</label>
-                <div class="input-group mb-3">
-                    @for (int i = 0; i < Model.PinDigits.Count; i++)
-                    {
-                        @Html.PasswordFor(x=>Model.PinDigits[i], !Model.PinDigitsActive[i] ? new {@readonly = "readonly", @class="form-control" } : new { @class="form-control" })
-                        @Html.HiddenFor(x=> Model.PinDigitsActive[i])
-                    }
-                </div>
+                <label for="Method">Method</label>
+                @Html.DropDownListFor(ddl => ddl.TokenRequest.Type, Model.AuthOptions, new { @readonly = "readonly", @class="form-control" })
             </div>
 
+            @switch (Model.TokenRequest.Type)
+            {
+                case @CustomGrantTypes.Passcode:
+
+                    <div class="form-group">
+                        <label for="Pin">Pin</label>
+                        <div class="input-group mb-3">
+                            @for (int i = 0; i < Model.PasscodeDigits.Count; i++)
+                            {
+                                @Html.PasswordFor(x=>Model.PasscodeDigits[i], !Model.PasscodeDigitsActive[i] ? new {@readonly = "readonly", @class="form-control" } : new { @class="form-control" })
+                                @Html.HiddenFor(x=> Model.PasscodeDigitsActive[i])
+                            }
+                        </div>
+                    </div>
+
+                    break;
+
+                case @CustomGrantTypes.OTP:
+
+                    break;
+            }
             <button type="submit" class="btn btn-primary">Authorise</button>
 
             break;
