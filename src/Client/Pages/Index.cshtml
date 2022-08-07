@@ -298,23 +298,23 @@
                             <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
                         </div>
                         <div class="form-group" v-if="introspectionData.loaded">
-                            <label for="introspectionDataClientActive"></label>
+                            <label for="introspectionDataClientActive">Active?</label>
                             <input type="text" class="form-control" id="introspectionDataClientActive" v-model="introspectionData.active" readonly="readonly">
                         </div>
                         <div class="form-group" v-if="introspectionData.loaded">
-                            <label for="introspectionDataClientScope"></label>
+                            <label for="introspectionDataClientScope">Scope</label>
                             <input type="text" class="form-control" id="introspectionDataClientScope" v-model="introspectionData.scope" readonly="readonly">
                         </div>
                         <div class="form-group" v-if="introspectionData.loaded">
-                            <label for="introspectionDataClientId"></label>
+                            <label for="introspectionDataClientId">Client Id</label>
                             <input type="text" class="form-control" id="introspectionDataClientId" v-model="introspectionData.client_id" readonly="readonly">
                         </div>
                         <div class="form-group" v-if="introspectionData.loaded">
-                            <label for="introspectionDataUsername"></label>
+                            <label for="introspectionDataUsername">Username</label>
                             <input type="text" class="form-control" id="introspectionDataUsername" v-model="introspectionData.username" readonly="readonly">
                         </div>
                         <div class="form-group" v-if="introspectionData.loaded">
-                            <label for="introspectionDataExp"></label>
+                            <label for="introspectionDataExp">Expires</label>
                             <input type="text" class="form-control" id="introspectionDataExp" v-model="introspectionData.expAsString" readonly="readonly">
                         </div>
                     </form>

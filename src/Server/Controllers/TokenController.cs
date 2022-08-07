@@ -163,13 +163,21 @@ namespace Server.Controllers
             {
                 ValidIssuer = _serverSettings.Issuer,
                 ValidAudiences = _serverSettings.Audiences.Select(aud => aud.Name).ToArray(),
+                ValidateLifetime = true,
+                RequireExpirationTime = true,
+                RequireAudience = true,
                 IssuerSigningKeys = new List<SecurityKey> { new RsaSecurityKey(rsa) }
             };
 
             try
             {
-                ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out Microsoft.IdentityModel.Tokens.SecurityToken jsonToken);
+                ClaimsPrincipal principal = handler.ValidateToken(request.token, validationParameters, out SecurityToken jsonToken);
                 JwtSecurityToken token = jsonToken as JwtSecurityToken;
+
+                // Token validation is seemingly avoiding if the exp date < datetime.utcnow so do it manually
+#warning ValidateToken should do this right?
+                if (token.Payload.Exp.Value <= (new DateTimeOffset(DateTime.UtcNow)).ToUnixTimeSeconds())
+                    throw new SecurityTokenExpiredException();
 
                 string type = token.Header["typ"].ToString().ToLower();
 
@@ -199,7 +207,11 @@ namespace Server.Controllers
             {
 
             }
-            catch (SecurityTokenInvalidLifetimeException expEx)
+            catch (SecurityTokenInvalidLifetimeException lifEx)
+            {
+
+            }
+            catch (SecurityTokenExpiredException expEx)
             {
 
             }
