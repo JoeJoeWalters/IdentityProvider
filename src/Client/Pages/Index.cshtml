@@ -297,6 +297,26 @@
                         <div class="btn-toolbar">
                             <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
                         </div>
+                        <div class="form-group" v-if="introspectionData.loaded">
+                            <label for="introspectionDataClientActive"></label>
+                            <input type="text" class="form-control" id="introspectionDataClientActive" v-model="introspectionData.active" readonly="readonly">
+                        </div>
+                        <div class="form-group" v-if="introspectionData.loaded">
+                            <label for="introspectionDataClientScope"></label>
+                            <input type="text" class="form-control" id="introspectionDataClientScope" v-model="introspectionData.scope" readonly="readonly">
+                        </div>
+                        <div class="form-group" v-if="introspectionData.loaded">
+                            <label for="introspectionDataClientId"></label>
+                            <input type="text" class="form-control" id="introspectionDataClientId" v-model="introspectionData.client_id" readonly="readonly">
+                        </div>
+                        <div class="form-group" v-if="introspectionData.loaded">
+                            <label for="introspectionDataUsername"></label>
+                            <input type="text" class="form-control" id="introspectionDataUsername" v-model="introspectionData.username" readonly="readonly">
+                        </div>
+                        <div class="form-group" v-if="introspectionData.loaded">
+                            <label for="introspectionDataExp"></label>
+                            <input type="text" class="form-control" id="introspectionDataExp" v-model="introspectionData.expAsString" readonly="readonly">
+                        </div>
                     </form>
                 </div>
             </div>
@@ -454,6 +474,15 @@
                     introspectionScreen: {
                         token_type_hint: "jwt"
                     },
+                    introspectionData: {
+                        loaded: false,
+                        active: false,
+                        scope: "",
+                        client_id: "",
+                        username: "",
+                        exp: 0,
+                        expAsString: ""
+                    },
                     wellKnownData: {
                         issuer: "",
                         jwks_uri: "",
@@ -576,7 +605,18 @@
                     apiCall(this.wellKnownData.introspection_endpoint + "?" + serialize({ token: tokenToUse, token_type_hint: this.introspectionScreen.token_type_hint }), "POST", {}, this.callbackIntrospection);
                 },
                 callbackIntrospection(success, response) {
-                    debugger;
+
+                    var data = {
+                        loaded: true,
+                        active: response.active,
+                        scope: response.scope,
+                        client_id: response.client_id,
+                        username: response.username,
+                        exp: response.exp,
+                        expAsString: unixTicksToIsoString(response['exp'])
+                    };
+
+                    this.introspectionData = data;
                 },
                 launchAuthenticate() {
 
@@ -618,7 +658,7 @@
                 }
                 catch
                 {
-                    alert('Failed to assign reponse back to client');
+                    alert('Failed to assign response back to client');
                 }
 
                 // Hide the authentication screen
