@@ -177,7 +177,7 @@ namespace Server.Controllers
 
                             if (passcodeResult != null)
                             {
-                                string code = _tokenStorage.Add(passcodeResult);
+                                string code = _tokenStorage.Add(passcodeResult, model.TokenRequest.CodeChallenge, model.TokenRequest.CodeChallengeMethod);
 
                                 AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
                                 String queryString = response.ToQueryString<AuthoriseResponse>();
@@ -194,7 +194,7 @@ namespace Server.Controllers
 
                             if (otpResult != null)
                             {
-                                string code = _tokenStorage.Add(otpResult);
+                                string code = _tokenStorage.Add(otpResult, model.Request.code_challenge, model.Request.code_challenge_method);
 
                                 AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
                                 String queryString = response.ToQueryString<AuthoriseResponse>();

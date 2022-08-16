@@ -1,4 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
+using Server.Contracts.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace Server.Services
@@ -9,14 +10,14 @@ namespace Server.Services
     public class TokenStorage : ITokenStorage
     {
         // Storage for the security tokens
-        private readonly Dictionary<string, JwtSecurityToken> _tokens;
+        private readonly Dictionary<string, StoredToken> _tokens;
 
         /// <summary>
         /// Construct the token storage
         /// </summary>
         public TokenStorage()
         {
-            _tokens = new Dictionary<string, JwtSecurityToken>();
+            _tokens = new Dictionary<string, StoredToken>();
         }
 
         /// <summary>
@@ -24,10 +25,16 @@ namespace Server.Services
         /// </summary>
         /// <param name="token">The security token to store</param>
         /// <returns>Identifier for the token</returns>
-        public string Add(JwtSecurityToken token)
+        public string Add(JwtSecurityToken token, string? codeChallenge, string? codeChallengeMethod)
         {
             string id = Guid.NewGuid().ToString();
-            _tokens.Add(id, token);
+            StoredToken storage = new StoredToken()
+            {
+                Token = token,
+                CodeChallenge = codeChallenge,
+                CodeChallengeMethod = codeChallengeMethod
+            };
+            _tokens.Add(id, storage);
             return id;
         }
 
@@ -36,9 +43,9 @@ namespace Server.Services
         /// </summary>
         /// <param name="id">The token identifier</param>
         /// <returns>The security token</returns>
-        public JwtSecurityToken Retrieve(string id)
+        public JwtSecurityToken Retrieve(string id, string? codeVerifier)
         {
-            JwtSecurityToken token = _tokens[id];
+            JwtSecurityToken token = _tokens[id].Token;
             _tokens.Remove(id);
             return token;
         }

@@ -48,5 +48,10 @@ namespace Server.Contracts.Tokens
 
         [JsonProperty(Required = Required.Default, PropertyName = "redirect_uri")]
         public String RedirectUri { get; set; } = String.Empty;
+
+
+        // PKCE
+        [JsonProperty(Required = Required.AllowNull, PropertyName = "code_verifier")]
+        public string? CodeVerifier { get; set; } = null;
     }
 }

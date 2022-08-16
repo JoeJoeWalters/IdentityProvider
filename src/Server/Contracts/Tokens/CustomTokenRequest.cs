@@ -30,5 +30,13 @@ namespace Server.Contracts.Tokens
 
         [JsonProperty(Required = Required.Default, PropertyName = "redirect_uri")]
         public String RedirectUri { get; set; } = String.Empty;
+
+        // PKCE
+
+        [JsonProperty(Required = Required.AllowNull, PropertyName = "code_challenge")]
+        public string? CodeChallenge { get; set; } = null;
+
+        [JsonProperty(Required = Required.AllowNull, PropertyName = "code_challenge_method")]
+        public string? CodeChallengeMethod { get; set; } = null;
     }
 }

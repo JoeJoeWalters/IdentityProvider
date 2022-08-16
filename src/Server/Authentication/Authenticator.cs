@@ -168,7 +168,7 @@ namespace Server.Authentication
 
                     case GrantTypes.AuthorisationCode:
 
-                        response = _tokenStorage.Retrieve(tokenRequest.Code);
+                        response = _tokenStorage.Retrieve(tokenRequest.Code, tokenRequest.CodeVerifier);
 
                         break;
 

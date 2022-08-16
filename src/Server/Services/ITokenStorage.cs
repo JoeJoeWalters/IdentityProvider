@@ -12,13 +12,13 @@ namespace Server.Services
         /// </summary>
         /// <param name="token">The security token to store</param>
         /// <returns>Identifier for the token</returns>
-        string Add(JwtSecurityToken token);
+        string Add(JwtSecurityToken token, string? codeChallenge, string? codeChallengeMethod);
 
         /// <summary>
         /// Exchange an identifier for the security token
         /// </summary>
         /// <param name="id">The token identifier</param>
         /// <returns>The security token</returns>
-        JwtSecurityToken Retrieve(string id);
+        JwtSecurityToken Retrieve(string id, string? codeVerifier);
     }
 }
