@@ -194,14 +194,21 @@
                             </div>
                         </div>
                         <!-- End Documentation -->
-
+                        <button type="button" class="btn btn-primary" v-on:click="createPKSEVerifier">Generate Verifier</button>
+                        <div class="form-group">
+                            <label for="code_verifier">Code Verifier</label>
+                            <input type="text" readonly="readonly" class="form-control" id="code_verifier" v-model="authenticationScreen.code_verifier">
+                        </div>
                         <div class="form-group">
                             <label for="code_challenge">Code Challenge</label>
-                            <input type="text" class="form-control" id="code_challenge" v-model="authenticationScreen.code_challenge">
+                            <input type="text" readonly="readonly" class="form-control" id="code_challenge" v-model="authenticationScreen.code_challenge">
                         </div>
                         <div class="form-group">
                             <label for="code_challenge_method">Code Challenge Method</label>
-                            <input type="text" class="form-control" id="code_challenge_method" v-model="authenticationScreen.code_challenge_method">
+                            <select class="form-control" readonly="readonly" id="code_challenge_method" v-model="authenticationScreen.code_challenge_method">
+                                <option value="">None</option>
+                                <option value="SHA256">SHA256</option>
+                            </select>
                         </div>
 
                         <button type="button" class="btn btn-primary" data-toggle="modal" v-on:click="launchAuthenticate">
@@ -364,6 +371,13 @@
 
         import { createApp } from './lib/vue/vue.esm-browser.min.js';
 
+        // https://www.npmjs.com/package/crypto-js
+        //import { sha256 } from './crypto-js/sha256.js';
+        //import { hmacSHA512 } from './crypto-js/hmac-sha512';
+        //import ;
+
+        //var crypto = requires("crypto-js");
+
         function parseJwt(token) {
             if (token != undefined && token != "") {
                 var base64Url = token.split('.')[1];
@@ -443,6 +457,12 @@
             return expiryDateTime.toISOString();
         }
 
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
+
         const app = createApp({
             data() {
                 return {
@@ -468,6 +488,7 @@
                         state: "1234567890",
 
                         // PKCE
+                        code_verifier: "",
                         code_challenge: "",
                         code_challenge_method: ""
                     },
@@ -558,6 +579,13 @@
                 },
                 callbackJWKS(success, response) {
                     this.jwksData = response; // Copy over existing object (same properties anyway)
+                },
+                createPKSEVerifier() 
+                { 
+                    var verifier = uuidv4();
+                    this.authenticationScreen.code_verifier = verifier;
+                    this.authenticationScreen.code_challenge = CryptoJS.SHA256(verifier);
+                    this.authenticationScreen.code_challenge_method = "SHA256";
                 },
                 getToken() {
                     var request;
