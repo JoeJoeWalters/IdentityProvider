@@ -206,7 +206,7 @@
                         <div class="form-group">
                             <label for="code_challenge_method">Code Challenge Method</label>
                             <select class="form-control" readonly="readonly" id="code_challenge_method" v-model="authenticationScreen.code_challenge_method">
-                                <option value="">None</option>
+                                <option value=""></option>
                                 <option value="SHA256">SHA256</option>
                             </select>
                         </div>
@@ -256,11 +256,15 @@
                             <input type="password" class="form-control" id="loginPassword" placeholder="Password" v-model="tokenScreen.password">
                         </div>
                         <div class="form-group" v-if="tokenScreen.type == 'authorization_code'">
-                            <label for="loginPassword">Code</label>
+                            <label for="loginAuthCode">Code</label>
                             <input type="text" class="form-control" id="loginAuthCode" readonly="readonly" v-model="authorization_code">
                         </div>
+                        <div class="form-group" v-if="tokenScreen.type == 'authorization_code' && authenticationScreen.code_verifier != ''">
+                            <label for="loginVerifier">PKCE Verifier</label>
+                            <input type="text" class="form-control" id="loginVerifier" readonly="readonly" v-model="authenticationScreen.code_verifier">
+                        </div>
                         <div class="form-group" v-if="tokenScreen.type == 'refresh_token'">
-                            <label for="loginPassword">Refresh Token</label>
+                            <label for="loginRefreshToken">Refresh Token</label>
                             <input type="text" class="form-control" id="loginRefreshToken" readonly="readonly" v-model="refreshToken">
                         </div>
                         <div class="form-group" v-if="tokenScreen.type == 'client_credentials'">
@@ -593,7 +597,7 @@
                         request = { type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password, client_id: this.client_id };
                     }
                     else if (this.tokenScreen.type == "authorization_code") {
-                        request = { type: "authorization_code", code: this.authorization_code, client_id: this.client_id };
+                        request = { type: "authorization_code", code: this.authorization_code, client_id: this.client_id, code_verifier: this.authenticationScreen.code_verifier };
                     }
                     else if (this.tokenScreen.type == "client_credentials") {
                         request = { type: "client_credentials", client_id: this.client_id, client_secret: this.client_secret };
