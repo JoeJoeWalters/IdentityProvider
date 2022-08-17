@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using Server.Contracts.Services;
 using Server.Contracts.Tokens;
+using Server.Exceptions;
 using Server.Helpers;
 using Server.Services;
 using System.IdentityModel.Tokens.Jwt;
@@ -168,7 +169,18 @@ namespace Server.Authentication
 
                     case GrantTypes.AuthorisationCode:
 
-                        response = _tokenStorage.Retrieve(tokenRequest.Code, tokenRequest.CodeVerifier);
+                        try
+                        {
+                            response = _tokenStorage.Retrieve(tokenRequest.Code, tokenRequest.CodeVerifier);
+                        }
+                        catch(SecurityTokenAuthenticationCodeNotFound notFoundEx)
+                        {
+                            // Security token either wasn't there or wasn't matched with the PKCE method
+                        }
+                        catch(Exception ex)
+                        {
+                            // Some other error
+                        }
 
                         break;
 
