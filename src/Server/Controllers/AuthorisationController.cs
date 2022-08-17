@@ -197,7 +197,7 @@ namespace Server.Controllers
                                 string code = _tokenStorage.Add(otpResult, model.Request.code_challenge, model.Request.code_challenge_method);
 
                                 AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
-                                String queryString = response.ToQueryString<AuthoriseResponse>();
+                                string queryString = response.ToQueryString<AuthoriseResponse>();
 
                                 string url = $"{model.TokenRequest.RedirectUri}?{queryString}";
                                 return new RedirectResult(url);
