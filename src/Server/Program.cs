@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Newtonsoft.Json;
 using Server.Authentication;
 using Server.Services;
 using System.Diagnostics.CodeAnalysis;
@@ -10,7 +11,6 @@ using System.Text;
 
 namespace Server
 {
-
     [ExcludeFromCodeCoverage]
     internal class Program
     {
@@ -21,23 +21,24 @@ namespace Server
 
             builder.Services.AddCors();
 
+            // For now just log to the console
+            builder.Services.AddLogging(logging => logging.AddConsole());
+
             // Map the server settings from configuration before loading the signing keys to it seperately
             ServerSettings settings = builder.Configuration.GetSection("SecurityKeys").Get<ServerSettings>();
             if (settings != null)
             {
-                // Create somewhere for tokens to be stored and retrieved later if needed
-                ITokenStorage tokenStorage = new TokenStorage();
-                builder.Services.AddSingleton<ITokenStorage>(tokenStorage);
-
                 // Create services for comparison and hashing
-                IHashService hashService = new HashService();
-                builder.Services.AddSingleton<IHashService>(hashService);
+                builder.Services.AddSingleton<IHashService, HashService>();
 
-                IPasscodeService pinService = new PasscodeService(hashService);
-                builder.Services.AddSingleton<IPasscodeService>(pinService);
+                // Create somewhere for tokens to be stored and retrieved later if needed
+                builder.Services.AddSingleton<ITokenStorage, TokenStorage>();
 
-                IOTPService otpService = new MockOTPService();
-                builder.Services.AddSingleton<IOTPService>(otpService);
+                //IPasscodeService pinService = new PasscodeService(hashService);
+                builder.Services.AddSingleton<IPasscodeService, PasscodeService>();
+
+                //IOTPService otpService = new MockOTPService();
+                builder.Services.AddSingleton<IOTPService, MockOTPService>();
 
                 // Add the private and public keys for signing to the settings collection before adding for DI
                 settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
@@ -57,23 +58,24 @@ namespace Server
                     };
                     builder.Services.AddSingleton<SigningCredentials>(signingCredentials);
 
-                    // Set up the authentication service consuming the signing credentials and server settings to generate the tokens
-                    IAuthenticator authenticator = new Authenticator(new TokenValidationParameters()
-                                                                {
-                                                                    ValidateLifetime = true,
-                                                                    ValidateAudience = true,
-                                                                    ValidateIssuer = true,
-                                                                    ValidIssuer = settings.Issuer,
-                                                                    ValidAudiences = settings.Audiences.Select(aud => aud.Name)
-                                                                }, 
-                                                                signingCredentials,
-                                                                settings,
-                                                                hashService,
-                                                                pinService,
-                                                                otpService,
-                                                                tokenStorage);
-                    authenticator.RefreshAccessList(accessControlStream); // Pass the user / client registrations file to the authenticator to pre-load them
-                    builder.Services.AddSingleton<IAuthenticator>(authenticator);
+                    TokenValidationParameters tokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateLifetime = true,
+                        ValidateAudience = true,
+                        ValidateIssuer = true,
+                        ValidIssuer = settings.Issuer,
+                        ValidAudiences = settings.Audiences.Select(aud => aud.Name),
+                    };
+                    builder.Services.AddSingleton<TokenValidationParameters>(tokenValidationParameters);
+
+                    // Now decode the users.json stream and build the default access list to populate the authenticator
+                    using (StreamReader reader = new StreamReader(accessControlStream))
+                    {
+                        string raw = reader.ReadToEnd();
+                        AccessControl accessControl = JsonConvert.DeserializeObject<AccessControl>(raw);
+                        builder.Services.AddSingleton<AccessControl>(accessControl);
+                    }
+                    builder.Services.AddSingleton<IAuthenticator, Authenticator>();
                 }
 
             }

@@ -9,13 +9,13 @@ namespace Server.Controllers
     [ApiController]
     public class ClientsController : ControllerBase
     {
-        private readonly ILogger<SessionController> _logger;
+        private readonly ILogger<ClientsController> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
-        public ClientsController(ILogger<SessionController> logger)
+        public ClientsController(ILogger<ClientsController> logger)
         {
             _logger = logger;
         }

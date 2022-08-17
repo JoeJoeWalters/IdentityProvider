@@ -23,9 +23,11 @@ namespace Server.Controllers
         private readonly IPasscodeService _passcodeService;
         private readonly IOTPService _otpService;
         private readonly ServerSettings _serverSettings;
+        private readonly ILogger<AuthorisationController> _logger;
 
-        public AuthorisationController(ITokenStorage tokenStorage, IAuthenticator authenticator, IPasscodeService passcodeService, IOTPService otpService, ServerSettings serverSettings)
+        public AuthorisationController(ILogger<AuthorisationController> logger, ITokenStorage tokenStorage, IAuthenticator authenticator, IPasscodeService passcodeService, IOTPService otpService, ServerSettings serverSettings)
         {
+            _logger = logger;
             _tokenStorage = tokenStorage;
             _authenticator = authenticator;
             _passcodeService = passcodeService;

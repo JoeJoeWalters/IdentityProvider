@@ -10,22 +10,19 @@ namespace Server.Services
     /// </summary>
     public class TokenStorage : ITokenStorage
     {
-        private readonly IHashService _hashService;
-
-        public TokenStorage(IHashService hashService)
-        {
-            _hashService = hashService;
-        }
-
         // Storage for the security tokens
         private readonly Dictionary<string, StoredToken> _tokens;
+        private readonly ILogger<TokenStorage> _logger;
+        private readonly IHashService _hashService;
 
         /// <summary>
         /// Construct the token storage
         /// </summary>
-        public TokenStorage()
+        public TokenStorage(ILogger<TokenStorage> logger, IHashService hashService)
         {
+            _hashService = hashService;
             _tokens = new Dictionary<string, StoredToken>();
+            _logger = logger;
         }
 
         /// <summary>

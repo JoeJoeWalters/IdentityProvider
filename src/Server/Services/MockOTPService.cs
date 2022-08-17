@@ -10,13 +10,15 @@ namespace Server.Services
         private const string _otpDefaultValue = "000000";
 
         private readonly Dictionary<string, SendOTPRequest> _otpRequests;
+        private readonly ILogger<MockOTPService> _logger;
 
         /// <summary>
         /// Default constructor
         /// </summary>
-        public MockOTPService()
+        public MockOTPService(ILogger<MockOTPService> logger)
         {
             _otpRequests = new Dictionary<string, SendOTPRequest>();
+            _logger = logger;
         }
 
         /// <summary>

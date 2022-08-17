@@ -8,14 +8,16 @@ namespace Server.Services
     public class PasscodeService : IPasscodeService
     {
         private readonly IHashService _hashService;
+        private readonly ILogger<PasscodeService> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="hashService"></param>
-        public PasscodeService(IHashService hashService)
+        public PasscodeService(IHashService hashService, ILogger<PasscodeService> logger)
         {
             _hashService = hashService;
+            _logger = logger;
         }
 
         /// <summary>

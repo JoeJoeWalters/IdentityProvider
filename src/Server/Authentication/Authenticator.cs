@@ -21,8 +21,9 @@ namespace Server.Authentication
         /// <summary>
         /// Local cached list of users
         /// </summary>
-        private AccessControl accessControl = new AccessControl() { };
+        private readonly AccessControl _accessControl;
 
+        private readonly ILogger<Authenticator> _logger;
         private readonly ServerSettings _serverSettings;
         private readonly SigningCredentials _signingCredentials;
         private readonly IPasscodeService _pinService;
@@ -35,19 +36,23 @@ namespace Server.Authentication
         /// <summary>
         /// Default Constructor
         /// </summary>
-        /// <param name="tokenValidationParameters">Validation parameters for the JWT Tokens</param>
         public Authenticator()
-            => RefreshAccessList(); // Get the new access control list
+        {
+
+        }
 
         public Authenticator(
+            ILogger<Authenticator> logger,
             TokenValidationParameters tokenValidationParameters,
             SigningCredentials signingCredentials,
             ServerSettings serverSettings,
             IHashService hashService,
             IPasscodeService pinService,
             IOTPService otpService,
-            ITokenStorage tokenStorage)
+            ITokenStorage tokenStorage,
+            AccessControl accessControl)
         {
+            _logger = logger;
             this.JWTValidationParams = tokenValidationParameters; // Assign the validator for the JWT tokens
             _serverSettings = serverSettings;
             _signingCredentials = signingCredentials;
@@ -55,7 +60,7 @@ namespace Server.Authentication
             _pinService = pinService;
             _otpService = otpService;
             _tokenStorage = tokenStorage;
-            RefreshAccessList(); // Get the new access control list
+            _accessControl = accessControl;
         }
 
         /// <summary>
@@ -80,7 +85,7 @@ namespace Server.Authentication
             {
                 case CustomGrantTypes.Passcode:
 
-                    data = accessControl
+                    data = _accessControl
                             .Users
                             .Where(user =>
                             {
@@ -96,7 +101,7 @@ namespace Server.Authentication
 
                     if (await _otpService.VerifyOTP(new VerifyOTPRequest() { Identifier = tokenRequest.OTPIdentifier, Value = tokenRequest.OTP }))
                     {
-                        data = accessControl
+                        data = _accessControl
                                 .Users
                                 .Where(user =>
                                 {
@@ -137,7 +142,7 @@ namespace Server.Authentication
                 {
                     case GrantTypes.ClientCredentials:
 
-                        data = accessControl
+                        data = _accessControl
                             .Clients
                             .Where(client =>
                             {
@@ -153,7 +158,7 @@ namespace Server.Authentication
                     case GrantTypes.Password:
 
 #warning This is not efficient, creating the hash on the fly because we are using userid of the comparer for the hash salt so revisit later (it's only a sandbox service for now)
-                        data = accessControl
+                        data = _accessControl
                             .Users
                             .Where(user =>
                             {
@@ -336,57 +341,13 @@ namespace Server.Authentication
             throw new Exception();
         }
 
-        /// <summary>
-        /// Refresh the list of cached users that are validated against
-        /// </summary>
-        /// <returns>If the refresh was successful</returns>
-        public Boolean RefreshAccessList()
-            => RefreshAccessList(new AccessControl());
-
-        public Boolean RefreshAccessList(Stream stream)
-        {
-            try
-            {
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    string raw = reader.ReadToEnd();
-                    return RefreshAccessList(
-                        JsonConvert.DeserializeObject<AccessControl>(raw)
-                        );
-                }
-            }
-            catch (Exception ex)
-            {
-                return false;
-            }
-        }
-
-        public Boolean RefreshAccessList(AccessControl accessControl)
-        {
-            // Do any test data infill (e.g. if no hashed digits for plain text passcode)
-            /*
-            if (accessControl?.Users != null)
-            {
-                foreach (SecurityData data in accessControl.Users)
-                {
-                    //data.Password = _hashService.CreateHash($"{data.Id}{data.Password}");
-
-                    if ((data.Pin.Value ?? String.Empty) != String.Empty && data.Pin.HashedDigits.Count == 0)
-                        data.Pin.HashedDigits = _pinService.ToHashedDigits(data.Pin.Value ?? String.Empty, data.Id);
-                }
-            }
-            */
-            this.accessControl = accessControl ?? new AccessControl() { };
-
-            return true;
-        }
 
         /// <summary>
         /// Get the security data of a credential based on the username (for choosing what authentication options to display etc.)
         /// </summary>
         /// <returns></returns>
         public SecurityData GetByUsername(string username)
-            => accessControl
+            => _accessControl
                 .Users
                 .Where(user =>
                 {

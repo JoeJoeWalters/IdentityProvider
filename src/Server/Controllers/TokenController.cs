@@ -17,7 +17,7 @@ namespace Server.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly ILogger<SessionController> _logger;
+        private readonly ILogger<TokenController> _logger;
         private readonly IAuthenticator _userAuthenticator;
         private readonly ServerSettings _serverSettings;
 
@@ -33,7 +33,7 @@ namespace Server.Controllers
         /// <param name="serverSettings"></param>
         /// <param name="signingCredentials"></param>
         public TokenController(
-            ILogger<SessionController> logger,
+            ILogger<TokenController> logger,
             IAuthenticator userAuthenticator,
             ServerSettings serverSettings,
             SigningCredentials signingCredentials)

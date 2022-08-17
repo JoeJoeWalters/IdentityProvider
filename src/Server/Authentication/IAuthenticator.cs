@@ -40,14 +40,6 @@ namespace Server.Authentication
         Task<JwtSecurityToken> AuthenticateCustomAsync(CustomTokenRequest tokenRequest);
 
         /// <summary>
-        /// Refresh the list of cached users that are validated against
-        /// </summary>
-        /// <returns>If the refresh was successful</returns>
-        Boolean RefreshAccessList();
-        Boolean RefreshAccessList(Stream stream);
-        Boolean RefreshAccessList(AccessControl accessControl);
-
-        /// <summary>
         /// Get the security data of a credential based on the username (for choosing what authentication options to display etc.)
         /// </summary>
         /// <returns></returns>

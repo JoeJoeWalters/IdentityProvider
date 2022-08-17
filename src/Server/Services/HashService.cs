@@ -8,6 +8,13 @@ namespace Server.Services
     /// </summary>
     public class HashService : IHashService
     {
+        private readonly ILogger<HashService> _logger;
+
+        public HashService(ILogger<HashService> logger)
+        {
+            _logger = logger;
+        }
+
         /// <summary>
         /// Generate the hash for a given string
         /// </summary>

@@ -8,13 +8,13 @@ namespace Server.Controllers
     [ApiController]
     public class FederationController : ControllerBase
     {
-        private readonly ILogger<SessionController> _logger;
+        private readonly ILogger<FederationController> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="logger"></param>
-        public FederationController(ILogger<SessionController> logger)
+        public FederationController(ILogger<FederationController> logger)
         {
             _logger = logger;
         }
