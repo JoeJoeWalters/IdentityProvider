@@ -237,7 +237,13 @@ namespace Server.Authentication
                     now.AddSeconds(_serverSettings.AccessTokenExpiry));
 
                 // Add the authentication method to the payload's claim (it's an array)
-                secPayload.Amr.Add(amr);
+                // secPayload.Amr.Add(amr); does not work as the IList item is readonly for when it is read back
+                // so assign via the parent "Add" instead.
+                var amrValues = new List<string>() { amr }.Distinct().ToArray();
+                if (amrValues.Any())
+                {
+                    secPayload.Add("amr", amrValues);
+                }
 
                 // Generate the final tokem from the header and it's payload
                 JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
