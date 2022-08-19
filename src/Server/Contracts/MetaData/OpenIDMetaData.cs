@@ -110,9 +110,14 @@
         [ userinfo_encryption_enc_values_supported ] {string array} List of the supported JWE encryption methods for securing the claims returned at the UserInfo endpoint, omitted or empty if none.
 
         subject_types_supported {string array} List of the supported subject (end-user) identifier types.
+        */
 
-        acr_values_supported {string array} List of the supported Authentication Context Class References (ACRs).
+        /// <summary>
+        /// List of the supported Authentication Context Class References (ACRs)
+        /// </summary>
+        public List<string> acr_values_supported { get; set; } = new List<string>();
 
+        /*
         display_values_supported {string array} List of the supported display parameters.
 
         scopes_supported {string array} List of the supported scope values. Certain values may be omitted for privacy reasons.

@@ -55,7 +55,8 @@ namespace Server.Controllers
                 response_types_supported = new List<string>() { "code", "token", "id_token" },
                 revocation_endpoint = new Uri($"{baseUri}{URIs.revocation_endpoint}"),
                 token_endpoint = new Uri($"{baseUri}{URIs.token_endpoint}"),
-                userinfo_endpoint = new Uri($"{baseUri}{URIs.userinfo_endpoint}")
+                userinfo_endpoint = new Uri($"{baseUri}{URIs.userinfo_endpoint}"),
+                acr_values_supported = new List<string> { ACR.LOALevel1, ACR.LOALevel2, ACR.LOALevel3, ACR.LOALevel4 }
             };
 
             return new OkObjectResult(JsonConvert.SerializeObject(metaData, Formatting.None));
