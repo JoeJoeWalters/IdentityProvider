@@ -245,8 +245,11 @@ namespace Server.Authentication
                     secPayload.Add("amr", amrValues);
                 }
 
-                // Generate the final tokem from the header and it's payload
+                // Generate the final token from the header and it's payload
                 JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
+
+                // Apply the ACR policy by evaluating the otken
+                token = AssignACR(token);
 
                 return await Task.FromResult<JwtSecurityToken>(token);
             }
@@ -355,6 +358,30 @@ namespace Server.Authentication
 
 #warning "TODO"
             throw new Exception();
+        }
+
+        /// <summary>
+        /// Take a token and evaluate it's ACR then assign to the claim the correct level
+        /// based on a number of factors including the AMR methods used
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        private JwtSecurityToken AssignACR(JwtSecurityToken token)
+        {
+            String acr = ACR.LOALevel1; // Default is level 1 (must have been authorised to get to this point)
+
+            // Move than one form of verification was used (e.g. SMS and Hardware key)
+            if (token.Payload.Amr.Count > 1)
+                acr = ACR.LOALevel2;
+
+            // Does the ACR already exist? Then remove it first
+            if (token.Payload.ContainsKey("acr"))
+                token.Payload.Remove("acr");
+
+            // Add the ACR
+            token.Payload.Add("acr", acr);
+
+            return token;
         }
 
 

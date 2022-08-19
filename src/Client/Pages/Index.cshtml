@@ -200,7 +200,7 @@
                             </div>
                         </div>
                         <!-- End Documentation -->
-                        <button type="button" class="btn btn-primary" v-on:click="createPKSEVerifier">Generate Verifier</button>
+                        <button type="button" class="btn btn-primary" v-on:click="createPKSEVerifier">Create New Verifier</button>
                         <div class="form-group">
                             <label for="code_verifier">Code Verifier</label>
                             <input type="text" readonly="readonly" class="form-control" id="code_verifier" v-model="authenticationScreen.code_verifier">
@@ -582,8 +582,12 @@
                     this.wellKnownData = response; // Copy over existing object (same properties anyway)
 
                     // Now load the JWKS if possible
-                    if (!this.jwksDisabled)
+                    if (!this.jwksDisabled) {
                         this.getJWKS();
+                    }
+
+                    // Generate a new PKSE verfifier for this client to use to make authentication calls
+                    this.createPKSEVerifier();
                 },
                 getJWKS() {
                     apiCall(this.wellKnownData.jwks_uri, "GET", {}, this.callbackJWKS);
@@ -591,8 +595,7 @@
                 callbackJWKS(success, response) {
                     this.jwksData = response; // Copy over existing object (same properties anyway)
                 },
-                createPKSEVerifier() 
-                { 
+                createPKSEVerifier() {
                     var verifier = uuidv4();
                     this.authenticationScreen.code_verifier = verifier;
                     this.authenticationScreen.code_challenge = CryptoJS.SHA256(verifier);
