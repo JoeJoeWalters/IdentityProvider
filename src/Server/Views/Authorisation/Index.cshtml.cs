@@ -44,12 +44,12 @@ namespace Server.Views.Authorisation
         /// <summary>
         /// Pin entries with strict naming due to the way 
         /// </summary>
-        public List<string> PasscodeDigits { get; set; } = new List<string>();
+        public List<string> PinDigits { get; set; } = new List<string>();
 
         /// <summary>
         /// If certain digits are active or not (for rendering)
         /// </summary>
-        public List<Boolean> PasscodeDigitsActive { get; set; } = new List<Boolean>();
+        public List<Boolean> PinDigitsActive { get; set; } = new List<Boolean>();
 
         /// <summary>
         /// Drop down list of the authentication options

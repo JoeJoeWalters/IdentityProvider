@@ -11,7 +11,7 @@ namespace Server.Contracts.Tokens
     public class CustomTokenRequest
     {
         [JsonProperty(Required = Required.Default, PropertyName = "type")]
-        public String Type { get; set; } = CustomGrantTypes.Passcode;
+        public String Type { get; set; } = CustomGrantTypes.Pin;
 
         [JsonProperty(Required = Required.Default, PropertyName = "client_id")]
         public String Client_Id { get; set; } = String.Empty;
@@ -19,8 +19,8 @@ namespace Server.Contracts.Tokens
         [JsonProperty(Required = Required.Default, PropertyName = "username")]
         public String Username { get; set; } = String.Empty;
 
-        [JsonProperty(Required = Required.Default, PropertyName = "passcode")]
-        public List<KeyValuePair<int, string>> Passcode { get; set; } = new List<KeyValuePair<int, string>>();
+        [JsonProperty(Required = Required.Default, PropertyName = "pin")]
+        public List<KeyValuePair<int, string>> Pin { get; set; } = new List<KeyValuePair<int, string>>();
 
         [JsonProperty(Required = Required.Default, PropertyName = "otp_identifier")]
         public String OTPIdentifier { get; set; } = String.Empty;

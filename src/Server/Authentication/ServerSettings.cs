@@ -14,7 +14,7 @@
 
         public string PublicKey { get; set; } = string.Empty;
         public string PrivateKey { get; set; } = string.Empty;
-        public int PasscodeSize { get; set; } = 6;
+        public int PinSize { get; set; } = 6;
         public string Issuer { get; set; } = string.Empty;
         public List<Audience> Audiences { get; set; } = new List<Audience>() { };
 

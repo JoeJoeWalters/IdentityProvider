@@ -5,16 +5,16 @@ namespace Server.Services
     /// <summary>
     /// Service for managing interactions with passcodes
     /// </summary>
-    public class PasscodeService : IPasscodeService
+    public class PinService : IPinService
     {
         private readonly IHashService _hashService;
-        private readonly ILogger<PasscodeService> _logger;
+        private readonly ILogger<PinService> _logger;
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="hashService"></param>
-        public PasscodeService(IHashService hashService, ILogger<PasscodeService> logger)
+        public PinService(IHashService hashService, ILogger<PinService> logger)
         {
             _hashService = hashService;
             _logger = logger;
@@ -46,7 +46,7 @@ namespace Server.Services
         /// <param name="salt">The salt for hash comparisons</param>
         /// <param name="data">The pin data for a user to compare against</param>
         /// <returns>Success or failure</returns>
-        public Boolean CompareHashedDigits(List<KeyValuePair<int, string>> digitsAndPositions, string salt, PasscodeData data)
+        public Boolean CompareHashedDigits(List<KeyValuePair<int, string>> digitsAndPositions, string salt, PinData data)
         {
             foreach (KeyValuePair<int, string> toCompare in digitsAndPositions)
             {
@@ -64,7 +64,7 @@ namespace Server.Services
         /// <param name="data">The user's pin data</param>
         /// <param name="totalRequired">The amount of positions needed</param>
         /// <returns>A list of positions in that data</returns>
-        public List<int> RandomPositions(PasscodeData data, int totalRequired)
+        public List<int> RandomPositions(PinData data, int totalRequired)
         {
             List<int> result = new List<int>();
 

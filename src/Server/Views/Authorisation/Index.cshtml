@@ -66,15 +66,15 @@
 
             @switch (Model.TokenRequest.Type)
             {
-                case @CustomGrantTypes.Passcode:
+                case @CustomGrantTypes.Pin:
 
                     <div class="form-group">
                         <label for="Pin">Pin</label>
                         <div class="input-group mb-3">
-                            @for (int i = 0; i < Model.PasscodeDigits.Count; i++)
+                            @for (int i = 0; i < Model.PinDigits.Count; i++)
                             {
-                                @Html.PasswordFor(x=>Model.PasscodeDigits[i], !Model.PasscodeDigitsActive[i] ? new {@readonly = "readonly", @class="form-control" } : new { @class="form-control" })
-                                @Html.HiddenFor(x=> Model.PasscodeDigitsActive[i])
+                                @Html.PasswordFor(x=>Model.PinDigits[i], !Model.PinDigitsActive[i] ? new {@readonly = "readonly", @class="form-control" } : new { @class="form-control" })
+                                @Html.HiddenFor(x=> Model.PinDigitsActive[i])
                             }
                         </div>
                     </div>

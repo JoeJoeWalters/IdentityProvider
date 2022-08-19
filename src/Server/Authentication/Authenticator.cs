@@ -1,5 +1,6 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Server.Contracts.MetaData;
 using Server.Contracts.Services;
 using Server.Contracts.Tokens;
 using Server.Exceptions;
@@ -26,7 +27,7 @@ namespace Server.Authentication
         private readonly ILogger<Authenticator> _logger;
         private readonly ServerSettings _serverSettings;
         private readonly SigningCredentials _signingCredentials;
-        private readonly IPasscodeService _pinService;
+        private readonly IPinService _pinService;
         private readonly IOTPService _otpService;
         private readonly IHashService _hashService;
         private readonly ITokenStorage _tokenStorage;
@@ -47,7 +48,7 @@ namespace Server.Authentication
             SigningCredentials signingCredentials,
             ServerSettings serverSettings,
             IHashService hashService,
-            IPasscodeService pinService,
+            IPinService pinService,
             IOTPService otpService,
             ITokenStorage tokenStorage,
             AccessControl accessControl)
@@ -80,10 +81,11 @@ namespace Server.Authentication
         {
             SecurityData data = null;
             DateTime now = DateTime.UtcNow; // Fixed point in time
+            string amr = string.Empty;
 
             switch (tokenRequest.Type)
             {
-                case CustomGrantTypes.Passcode:
+                case CustomGrantTypes.Pin:
 
                     data = _accessControl
                             .Users
@@ -91,9 +93,11 @@ namespace Server.Authentication
                             {
                                 return
                                     user.Username == tokenRequest.Username &&
-                                    _pinService.CompareHashedDigits(tokenRequest.Passcode, user.Id, user.Passcode) &&
+                                    _pinService.CompareHashedDigits(tokenRequest.Pin, user.Id, user.Pin) &&
                                     user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
+
+                    amr = AMR.Pin;
 
                     break;
 
@@ -109,12 +113,14 @@ namespace Server.Authentication
                                         user.Username == tokenRequest.Username &&
                                         user.ClientId == tokenRequest.Client_Id;
                                 }).FirstOrDefault();
+
+                        amr = AMR.SMS;
                     }
 
                     break;
             }
 
-            return await GenerateTokenFromSecurityData(data, now);
+            return await GenerateTokenFromSecurityData(data, amr, now);
         }
 
         /// <summary>
@@ -135,6 +141,7 @@ namespace Server.Authentication
             SecurityData data = null;
             JwtSecurityToken response = null;
             DateTime now = DateTime.UtcNow; // Fixed point in time
+            string amr = string.Empty;
 
             try
             {
@@ -151,7 +158,7 @@ namespace Server.Authentication
                                     client.Secret == tokenRequest.Client_Secret;
                             }).Select(client => new SecurityData() { ClientId = client.Id }).FirstOrDefault();
 
-                        response = await GenerateTokenFromSecurityData(data, now);
+                        response = await GenerateTokenFromSecurityData(data, amr, now);
 
                         break;
 
@@ -168,7 +175,7 @@ namespace Server.Authentication
                                     user.ClientId == tokenRequest.Client_Id;
                             }).FirstOrDefault();
 
-                        response = await GenerateTokenFromSecurityData(data, now);
+                        response = await GenerateTokenFromSecurityData(data, amr, now);
 
                         break;
 
@@ -202,7 +209,7 @@ namespace Server.Authentication
 
         }
 
-        private async Task<JwtSecurityToken> GenerateTokenFromSecurityData(SecurityData data, DateTime now)
+        private async Task<JwtSecurityToken> GenerateTokenFromSecurityData(SecurityData data, string amr, DateTime now)
         {
             long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
 
@@ -211,7 +218,7 @@ namespace Server.Authentication
                 // Generate a new JWT Header to wrap the token
                 JwtHeader header = new JwtHeader(_signingCredentials);
                 header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
-
+                
                 // Combine the claims list to a standard claim array for the JWT payload
                 List<Claim> claims = new List<Claim>()
                 {
@@ -220,7 +227,7 @@ namespace Server.Authentication
                 claims.AddRange(data.Claims);
                 claims.Add(new Claim("sub", data.Id)); // Add the user id as the subject (sub claim) 
                 claims.Add(new Claim("ait", unixTime.ToString())); // Creation Time claim
-
+                
                 // Create the content of the JWT Token with the appropriate expiry date
                 JwtPayload secPayload = new JwtPayload(
                     _serverSettings.Issuer,
@@ -228,6 +235,9 @@ namespace Server.Authentication
                     claims,
                     now.AddSeconds(-1), // For the bots
                     now.AddSeconds(_serverSettings.AccessTokenExpiry));
+
+                // Add the authentication method to the payload's claim (it's an array)
+                secPayload.Amr.Add(amr);
 
                 // Generate the final tokem from the header and it's payload
                 JwtSecurityToken token = new JwtSecurityToken(header, secPayload);

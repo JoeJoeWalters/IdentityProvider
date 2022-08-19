@@ -28,16 +28,10 @@ namespace Server
             ServerSettings settings = builder.Configuration.GetSection("SecurityKeys").Get<ServerSettings>();
             if (settings != null)
             {
-                // Create services for comparison and hashing
+                // Register dependent services
                 builder.Services.AddSingleton<IHashService, HashService>();
-
-                // Create somewhere for tokens to be stored and retrieved later if needed
                 builder.Services.AddSingleton<ITokenStorage, TokenStorage>();
-
-                //IPasscodeService pinService = new PasscodeService(hashService);
-                builder.Services.AddSingleton<IPasscodeService, PasscodeService>();
-
-                //IOTPService otpService = new MockOTPService();
+                builder.Services.AddSingleton<IPinService, PinService>();
                 builder.Services.AddSingleton<IOTPService, MockOTPService>();
 
                 // Add the private and public keys for signing to the settings collection before adding for DI

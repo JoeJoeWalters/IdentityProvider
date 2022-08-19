@@ -20,17 +20,17 @@ namespace Server.Controllers
     {
         private readonly ITokenStorage _tokenStorage;
         private readonly IAuthenticator _authenticator;
-        private readonly IPasscodeService _passcodeService;
+        private readonly IPinService _pinService;
         private readonly IOTPService _otpService;
         private readonly ServerSettings _serverSettings;
         private readonly ILogger<AuthorisationController> _logger;
 
-        public AuthorisationController(ILogger<AuthorisationController> logger, ITokenStorage tokenStorage, IAuthenticator authenticator, IPasscodeService passcodeService, IOTPService otpService, ServerSettings serverSettings)
+        public AuthorisationController(ILogger<AuthorisationController> logger, ITokenStorage tokenStorage, IAuthenticator authenticator, IPinService pinService, IOTPService otpService, ServerSettings serverSettings)
         {
             _logger = logger;
             _tokenStorage = tokenStorage;
             _authenticator = authenticator;
-            _passcodeService = passcodeService;
+            _pinService = pinService;
             _serverSettings = serverSettings;
             _otpService = otpService;
         }
@@ -60,7 +60,7 @@ namespace Server.Controllers
 
                     List<SelectListItem> authOptions = new List<SelectListItem>()
                     {
-                        new SelectListItem("Passcode", CustomGrantTypes.Passcode),
+                        new SelectListItem("Pin", CustomGrantTypes.Pin),
                         new SelectListItem("OTP", CustomGrantTypes.OTP)
                     };
 
@@ -74,24 +74,24 @@ namespace Server.Controllers
 
                     switch (model.TokenRequest.Type)
                     {
-                        case CustomGrantTypes.Passcode:
+                        case CustomGrantTypes.Pin:
 
                             // Ask the pin service which positions we should be asking for by asking for X digits of the Y that are available
 #warning 3 is an arbitory number right now, make a service setting
-                            List<int> positions = _passcodeService.RandomPositions(entryData.Passcode, 3);
+                            List<int> positions = _pinService.RandomPositions(entryData.Pin, 3);
 
                             // Map the positions to the model
-                            List<string> passcodeDigitsSetup = new List<string>();
-                            List<Boolean> passcodeDigitsActiveSetup = new List<bool>();
-                            for (int pos = 0; pos < _serverSettings.PasscodeSize; pos++)
+                            List<string> pinDigitsSetup = new List<string>();
+                            List<Boolean> pinDigitsActiveSetup = new List<bool>();
+                            for (int pos = 0; pos < _serverSettings.PinSize; pos++)
                             {
-                                passcodeDigitsSetup.Add("");
-                                passcodeDigitsActiveSetup.Add(positions.Contains(pos));
+                                pinDigitsSetup.Add("");
+                                pinDigitsActiveSetup.Add(positions.Contains(pos));
                             }
 
-                            methodEntryModel.PasscodeDigits = passcodeDigitsSetup;
-                            methodEntryModel.PasscodeDigitsActive = passcodeDigitsActiveSetup;
-                            methodEntryModel.AuthOptions.Add(new SelectListItem("Passcode", CustomGrantTypes.Passcode));
+                            methodEntryModel.PinDigits = pinDigitsSetup;
+                            methodEntryModel.PinDigitsActive = pinDigitsActiveSetup;
+                            methodEntryModel.AuthOptions.Add(new SelectListItem("Pin", CustomGrantTypes.Pin));
                             return View("~/Views/Authorisation/Index.cshtml", methodEntryModel);
 
                         case CustomGrantTypes.OTP:
@@ -115,7 +115,7 @@ namespace Server.Controllers
 
                     switch (model.TokenRequest.Type)
                     {
-                        case CustomGrantTypes.Passcode:
+                        case CustomGrantTypes.Pin:
 
                             break;
 
@@ -161,25 +161,25 @@ namespace Server.Controllers
 
                     switch (model.TokenRequest.Type)
                     {
-                        case CustomGrantTypes.Passcode:
+                        case CustomGrantTypes.Pin:
 
                             // Convert input fields in to format accepted by the service
-                            List<KeyValuePair<int, string>> passcodeDigits = new List<KeyValuePair<int, string>>();
-                            for (int pos = 0; pos < model.PasscodeDigits.Count; pos++)
+                            List<KeyValuePair<int, string>> pinDigits = new List<KeyValuePair<int, string>>();
+                            for (int pos = 0; pos < model.PinDigits.Count; pos++)
                             {
-                                if (model.PasscodeDigitsActive[pos])
+                                if (model.PinDigitsActive[pos])
                                 {
-                                    passcodeDigits.Add(new KeyValuePair<int, string>(pos, model.PasscodeDigits[pos]));
+                                    pinDigits.Add(new KeyValuePair<int, string>(pos, model.PinDigits[pos]));
                                 }
                             }
 
                             // Create the custom request to pass to the authentication service
-                            model.TokenRequest.Passcode = passcodeDigits;
-                            JwtSecurityToken passcodeResult = _authenticator.AuthenticateCustom(model.TokenRequest);
+                            model.TokenRequest.Pin = pinDigits;
+                            JwtSecurityToken pinResult = _authenticator.AuthenticateCustom(model.TokenRequest);
 
-                            if (passcodeResult != null)
+                            if (pinResult != null)
                             {
-                                string code = _tokenStorage.Add(passcodeResult, model.TokenRequest.CodeChallenge, model.TokenRequest.CodeChallengeMethod);
+                                string code = _tokenStorage.Add(pinResult, model.TokenRequest.CodeChallenge, model.TokenRequest.CodeChallengeMethod);
 
                                 AuthoriseResponse response = new AuthoriseResponse() { code = code, state = "" };
                                 String queryString = response.ToQueryString<AuthoriseResponse>();

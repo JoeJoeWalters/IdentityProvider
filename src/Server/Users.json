@@ -18,7 +18,7 @@
       "Key": "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
       "Username": "admin_a",
       "Password": "40D03466E02A5C1F7954893A82DB41B9E8976A05D9397E0FE9F47E4D1CC6A126", // password
-      "Passcode": {
+      "Pin": {
         "Value": "", // A12345,
         "HashedDigits": [
           "0E5D2295A564D44AADF2862E76AB859FFFFC0DB917137B83D258029F32DA7268",
@@ -39,7 +39,7 @@
       "Key": "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
       "Username": "admin_b",
       "Password": "63BB804427C00D09094EA193F643BCAA0565A52E0E06FDB383C64808F0A39E28", // password
-      "Passcode": {
+      "Pin": {
         "Value": "", // B12345
         "HashedDigits": [
           "C7BAC3C46AFEA9C23B2DD94528BBBD467632F6F65AFF024E64A113FBD01A9622",
