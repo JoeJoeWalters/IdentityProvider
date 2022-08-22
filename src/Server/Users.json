@@ -8,7 +8,9 @@
         "https://localhost:7053/authorizeCallback"
       ],
       "Claims": [],
-      "Scopes": []
+      "Scopes": [],
+      "Created": "0001-01-01 00:00:00.000",
+      "Expires": "2050-01-01 00:00:00.000"
     }
   ],
   "Users": [
@@ -31,7 +33,9 @@
       },
       "ClientId": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Claims": [],
-      "Scopes": []
+      "Scopes": [],
+      "Created": "0001-01-01 00:00:00.000",
+      "Expires": "2050-01-01 00:00:00.000"
     },
     {
       "Audience": "System B",
@@ -52,7 +56,9 @@
       },
       "ClientId": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Claims": [],
-      "Scopes": []
+      "Scopes": [],
+      "Created": "0001-01-01 00:00:00.000",
+      "Expires": "2050-01-01 00:00:00.000"
     }
   ]
 }

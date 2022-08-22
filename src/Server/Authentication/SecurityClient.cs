@@ -28,6 +28,12 @@ namespace Server.Authentication
 
         [JsonProperty("Scopes", Required = Required.AllowNull)]
         public List<String> Scopes { get; set; }
+
+        [JsonProperty("Created", Required = Required.Default)]
+        public DateTime Created { get; set; }
+
+        [JsonProperty("Expires", Required = Required.Default)]
+        public DateTime Expires { get; set; }
     }
 
 }

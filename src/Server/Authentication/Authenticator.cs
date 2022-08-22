@@ -92,6 +92,8 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
+                                    now >= user.Created &&
+                                    now <= user.Expires &&
                                     user.Username == tokenRequest.Username &&
                                     _pinService.CompareHashedDigits(tokenRequest.Pin, user.Id, user.Pin) &&
                                     user.ClientId == tokenRequest.Client_Id;
@@ -110,6 +112,8 @@ namespace Server.Authentication
                                 .Where(user =>
                                 {
                                     return
+                                        now >= user.Created &&
+                                        now <= user.Expires &&
                                         user.Username == tokenRequest.Username &&
                                         user.ClientId == tokenRequest.Client_Id;
                                 }).FirstOrDefault();
@@ -154,6 +158,8 @@ namespace Server.Authentication
                             .Where(client =>
                             {
                                 return
+                                    now >= client.Created &&
+                                    now <= client.Expires &&
                                     client.Id == tokenRequest.Client_Id &&
                                     client.Secret == tokenRequest.Client_Secret;
                             }).Select(client => new SecurityData() { ClientId = client.Id }).FirstOrDefault();
@@ -170,6 +176,8 @@ namespace Server.Authentication
                             .Where(user =>
                             {
                                 return
+                                    now >= user.Created &&
+                                    now <= user.Expires &&
                                     user.Username == tokenRequest.Username &&
                                     user.Password == _hashService.CreateHash($"{user.Id}{tokenRequest.Password}") &&
                                     user.ClientId == tokenRequest.Client_Id;
