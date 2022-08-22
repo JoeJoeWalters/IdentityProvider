@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>IdentityServer.Client</AssemblyName>
-    <RootNamespace>IdentityServer.Client</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,7 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\APIAuthorisation\APIAuthorisation.csproj" />
     <ProjectReference Include="..\Server\Server.csproj" />
   </ItemGroup>
 

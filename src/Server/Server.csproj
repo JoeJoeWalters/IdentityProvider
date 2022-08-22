@@ -5,6 +5,8 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <AssemblyName>IdentityServer.Server</AssemblyName>
+    <RootNamespace>IdentityServer.Server</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

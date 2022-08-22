@@ -1,4 +1,4 @@
-﻿namespace Server.Helpers
+﻿namespace IdentityServer.Server.Helpers
 {
     public static class HttpHelper
     {

@@ -1,4 +1,4 @@
-﻿namespace Server.Contracts.Services
+﻿namespace IdentityServer.Server.Contracts.Services
 {
     /// <summary>
     /// Response back from the OTP Service

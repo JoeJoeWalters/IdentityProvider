@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Server.Contracts.Tokens;
+using IdentityServer.Server.Contracts.Tokens;
 
-namespace Server.Views.Authorisation
+namespace IdentityServer.Server.Views.Authorisation
 {
     /// <summary>
     /// What step of the authorisation screen should be showing

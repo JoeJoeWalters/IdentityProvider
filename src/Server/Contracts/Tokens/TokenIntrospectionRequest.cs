@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace Server.Contracts.Tokens
+namespace IdentityServer.Server.Contracts.Tokens
 {
     // https://datatracker.ietf.org/doc/html/rfc7662#section-2.1
     /// <summary>

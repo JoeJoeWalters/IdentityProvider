@@ -1,4 +1,4 @@
-﻿namespace Server.Contracts.Tokens
+﻿namespace IdentityServer.Server.Contracts.Tokens
 {
     public class GrantTypes
     {

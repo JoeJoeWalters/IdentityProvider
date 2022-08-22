@@ -1,4 +1,4 @@
-﻿namespace Server.Contracts.MetaData
+﻿namespace IdentityServer.Server.Contracts.MetaData
 {
     /// <summary>
     /// Data returned by the Well Known endpoint

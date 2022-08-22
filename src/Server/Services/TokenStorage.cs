@@ -1,9 +1,9 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using Server.Contracts.Tokens;
-using Server.Exceptions;
+using IdentityServer.Server.Contracts.Tokens;
+using IdentityServer.Server.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Server.Services
+namespace IdentityServer.Server.Services
 {
     /// <summary>
     /// Store and retrieve security tokens

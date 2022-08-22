@@ -18,6 +18,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "postman", "postman", "{A5EB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "src\Client\Client.csproj", "{B9E8864B-7681-4370-B84C-C0819D1C8FEA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIAuthorisation", "src\APIAuthorisation\APIAuthorisation.csproj", "{B838FAE0-D8A4-48F8-96C7-641276D3D2D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,6 +38,10 @@ Global
 		{B9E8864B-7681-4370-B84C-C0819D1C8FEA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9E8864B-7681-4370-B84C-C0819D1C8FEA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9E8864B-7681-4370-B84C-C0819D1C8FEA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B838FAE0-D8A4-48F8-96C7-641276D3D2D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B838FAE0-D8A4-48F8-96C7-641276D3D2D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B838FAE0-D8A4-48F8-96C7-641276D3D2D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B838FAE0-D8A4-48F8-96C7-641276D3D2D2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -44,6 +50,7 @@ Global
 		{5801E3B3-89D3-46F0-BDB7-7A6EB4DF8C51} = {428EC208-1529-4649-B348-B7E908F15906}
 		{B375912F-AB3A-4082-8826-08FC0AC526B7} = {F246A6D4-C3C8-4258-A9E7-BBAFE279F3BD}
 		{B9E8864B-7681-4370-B84C-C0819D1C8FEA} = {428EC208-1529-4649-B348-B7E908F15906}
+		{B838FAE0-D8A4-48F8-96C7-641276D3D2D2} = {428EC208-1529-4649-B348-B7E908F15906}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {31AF1EE7-FFF6-4930-85DA-A242367D99B1}

@@ -1,4 +1,4 @@
-﻿namespace Server.Contracts
+﻿namespace IdentityServer.Server.Contracts
 {
     public static class URIs
     {

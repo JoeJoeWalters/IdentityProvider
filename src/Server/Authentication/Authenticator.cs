@@ -1,18 +1,18 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Server.Contracts.MetaData;
-using Server.Contracts.Services;
-using Server.Contracts.Tokens;
-using Server.Exceptions;
-using Server.Helpers;
-using Server.Services;
+using IdentityServer.Server.Contracts.MetaData;
+using IdentityServer.Server.Contracts.Services;
+using IdentityServer.Server.Contracts.Tokens;
+using IdentityServer.Server.Exceptions;
+using IdentityServer.Server.Helpers;
+using IdentityServer.Server.Services;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Text;
 
-namespace Server.Authentication
+namespace IdentityServer.Server.Authentication
 {
     /// <summary>
     /// Standard user authenticator that reads from a Json file in a given location

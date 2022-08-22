@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-namespace Server.Services
+namespace IdentityServer.Server.Services
 {
     /// <summary>
     /// Interface for storing security tokens for later retrieval

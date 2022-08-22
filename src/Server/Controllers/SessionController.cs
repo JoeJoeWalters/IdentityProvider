@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using Server.Contracts;
+using IdentityServer.Server.Contracts;
 
-namespace Server.Controllers
+namespace IdentityServer.Server.Controllers
 {
     /// <summary>
     /// 

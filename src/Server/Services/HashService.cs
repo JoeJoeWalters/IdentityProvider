@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace Server.Services
+namespace IdentityServer.Server.Services
 {
     /// <summary>
     /// Hash strings

@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using System;
 
-namespace Server.Contracts.Tokens
+namespace IdentityServer.Server.Contracts.Tokens
 {
     /// <summary>
     /// Request for a set of credentials (client id, secret etc.)

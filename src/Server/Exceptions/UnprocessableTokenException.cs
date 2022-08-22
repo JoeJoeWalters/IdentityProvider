@@ -1,4 +1,4 @@
-﻿namespace Server.Exceptions
+﻿namespace IdentityServer.Server.Exceptions
 {
     /// <summary>
     /// 

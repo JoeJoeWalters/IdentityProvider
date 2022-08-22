@@ -2,16 +2,16 @@
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Server.Authentication;
-using Server.Contracts;
-using Server.Contracts.Services;
-using Server.Contracts.Tokens;
-using Server.Helpers;
-using Server.Services;
-using Server.Views.Authorisation;
+using IdentityServer.Server.Authentication;
+using IdentityServer.Server.Contracts;
+using IdentityServer.Server.Contracts.Services;
+using IdentityServer.Server.Contracts.Tokens;
+using IdentityServer.Server.Helpers;
+using IdentityServer.Server.Services;
+using IdentityServer.Server.Views.Authorisation;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace Server.Controllers
+namespace IdentityServer.Server.Controllers
 {
     /// <summary>
     /// 

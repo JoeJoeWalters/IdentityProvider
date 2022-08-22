@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 
-namespace Server.Contracts.Tokens
+namespace IdentityServer.Server.Contracts.Tokens
 {
     /// <summary>
     /// On successful verification of a token request

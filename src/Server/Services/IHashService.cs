@@ -1,4 +1,4 @@
-﻿namespace Server.Services
+﻿namespace IdentityServer.Server.Services
 {
     /// <summary>
     /// Interface for the service to hash pins/passwords etc.
