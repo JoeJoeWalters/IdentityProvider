@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace IdentityServer.APIAuthorisation
+namespace IdentityProvider.APIAuthorisation
 {
     public class Class1
     {

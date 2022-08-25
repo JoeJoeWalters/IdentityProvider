@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 
-namespace IdentityServer.Server.Authentication
+namespace IdentityProvider.Server.Authentication
 {
     /// <summary>
     /// A user object specifically for defining the security context

@@ -1,4 +1,4 @@
-﻿namespace IdentityServer.Server.Contracts.MetaData
+﻿namespace IdentityProvider.Server.Contracts.MetaData
 {
     // Dev References:
     // https://auth0.com/blog/navigating-rs256-and-jwks/

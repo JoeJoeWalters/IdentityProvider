@@ -1,9 +1,9 @@
-﻿using IdentityServer.Client.Pages.AuthorizeCallback;
+﻿using IdentityProvider.Client.Pages.AuthorizeCallback;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using IdentityServer.Server.Contracts.Tokens;
+using IdentityProvider.Server.Contracts.Tokens;
 
-namespace IdentityServer.Client.Controllers
+namespace IdentityProvider.Client.Controllers
 {
     public class AuthorizeCallbackController : Controller
     {

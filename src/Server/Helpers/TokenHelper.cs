@@ -1,10 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using IdentityServer.Server.Authentication;
-using IdentityServer.Server.Exceptions;
+using IdentityProvider.Server.Authentication;
+using IdentityProvider.Server.Exceptions;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace IdentityServer.Server.Helpers
+namespace IdentityProvider.Server.Helpers
 {
     /// <summary>
     /// Helpers for generating and manipulating tokens

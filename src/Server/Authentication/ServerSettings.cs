@@ -1,4 +1,4 @@
-﻿namespace IdentityServer.Server.Authentication
+﻿namespace IdentityProvider.Server.Authentication
 {
     public class Audience
     {

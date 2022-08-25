@@ -1,6 +1,6 @@
 using Xunit;
 
-namespace IdentityServer.Server.Unit.Tests
+namespace IdentityProvider.Server.Unit.Tests
 {
     public class UnitTest1
     {

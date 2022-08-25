@@ -1,4 +1,4 @@
-﻿namespace IdentityServer.Server.Contracts.MetaData
+﻿namespace IdentityProvider.Server.Contracts.MetaData
 {
     /// <summary>
     /// The amr claim is a JSON array containing one or more string values indicating the authentication methods used in the authentication.

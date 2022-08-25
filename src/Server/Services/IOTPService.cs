@@ -1,6 +1,6 @@
-﻿using IdentityServer.Server.Contracts.Services;
+﻿using IdentityProvider.Server.Contracts.Services;
 
-namespace IdentityServer.Server.Services
+namespace IdentityProvider.Server.Services
 {
     /// <summary>
     /// Interface for service that sends one time passcodes

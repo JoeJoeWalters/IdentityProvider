@@ -2,14 +2,14 @@ using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using IdentityServer.Server.Authentication;
-using IdentityServer.Server.Services;
+using IdentityProvider.Server.Authentication;
+using IdentityProvider.Server.Services;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace IdentityServer.Server
+namespace IdentityProvider.Server
 {
     [ExcludeFromCodeCoverage]
     internal class Program

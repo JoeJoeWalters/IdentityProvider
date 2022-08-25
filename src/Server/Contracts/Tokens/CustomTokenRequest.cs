@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using System;
 
-namespace IdentityServer.Server.Contracts.Tokens
+namespace IdentityProvider.Server.Contracts.Tokens
 {
     /// <summary>
     /// Custom token request (e.g. via PIN from the Authorize endpoint) that usually is stored and a code reference returned

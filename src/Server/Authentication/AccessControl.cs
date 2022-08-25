@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace IdentityServer.Server.Authentication
+namespace IdentityProvider.Server.Authentication
 {
     /// <summary>
     /// Access control list that should contain the users that are validated against

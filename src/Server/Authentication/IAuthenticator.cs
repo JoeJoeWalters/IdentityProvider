@@ -1,11 +1,11 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using IdentityServer.Server.Contracts.Tokens;
+using IdentityProvider.Server.Contracts.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Threading.Tasks;
 
-namespace IdentityServer.Server.Authentication
+namespace IdentityProvider.Server.Authentication
 {
     /// <summary>
     /// Interface to specify how user authenticator's should behave

@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using IdentityServer.Server.Contracts.Tokens;
+using IdentityProvider.Server.Contracts.Tokens;
 
-namespace IdentityServer.Client.Pages.AuthorizeCallback
+namespace IdentityProvider.Client.Pages.AuthorizeCallback
 {
     /// <summary>
     /// 

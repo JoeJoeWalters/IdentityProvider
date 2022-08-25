@@ -1,6 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 
-namespace IdentityServer.Server.Contracts.Tokens
+namespace IdentityProvider.Server.Contracts.Tokens
 {
     /// <summary>
     /// Storage medium for JWT tokens that may be recalled by the authorisation code and the PKCE challenge method

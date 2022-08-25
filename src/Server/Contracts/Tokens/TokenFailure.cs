@@ -2,7 +2,7 @@
 using Newtonsoft.Json.Converters;
 using System;
 
-namespace IdentityServer.Server.Contracts.Tokens
+namespace IdentityProvider.Server.Contracts.Tokens
 {
     /// <summary>
     /// On unsuccessful verification of a token request

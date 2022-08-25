@@ -6,7 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 
-namespace IdentityServer.Server.Authentication
+namespace IdentityProvider.Server.Authentication
 {
     public class MixedAuthenticationHandler : AuthenticationHandler<MixedAuthenticationOptions>
     {

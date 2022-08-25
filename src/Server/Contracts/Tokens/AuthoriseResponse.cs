@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace IdentityServer.Server.Contracts.Tokens
+namespace IdentityProvider.Server.Contracts.Tokens
 {
     /// <summary>
     /// 

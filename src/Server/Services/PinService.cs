@@ -1,6 +1,6 @@
-﻿using IdentityServer.Server.Authentication;
+﻿using IdentityProvider.Server.Authentication;
 
-namespace IdentityServer.Server.Services
+namespace IdentityProvider.Server.Services
 {
     /// <summary>
     /// Service for managing interactions with passcodes

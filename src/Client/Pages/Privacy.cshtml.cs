@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace IdentityServer.Client.Pages
+namespace IdentityProvider.Client.Pages
 {
     public class PrivacyModel : PageModel
     {

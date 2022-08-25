@@ -1,7 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 
-namespace IdentityServer.Server.Helpers
+namespace IdentityProvider.Server.Helpers
 {
     public static class KeyHelper
     {

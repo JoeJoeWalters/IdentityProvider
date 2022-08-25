@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace IdentityServer.Client.Controllers
+namespace IdentityProvider.Client.Controllers
 {
     /// <summary>
     /// Controller for testing API calls and the functionality for verifying that the scope of the token

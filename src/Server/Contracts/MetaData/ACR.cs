@@ -1,4 +1,4 @@
-﻿namespace IdentityServer.Server.Contracts.MetaData
+﻿namespace IdentityProvider.Server.Contracts.MetaData
 {
     /// <summary>
     /// https://www.rfc-editor.org/rfc/rfc6711.txt
