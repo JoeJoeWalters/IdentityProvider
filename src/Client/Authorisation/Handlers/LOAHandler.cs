@@ -19,7 +19,7 @@ namespace IdentityProvider.Client.Authorisation.Handlers
             }
 
             // Does the LOA Level in the token exceed or equal what is required?
-            int amrLevel = int.Parse(amrRaw.Value.Replace("LOALevel", String.Empty));
+            int amrLevel = int.Parse(amrRaw.Value.Replace("Level", String.Empty));
             if (amrLevel >= requirement.Level)
             {
                 context.Succeed(requirement);
