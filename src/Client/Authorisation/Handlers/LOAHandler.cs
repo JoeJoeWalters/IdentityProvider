@@ -10,7 +10,7 @@ namespace IdentityProvider.Client.Authorisation.Handlers
             AuthorizationHandlerContext context, LOARequirement requirement)
         {            
             // Get the AMR claim
-            Claim? amrRaw = context.User.FindFirst(c => c.Type == "AMR");
+            Claim? amrRaw = context.User.FindFirst(c => c.Type.ToLower() == "amr");
 
             // No claim then fail
             if (amrRaw is null)
