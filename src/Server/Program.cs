@@ -103,8 +103,8 @@ namespace IdentityProvider.Server
                     options.SwaggerDoc("v1", new OpenApiInfo
                     {
                         Version = "v1",
-                        Title = "Identity Provider API",
-                        Description = "An example Identity Provider",
+                        Title = "Identity Provider Server API",
+                        Description = "An example Identity Provider Server",
                         TermsOfService = new Uri("https://example.com/terms"),
                         Contact = new OpenApiContact
                         {
