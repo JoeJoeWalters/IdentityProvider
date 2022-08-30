@@ -13,7 +13,7 @@ namespace IdentityProvider.Client.Controllers
     {
         // GET: api/<TestApiController>
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Level1")]
+        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Level1")]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
@@ -28,7 +28,7 @@ namespace IdentityProvider.Client.Controllers
 
         // POST api/<TestApiController>
         [HttpPost]
-        [Authorize(AuthenticationSchemes = "Level2")]
+        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Level2")]
         public void Post([FromBody] string value)
         {
 

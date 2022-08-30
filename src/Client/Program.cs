@@ -1,4 +1,5 @@
 using IdentityProvider.Client.Authorisation.Handlers;
+using IdentityProvider.Client.Authorisation.Policies;
 using IdentityProvider.Client.Authorisation.Requirements;
 using IdentityProvider.Common.Contracts;
 using IdentityProvider.Common.Contracts.MetaData;
@@ -82,9 +83,8 @@ namespace IdentityProvider.Client
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/policyschemes?view=aspnetcore-6.0
             // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-6.0
             // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-6.0
-            builder.Services.AddSingleton<IAuthorizationHandler, LOAHandler>();
             builder.Services.AddAuthentication()
-                .AddJwtBearer("LOA", jwtOptions =>
+                .AddJwtBearer("Bearer", jwtOptions =>
                 {
                     jwtOptions.RequireHttpsMetadata = false;
                     jwtOptions.TokenValidationParameters = new TokenValidationParameters
@@ -95,56 +95,12 @@ namespace IdentityProvider.Client
                         ValidAudiences = new List<String>() { Audiences.SystemA, Audiences.SystemB },
                         ValidIssuers = new List<string>() { Issuers.PrimaryIssuer }
                     };
-                })
-                .AddPolicyScheme(ACR.LOALevel1, ACR.LOALevel1, options =>
-                {
-                    options.ForwardDefaultSelector = context =>
-                    {
-                        string authorization = context.Request.Headers[HeaderNames.Authorization];
-                        /*
-                        if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
-                        {
-                            var token = authorization.Substring("Bearer ".Length).Trim();
-                            var jwtHandler = new JwtSecurityTokenHandler();
-
-                            return (jwtHandler.CanReadToken(token) && jwtHandler.ReadJwtToken(token).Issuer.Equals(Issuers.PrimaryIssuer))
-                                ? "B2C" : "AAD";
-                        }*/
-                        return "LOA";
-                    };
                 });
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy(ACR.LOALevel1, policy =>
-                {
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                    policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new LOARequirement(ACR.LOALevel1));
-                });
-
-                options.AddPolicy(ACR.LOALevel2, policy =>
-                {
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                    policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new LOARequirement(ACR.LOALevel2));
-                });
-
-                options.AddPolicy(ACR.LOALevel3, policy =>
-                {
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                    policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new LOARequirement(ACR.LOALevel3));
-                });
-
-                options.AddPolicy(ACR.LOALevel4, policy =>
-                {
-                    policy.AuthenticationSchemes.Add(JwtBearerDefaults.AuthenticationScheme);
-                    policy.RequireAuthenticatedUser();
-                    policy.Requirements.Add(new LOARequirement(ACR.LOALevel4));
-                });
-
-            });
+            // Policies for authorisation picked up from the registered singletons
+            builder.Services.AddSingleton<IAuthorizationHandler, LOAHandler>();
+            builder.Services.AddSingleton<IAuthorizationPolicyProvider, LOAPolicyProvider>();
+            builder.Services.AddAuthorization();
 
             var app = builder.Build();
 
