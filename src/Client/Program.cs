@@ -1,11 +1,15 @@
 using IdentityProvider.Client.Authorisation.Handlers;
 using IdentityProvider.Client.Authorisation.Requirements;
+using IdentityProvider.Common.Contracts;
 using IdentityProvider.Common.Contracts.MetaData;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Versioning;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Net.Http.Headers;
 using Microsoft.OpenApi.Models;
 using System.Diagnostics.CodeAnalysis;
+using System.IdentityModel.Tokens.Jwt;
 using System.Reflection;
 
 namespace IdentityProvider.Client
@@ -77,8 +81,38 @@ namespace IdentityProvider.Client
             // Add LOA Level Authorisation
             // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/policyschemes?view=aspnetcore-6.0
             // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-6.0
+            // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-6.0
             builder.Services.AddSingleton<IAuthorizationHandler, LOAHandler>();
-            builder.Services.AddAuthentication().AddJwtBearer();
+            builder.Services.AddAuthentication()
+                .AddJwtBearer("LOA", jwtOptions =>
+                {
+                    jwtOptions.RequireHttpsMetadata = false;
+                    jwtOptions.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidAudiences = new List<String>() { Audiences.SystemA, Audiences.SystemB },
+                        ValidIssuers = new List<string>() { Issuers.PrimaryIssuer }
+                    };
+                })
+                .AddPolicyScheme(ACR.LOALevel1, ACR.LOALevel1, options =>
+                {
+                    options.ForwardDefaultSelector = context =>
+                    {
+                        string authorization = context.Request.Headers[HeaderNames.Authorization];
+                        /*
+                        if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
+                        {
+                            var token = authorization.Substring("Bearer ".Length).Trim();
+                            var jwtHandler = new JwtSecurityTokenHandler();
+
+                            return (jwtHandler.CanReadToken(token) && jwtHandler.ReadJwtToken(token).Issuer.Equals(Issuers.PrimaryIssuer))
+                                ? "B2C" : "AAD";
+                        }*/
+                        return "LOA";
+                    };
+                });
 
             builder.Services.AddAuthorization(options =>
             {

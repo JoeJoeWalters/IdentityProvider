@@ -8,6 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using IdentityProvider.Common.Contracts;
 
 namespace IdentityProvider.Server
 {
@@ -37,6 +38,7 @@ namespace IdentityProvider.Server
                 // Add the private and public keys for signing to the settings collection before adding for DI
                 settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
                 settings.PublicKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "public.pem"), Encoding.UTF8);
+                settings.Issuer = Issuers.PrimaryIssuer; // Override the issuer in this specific case so we know the constant
                 builder.Services.AddSingleton<ServerSettings>(settings);
 
                 // Load the default users and client registrations from the json file
