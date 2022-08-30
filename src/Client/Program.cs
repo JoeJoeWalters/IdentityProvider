@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,13 @@ builder.Services.AddMvc();
 builder.Services
     .AddRazorPages()
     .AddRazorRuntimeCompilation();
+
+builder.Services.AddAuthentication()
+        .AddJwtBearer(options =>
+        {
+            options.Audience = "http://localhost:5001/";
+            options.Authority = "http://localhost:5000/";
+        });
 
 var app = builder.Build();
 

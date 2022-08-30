@@ -1,5 +1,5 @@
+using IdentityProvider.Common.Contracts;
 using Microsoft.AspNetCore.Mvc;
-using IdentityProvider.Server.Contracts;
 
 namespace IdentityProvider.Server.Controllers
 {

@@ -1,6 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using IdentityProvider.Common.Contracts.Tokens;
+using Newtonsoft.Json;
 
 namespace IdentityProvider.Server.Contracts.Tokens
 {

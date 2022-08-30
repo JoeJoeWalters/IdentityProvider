@@ -1,16 +1,15 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
-using IdentityProvider.Server.Contracts.MetaData;
+﻿using IdentityProvider.Common.Contracts.MetaData;
+using IdentityProvider.Common.Contracts.Tokens;
 using IdentityProvider.Server.Contracts.Services;
 using IdentityProvider.Server.Contracts.Tokens;
 using IdentityProvider.Server.Exceptions;
 using IdentityProvider.Server.Helpers;
 using IdentityProvider.Server.Services;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Security.Principal;
-using System.Text;
 
 namespace IdentityProvider.Server.Authentication
 {

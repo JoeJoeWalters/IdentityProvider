@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityProvider.Client.Controllers
 {
@@ -12,6 +13,7 @@ namespace IdentityProvider.Client.Controllers
     {
         // GET: api/<TestApiController>
         [HttpGet]
+        [Authorize(AuthenticationSchemes = "Level1")]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
@@ -26,8 +28,10 @@ namespace IdentityProvider.Client.Controllers
 
         // POST api/<TestApiController>
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "Level2")]
         public void Post([FromBody] string value)
         {
+
         }
 
         // PUT api/<TestApiController>/5

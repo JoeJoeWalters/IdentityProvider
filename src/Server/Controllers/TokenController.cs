@@ -1,10 +1,11 @@
+using IdentityProvider.Common.Contracts;
+using IdentityProvider.Common.Contracts.Tokens;
+using IdentityProvider.Server.Authentication;
+using IdentityProvider.Server.Contracts.Tokens;
+using IdentityProvider.Server.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using IdentityProvider.Server.Authentication;
-using IdentityProvider.Server.Contracts;
-using IdentityProvider.Server.Contracts.Tokens;
-using IdentityProvider.Server.Helpers;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;

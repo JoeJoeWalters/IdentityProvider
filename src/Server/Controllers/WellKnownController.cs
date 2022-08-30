@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
+﻿using IdentityProvider.Common.Contracts;
+using IdentityProvider.Common.Contracts.MetaData;
+using IdentityProvider.Common.Contracts.Tokens;
 using IdentityProvider.Server.Authentication;
-using IdentityProvider.Server.Contracts;
 using IdentityProvider.Server.Contracts.MetaData;
-using IdentityProvider.Server.Contracts.Tokens;
 using IdentityProvider.Server.Helpers;
+using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Security.Cryptography;
 
 namespace IdentityProvider.Server.Controllers

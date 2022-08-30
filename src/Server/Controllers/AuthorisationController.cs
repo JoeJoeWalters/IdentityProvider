@@ -1,14 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
+﻿using IdentityProvider.Common.Contracts;
+using IdentityProvider.Common.Contracts.Tokens;
 using IdentityProvider.Server.Authentication;
-using IdentityProvider.Server.Contracts;
 using IdentityProvider.Server.Contracts.Services;
 using IdentityProvider.Server.Contracts.Tokens;
 using IdentityProvider.Server.Helpers;
 using IdentityProvider.Server.Services;
 using IdentityProvider.Server.Views.Authorisation;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace IdentityProvider.Server.Controllers
