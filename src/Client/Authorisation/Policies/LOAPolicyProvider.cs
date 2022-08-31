@@ -11,15 +11,14 @@ namespace IdentityProvider.Client.Authorisation.Policies
         private const string POLICY_PREFIX = "Level";
 
         public Task<AuthorizationPolicy> GetDefaultPolicyAsync() =>
-            Task.FromResult(new AuthorizationPolicyBuilder(ACR.LOALevel1).RequireAuthenticatedUser().Build());
+            Task.FromResult(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build());
 
         public Task<AuthorizationPolicy?> GetFallbackPolicyAsync() =>
             Task.FromResult<AuthorizationPolicy>(null);
 
         public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
         {
-            if (policyName.StartsWith(POLICY_PREFIX, StringComparison.OrdinalIgnoreCase) &&
-                int.TryParse(policyName.Substring(POLICY_PREFIX.Length), out var age))
+            if (policyName.StartsWith(POLICY_PREFIX, StringComparison.OrdinalIgnoreCase))
             {
                 var policy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme);
                 policy.RequireAuthenticatedUser();

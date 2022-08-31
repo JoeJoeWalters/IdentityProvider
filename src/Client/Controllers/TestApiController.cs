@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IdentityProvider.Client.Controllers
@@ -13,7 +14,7 @@ namespace IdentityProvider.Client.Controllers
     {
         // GET: api/<TestApiController>
         [HttpGet]
-        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Level1")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Level1")]
         public IEnumerable<string> Get()
         {
             return new string[] { "value1", "value2" };
@@ -28,7 +29,7 @@ namespace IdentityProvider.Client.Controllers
 
         // POST api/<TestApiController>
         [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer", Policy = "Level2")]
+        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Level2")]
         public void Post([FromBody] string value)
         {
 

@@ -58,4 +58,10 @@
     <Folder Include="Authentication\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Keys\public.pem">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
