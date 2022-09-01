@@ -1,3 +1,4 @@
+using IdentityProvider.Client.Authentication;
 using IdentityProvider.Client.Authorisation.Handlers;
 using IdentityProvider.Client.Authorisation.Policies;
 using IdentityProvider.Client.Authorisation.Requirements;
@@ -81,39 +82,7 @@ namespace IdentityProvider.Client
                 .AddRazorPages()
                 .AddRazorRuntimeCompilation();
 
-            var publicKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "public.pem"), Encoding.UTF8);
-            RSA imported = RSA.Create();
-            imported.ImportFromPem(publicKey);
-            RSAParameters rsaProperties = imported.ExportParameters(false);
-
-            // Add LOA Level Authorisation
-            // https://docs.microsoft.com/en-us/aspnet/core/security/authentication/policyschemes?view=aspnetcore-6.0
-            // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-6.0
-            // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-6.0
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-                .AddJwtBearer(jwtOptions =>
-                {
-                    jwtOptions.SaveToken = true;
-                    jwtOptions.TokenValidationParameters = new TokenValidationParameters
-                    {
-                        ValidateIssuer = false,
-                        ValidateAudience = false,
-                        ValidateIssuerSigningKey = false,
-                        ValidAudiences = new List<String>() { Audiences.SystemA, Audiences.SystemB },
-                        ValidIssuers = new List<string>() { Issuers.PrimaryIssuer },
-                        IssuerSigningKey = new RsaSecurityKey(rsaProperties) //Encoding.UTF8.GetBytes(publicKey))
-                    };
-                });
-
-            // Policies for authorisation picked up from the registered singletons
-            builder.Services.AddSingleton<IAuthorizationHandler, LOAHandler>();
-            builder.Services.AddSingleton<IAuthorizationPolicyProvider, LOAPolicyProvider>();
-            builder.Services.AddAuthorization();
+            builder.Services.AddAuthNAuthZ();
 
             var app = builder.Build();
 
@@ -134,8 +103,7 @@ namespace IdentityProvider.Client
 
             app.UseRouting();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthNAuthZ();
 
             app.MapControllers();
 
