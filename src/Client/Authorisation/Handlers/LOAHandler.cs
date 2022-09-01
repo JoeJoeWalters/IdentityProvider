@@ -10,17 +10,17 @@ namespace IdentityProvider.Client.Authorisation.Handlers
             AuthorizationHandlerContext context, LOARequirement requirement)
         {            
             // Get the AMR claim
-            Claim? amrRaw = context.User.FindFirst(c => c.Type.ToLower() == "amr");
+            Claim? acrRaw = context.User.FindFirst(c => c.Type.ToLower() == "http://schemas.microsoft.com/claims/authnclassreference"); // Also a constant in Microsoft.Identity.Web but wasn't ready to add all that in just for this
 
             // No claim then fail
-            if (amrRaw is null)
+            if (acrRaw is null)
             {
                 return Task.CompletedTask;
             }
 
             // Does the LOA Level in the token exceed or equal what is required?
-            int amrLevel = int.Parse(amrRaw.Value.Replace("Level", String.Empty));
-            if (amrLevel >= requirement.Level)
+            int acrLevel = int.Parse(acrRaw.Value.Replace("Level", String.Empty));
+            if (acrLevel >= requirement.Level)
             {
                 context.Succeed(requirement);
             }

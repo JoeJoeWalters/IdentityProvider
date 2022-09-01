@@ -40,5 +40,15 @@
         /// Geo-Location of the authentication device.
         /// </summary>
         public const string Geolocation = "geo";
+
+        /// <summary>
+        /// (For non-interactive) Token retrieved using password flow
+        /// </summary>
+        public const string Password = "pas";
+
+        /// <summary>
+        /// (For non-interactive) Token retrieved using client credentials flow
+        /// </summary>
+        public const string ClientCredentials = "cli";
     }
 }
