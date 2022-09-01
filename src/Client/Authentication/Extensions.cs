@@ -46,7 +46,7 @@ namespace IdentityProvider.Client.Authentication
                         ValidateIssuerSigningKey = false,
                         ValidAudiences = new List<String>() { Audiences.SystemA, Audiences.SystemB },
                         ValidIssuers = new List<string>() { Issuers.PrimaryIssuer },
-                        IssuerSigningKey = new RsaSecurityKey(rsaProperties) //Encoding.UTF8.GetBytes(publicKey))
+                        IssuerSigningKey = new RsaSecurityKey(rsaProperties)
                     };
                 });
 
