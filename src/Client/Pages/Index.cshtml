@@ -12,6 +12,7 @@
                 <div class="nav nav-tabs" id="nav-tab" role="tablist">
                     <button class="nav-link active" id="nav-wellKnown-tab" data-bs-toggle="tab" data-bs-target="#nav-wellKnown" type="button" role="tab" aria-controls="nav-wellKnown" aria-selected="true">Well Known</button>
                     <button class="nav-link" v-if="!jwksDisabled" id="nav-jwks-tab" data-bs-toggle="tab" data-bs-target="#nav-jwks" type="button" role="tab" aria-controls="nav-jwks" aria-selected="false">JWKS</button>
+                    <button class="nav-link" v-if="!pkceDisabled" id="nav-pkce-tab" data-bs-toggle="tab" data-bs-target="#nav-pkce" type="button" role="tab" aria-controls="nav-pkce" aria-selected="false">PKCE</button>
                     <button class="nav-link" v-if="!authenticationDisabled" id="nav-authentication-tab" data-bs-toggle="tab" data-bs-target="#nav-authentication" type="button" role="tab" aria-controls="nav-authentication" aria-selected="false">Authentication</button>
                     <button class="nav-link" v-if="!tokenDisabled" id="nav-token-tab" data-bs-toggle="tab" data-bs-target="#nav-token" type="button" role="tab" aria-controls="nav-token" aria-selected="false">Token</button>
                     <button class="nav-link" v-if="!introspectDisabled" id="nav-introspection-tab" data-bs-toggle="tab" data-bs-target="#nav-introspection" type="button" role="tab" aria-controls="nav-introspection" aria-selected="false">Introspection</button>
@@ -150,6 +151,39 @@
                         </div>
                     </form>
                 </div>
+
+
+                <div v-if="!pkceDisabled" class="tab-pane fade" id="nav-pkce" role="tabpanel" aria-labelledby="nav-pkce-tab">
+
+                    <!-- Start Documentation -->
+                    <a data-bs-toggle="collapse" data-bs-target="#collapseInfoPKCE" aria-expanded="false" aria-controls="collapseInfoPKCE"><i class="fa-solid fa-circle-question"></i></a>
+                    <div class="collapse" id="collapseInfoJWKS">
+                        <div class="card card-body">
+                            <iframe src="/documents/rfc/rfc7636.txt" style="width:100%; height: 400px"></iframe>
+                        </div>
+                    </div>
+                    <!-- End Documentation -->
+
+                    <form id="PKCE">
+                        <div class="form-group">
+                            <label for="code_verifier">Code Verifier</label>
+                            <input type="text" readonly="readonly" class="form-control" id="code_verifier" v-model="pkceScreen.code_verifier">
+                        </div>
+                        <div class="form-group">
+                            <label for="code_challenge">Code Challenge</label>
+                            <input type="text" readonly="readonly" class="form-control" id="code_challenge" v-model="pkceScreen.code_challenge">
+                        </div>
+                        <div class="form-group">
+                            <label for="code_challenge_method">Code Challenge Method</label>
+                            <select class="form-control" readonly="readonly" id="code_challenge_method" v-model="pkceScreen.code_challenge_method">
+                                <option value=""></option>
+                                <option value="SHA256">SHA256</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn btn-primary" v-on:click="createPKSEVerifier">Create New Verifier</button>
+                    </form>
+                </div>
+
                 <div v-if="!authDisabled" class="tab-pane fade" id="nav-authentication" role="tabpanel" aria-labelledby="nav-authentication-tab">
 
                     <!-- Start Documentation -->
@@ -189,32 +223,6 @@
                         <div class="form-group">
                             <label for="state">State</label>
                             <input type="text" class="form-control" id="state" v-model="authenticationScreen.state">
-                        </div>
-
-                        <h5>PKCE <a data-bs-toggle="collapse" data-bs-target="#collapseInfoPKCE" aria-expanded="false" aria-controls="collapseInfoPKCE"><i class="fa-solid fa-circle-question"></i></a></h5>
-
-                        <!-- Start Documentation -->
-                        <div class="collapse" id="collapseInfoPKCE">
-                            <div class="card card-body">
-                                <iframe src="/documents/rfc/rfc7636.txt" style="width:100%; height: 400px"></iframe>
-                            </div>
-                        </div>
-                        <!-- End Documentation -->
-                        <button type="button" class="btn btn-primary" v-on:click="createPKSEVerifier">Create New Verifier</button>
-                        <div class="form-group">
-                            <label for="code_verifier">Code Verifier</label>
-                            <input type="text" readonly="readonly" class="form-control" id="code_verifier" v-model="authenticationScreen.code_verifier">
-                        </div>
-                        <div class="form-group">
-                            <label for="code_challenge">Code Challenge</label>
-                            <input type="text" readonly="readonly" class="form-control" id="code_challenge" v-model="authenticationScreen.code_challenge">
-                        </div>
-                        <div class="form-group">
-                            <label for="code_challenge_method">Code Challenge Method</label>
-                            <select class="form-control" readonly="readonly" id="code_challenge_method" v-model="authenticationScreen.code_challenge_method">
-                                <option value=""></option>
-                                <option value="SHA256">SHA256</option>
-                            </select>
                         </div>
 
                         <button type="button" class="btn btn-primary" data-toggle="modal" v-on:click="launchAuthenticate">
@@ -267,7 +275,7 @@
                         </div>
                         <div class="form-group" v-if="tokenScreen.type == 'authorization_code' && authenticationScreen.code_verifier != ''">
                             <label for="loginVerifier">PKCE Verifier</label>
-                            <input type="text" class="form-control" id="loginVerifier" readonly="readonly" v-model="authenticationScreen.code_verifier">
+                            <input type="text" class="form-control" id="loginVerifier" readonly="readonly" v-model="pkceScreen.code_verifier">
                         </div>
                         <div class="form-group" v-if="tokenScreen.type == 'refresh_token'">
                             <label for="loginRefreshToken">Refresh Token</label>
@@ -495,9 +503,9 @@
                         response_mode: "query",
                         redirect_uri: "https://localhost:7053/authorizeCallback",
                         scope: "",
-                        state: "1234567890",
-
-                        // PKCE
+                        state: "1234567890"
+                    },
+                    pkceScreen: {
                         code_verifier: "",
                         code_challenge: "",
                         code_challenge_method: ""
@@ -539,6 +547,9 @@
                 },
                 authCodeVisible: function() {
                     return (this.authorization_code != undefined && this.authorization_code != "");
+                },
+                pkceDisabled: function() {
+                    return (this.wellKnownData.token_endpoint == undefined || this.wellKnownData.token_endpoint == "");
                 },
                 jwksDisabled: function() {
                     return (this.wellKnownData.jwks_uri == undefined || this.wellKnownData.jwks_uri == "");
@@ -597,9 +608,9 @@
                 },
                 createPKSEVerifier() {
                     var verifier = uuidv4();
-                    this.authenticationScreen.code_verifier = verifier;
-                    this.authenticationScreen.code_challenge = CryptoJS.SHA256(verifier);
-                    this.authenticationScreen.code_challenge_method = "SHA256";
+                    this.pkceScreen.code_verifier = verifier;
+                    this.pkceScreen.code_challenge = CryptoJS.SHA256(verifier);
+                    this.pkceScreen.code_challenge_method = "SHA256";
                 },
                 getToken() {
                     var request;
@@ -607,7 +618,7 @@
                         request = { type: "password", username: this.tokenScreen.username, password: this.tokenScreen.password, client_id: this.client_id };
                     }
                     else if (this.tokenScreen.type == "authorization_code") {
-                        request = { type: "authorization_code", code: this.authorization_code, client_id: this.client_id, code_verifier: this.authenticationScreen.code_verifier };
+                        request = { type: "authorization_code", code: this.authorization_code, client_id: this.client_id, code_verifier: this.pkceScreen.code_verifier };
                     }
                     else if (this.tokenScreen.type == "client_credentials") {
                         request = { type: "client_credentials", client_id: this.client_id, client_secret: this.client_secret };
