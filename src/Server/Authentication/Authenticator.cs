@@ -1,5 +1,6 @@
 ﻿using IdentityProvider.Common.Contracts.MetaData;
 using IdentityProvider.Common.Contracts.Tokens;
+using IdentityProvider.Server.Authentication.ACR;
 using IdentityProvider.Server.Contracts.Services;
 using IdentityProvider.Server.Contracts.Tokens;
 using IdentityProvider.Server.Exceptions;
@@ -30,6 +31,7 @@ namespace IdentityProvider.Server.Authentication
         private readonly IOTPService _otpService;
         private readonly IHashService _hashService;
         private readonly ITokenStorage _tokenStorage;
+        private readonly IACRCalculator _acrCalculator;
 
         public TokenValidationParameters JWTValidationParams { get; internal set; }
 
@@ -50,6 +52,7 @@ namespace IdentityProvider.Server.Authentication
             IPinService pinService,
             IOTPService otpService,
             ITokenStorage tokenStorage,
+            IACRCalculator acrCalculator,
             AccessControl accessControl)
         {
             _logger = logger;
@@ -60,6 +63,7 @@ namespace IdentityProvider.Server.Authentication
             _pinService = pinService;
             _otpService = otpService;
             _tokenStorage = tokenStorage;
+            _acrCalculator = acrCalculator;
             _accessControl = accessControl;
         }
 
@@ -260,7 +264,7 @@ namespace IdentityProvider.Server.Authentication
                 JwtSecurityToken token = new JwtSecurityToken(header, secPayload);
 
                 // Apply the ACR policy by evaluating the otken
-                token = AssignACR(token);
+                token = _acrCalculator.AssignACR(token);
 
                 return await Task.FromResult<JwtSecurityToken>(token);
             }
@@ -377,6 +381,7 @@ namespace IdentityProvider.Server.Authentication
         /// </summary>
         /// <param name="token"></param>
         /// <returns></returns>
+        /*
         private JwtSecurityToken AssignACR(JwtSecurityToken token)
         {
 #warning TODO: Move this all in to configuration so ACR can be defined in config rather than code
@@ -403,7 +408,7 @@ namespace IdentityProvider.Server.Authentication
 
             return token;
         }
-
+        */
 
         /// <summary>
         /// Get the security data of a credential based on the username (for choosing what authentication options to display etc.)

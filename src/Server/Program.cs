@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using IdentityProvider.Common.Contracts;
+using IdentityProvider.Server.Authentication.ACR;
 
 namespace IdentityProvider.Server
 {
@@ -34,6 +35,7 @@ namespace IdentityProvider.Server
                 builder.Services.AddSingleton<ITokenStorage, TokenStorage>();
                 builder.Services.AddSingleton<IPinService, PinService>();
                 builder.Services.AddSingleton<IOTPService, MockOTPService>();
+                builder.Services.AddSingleton<IACRCalculator, ACRCalculator>();
 
                 // Add the private and public keys for signing to the settings collection before adding for DI
                 settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
