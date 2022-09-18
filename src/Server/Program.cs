@@ -1,4 +1,5 @@
 using IdentityProvider.Common.Contracts;
+using IdentityProvider.Common.Providers;
 using IdentityProvider.Server.Authentication;
 using IdentityProvider.Server.Authentication.ACR;
 using IdentityProvider.Server.Services;
@@ -36,6 +37,7 @@ internal class Program
             builder.Services.AddSingleton<IPinService, PinService>();
             builder.Services.AddSingleton<IOTPService, MockOTPService>();
             builder.Services.AddSingleton<IACRCalculator, ACRCalculator>();
+            builder.Services.AddSingleton<ITimeProvider, TimeProvider>();
 
             // Add the private and public keys for signing to the settings collection before adding for DI
             settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);

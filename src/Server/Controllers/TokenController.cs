@@ -1,5 +1,6 @@
 using IdentityProvider.Common.Contracts;
 using IdentityProvider.Common.Contracts.Tokens;
+using IdentityProvider.Common.Providers;
 using IdentityProvider.Server.Authentication;
 using IdentityProvider.Server.Contracts.Tokens;
 using IdentityProvider.Server.Helpers;
@@ -21,6 +22,7 @@ public class TokenController : ControllerBase
     private readonly ILogger<TokenController> _logger;
     private readonly IAuthenticator _userAuthenticator;
     private readonly ServerSettings _serverSettings;
+    private readonly ITimeProvider _timeProvider;
 
     // https://vmsdurano.com/-net-core-3-1-signing-jwt-with-rsa/
     private SigningCredentials _signingCredentials { get; set; }
@@ -37,18 +39,14 @@ public class TokenController : ControllerBase
         ILogger<TokenController> logger,
         IAuthenticator userAuthenticator,
         ServerSettings serverSettings,
-        SigningCredentials signingCredentials)
+        SigningCredentials signingCredentials,
+        ITimeProvider timeProvider)
     {
-        // Assign the logger family
         _logger = logger;
-
-        // Assign the user authentication method to create tokens from
         _userAuthenticator = userAuthenticator;
-
-        // Set up the signing credentials for tokens
         _serverSettings = serverSettings;
-
         _signingCredentials = signingCredentials;
+        _timeProvider = timeProvider;
     }
 
     // https://connect2id.com/products/server/docs/api/par
@@ -72,7 +70,7 @@ public class TokenController : ControllerBase
     [Route(URIs.token_endpoint)]
     public ActionResult Token([FromQuery] OAuthTokenRequest request)
     {
-        DateTime now = DateTime.UtcNow; // Fixed point in time
+        DateTime now = _timeProvider.Now(); // Fixed point in time
         long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
 
         var handler = new JwtSecurityTokenHandler();
@@ -176,8 +174,8 @@ public class TokenController : ControllerBase
             JwtSecurityToken token = jsonToken as JwtSecurityToken;
 
             // Token validation is seemingly avoiding if the exp date < datetime.utcnow so do it manually
-#warning ValidateToken should do this right?
-            if (token.Payload.Exp.Value <= (new DateTimeOffset(DateTime.UtcNow)).ToUnixTimeSeconds())
+#warning ValidateToken should do this right? Maybe because of clock offset? Code some "wiggle room" in maybe?
+            if (token.Payload.Exp.Value <= (new DateTimeOffset(_timeProvider.Now())).ToUnixTimeSeconds())
                 throw new SecurityTokenExpiredException();
 
             string type = token.Header["typ"].ToString().ToLower();

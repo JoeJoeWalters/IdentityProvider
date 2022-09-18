@@ -1,6 +1,7 @@
 ﻿using IdentityProvider.Common.Contracts.MetaData;
 using IdentityProvider.Common.Contracts.Tokens;
 using IdentityProvider.Common.Exceptions;
+using IdentityProvider.Common.Providers;
 using IdentityProvider.Server.Authentication.ACR;
 using IdentityProvider.Server.Contracts.Services;
 using IdentityProvider.Server.Contracts.Tokens;
@@ -32,6 +33,7 @@ public class Authenticator : IAuthenticator
     private readonly IHashService _hashService;
     private readonly ITokenStorage _tokenStorage;
     private readonly IACRCalculator _acrCalculator;
+    private readonly ITimeProvider _timeProvider;
 
     public TokenValidationParameters JWTValidationParams { get; internal set; }
 
@@ -53,6 +55,7 @@ public class Authenticator : IAuthenticator
         IOTPService otpService,
         ITokenStorage tokenStorage,
         IACRCalculator acrCalculator,
+        ITimeProvider timeProvider,
         AccessControl accessControl)
     {
         _logger = logger;
@@ -65,6 +68,7 @@ public class Authenticator : IAuthenticator
         _tokenStorage = tokenStorage;
         _acrCalculator = acrCalculator;
         _accessControl = accessControl;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -83,7 +87,7 @@ public class Authenticator : IAuthenticator
     public async Task<JwtSecurityToken> AuthenticateCustomAsync(CustomTokenRequest tokenRequest)
     {
         SecurityData data = null;
-        DateTime now = DateTime.UtcNow; // Fixed point in time
+        DateTime now = _timeProvider.Now(); // Fixed point in time to be used in this method as a point of reference
         string amr = string.Empty;
 
         switch (tokenRequest.Type)
@@ -147,7 +151,7 @@ public class Authenticator : IAuthenticator
     {
         SecurityData data = null;
         JwtSecurityToken response = null;
-        DateTime now = DateTime.UtcNow; // Fixed point in time
+        DateTime now = _timeProvider.Now(); // Fixed point in time as a point of reference
         string amr = string.Empty;
 
         try
@@ -291,7 +295,7 @@ public class Authenticator : IAuthenticator
         SecurityData result = null;
 
         // The time the token started to validate so it is consistent
-        DateTime tokenReceivedTime = DateTime.UtcNow;
+        DateTime tokenReceivedTime = _timeProvider.Now();
 
         try
         {
