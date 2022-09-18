@@ -1,15 +1,15 @@
+using IdentityProvider.Common.Contracts;
+using IdentityProvider.Server.Authentication;
+using IdentityProvider.Server.Authentication.ACR;
+using IdentityProvider.Server.Services;
 using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
-using IdentityProvider.Server.Authentication;
-using IdentityProvider.Server.Services;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
-using IdentityProvider.Common.Contracts;
-using IdentityProvider.Server.Authentication.ACR;
 
 namespace IdentityProvider.Server;
 
