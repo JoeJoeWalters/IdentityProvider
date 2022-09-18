@@ -1,6 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using IdentityProvider.Common.Exceptions;
 using IdentityProvider.Server.Authentication;
-using IdentityProvider.Server.Exceptions;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 

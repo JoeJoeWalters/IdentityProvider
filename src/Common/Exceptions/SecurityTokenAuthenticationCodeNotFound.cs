@@ -1,4 +1,6 @@
-﻿namespace IdentityProvider.Server.Exceptions;
+﻿using System;
+
+namespace IdentityProvider.Common.Exceptions;
 
 /// <summary>
 /// 
