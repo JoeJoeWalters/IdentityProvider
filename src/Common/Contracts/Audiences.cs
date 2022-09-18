@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿namespace IdentityProvider.Common.Contracts;
 
-namespace IdentityProvider.Common.Contracts
+public class Audiences
 {
-    public class Audiences
-    {
-        public const string SystemA = "System A";
-        public const string SystemB = "System B";
-    }
+    public const string SystemA = "System A";
+    public const string SystemB = "System B";
 }

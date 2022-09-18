@@ -1,16 +1,15 @@
-﻿namespace IdentityProvider.Server.Exceptions
+﻿namespace IdentityProvider.Server.Exceptions;
+
+/// <summary>
+/// 
+/// </summary>
+public class UnprocessableTokenException : Exception
 {
     /// <summary>
     /// 
     /// </summary>
-    public class UnprocessableTokenException : Exception
+    public UnprocessableTokenException() : base("Unprocessable Token, Check Token is of correct type")
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public UnprocessableTokenException() : base("Unprocessable Token, Check Token is of correct type")
-        {
 
-        }
     }
 }

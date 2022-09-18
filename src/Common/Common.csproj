@@ -5,6 +5,7 @@
     <Nullable>enable</Nullable>
     <AssemblyName>IdentityProvider.Common</AssemblyName>
     <RootNamespace>IdentityProvider.Common</RootNamespace>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
 </Project>
