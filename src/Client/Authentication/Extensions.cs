@@ -3,7 +3,6 @@ using IdentityProvider.Client.Authorisation.Policies;
 using IdentityProvider.Common.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
