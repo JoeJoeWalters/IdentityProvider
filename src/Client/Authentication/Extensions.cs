@@ -54,6 +54,7 @@ public static class Extensions
         // Policies for authorisation picked up from the registered singletons
         services.AddSingleton<IAuthorizationHandler, LOAHandler>();
         services.AddSingleton<IAuthorizationPolicyProvider, LOAPolicyProvider>();
+        services.AddAuthorization();
 
         return services;
     }
