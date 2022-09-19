@@ -3,6 +3,7 @@ using IdentityProvider.Client.Authorisation.Policies;
 using IdentityProvider.Common.Contracts;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Cryptography;
 using System.Text;
@@ -31,11 +32,11 @@ public static class Extensions
         // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/policies?view=aspnetcore-6.0
         // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/limitingidentitybyscheme?view=aspnetcore-6.0
         services.AddAuthentication(options =>
-        {
-            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-        })
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(jwtOptions =>
             {
                 jwtOptions.SaveToken = true;
@@ -53,7 +54,6 @@ public static class Extensions
         // Policies for authorisation picked up from the registered singletons
         services.AddSingleton<IAuthorizationHandler, LOAHandler>();
         services.AddSingleton<IAuthorizationPolicyProvider, LOAPolicyProvider>();
-        services.AddAuthorization();
 
         return services;
     }

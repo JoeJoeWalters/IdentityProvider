@@ -5,11 +5,10 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace IdentityProvider.Client.Authorisation.Policies;
 
+// https://stackoverflow.com/questions/31464359/how-do-you-create-a-custom-authorizeattribute-in-asp-net-core/40824351#40824351
 // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/iauthorizationpolicyprovider?view=aspnetcore-6.0
 public class LOAPolicyProvider : IAuthorizationPolicyProvider
 {
-    private const string POLICY_PREFIX = "Level";
-
     public Task<AuthorizationPolicy> GetDefaultPolicyAsync() =>
         Task.FromResult(new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme).RequireAuthenticatedUser().Build());
 
@@ -18,11 +17,14 @@ public class LOAPolicyProvider : IAuthorizationPolicyProvider
 
     public Task<AuthorizationPolicy?> GetPolicyAsync(string policyName)
     {
-        if (policyName.StartsWith(POLICY_PREFIX, StringComparison.OrdinalIgnoreCase))
+        String[] policySplit = policyName.Split(':');
+
+        if (policySplit.Length > 1)
         {
             var policy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme);
             policy.RequireAuthenticatedUser();
-            policy.Requirements.Add(new LOARequirement(policyName));
+            policy.Requirements.Add(new LOARequirement(policySplit[0], policySplit[1]));
+            
             return Task.FromResult(policy.Build());
         }
 

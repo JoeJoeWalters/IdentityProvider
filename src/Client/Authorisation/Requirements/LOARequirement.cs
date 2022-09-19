@@ -5,11 +5,12 @@ namespace IdentityProvider.Client.Authorisation.Requirements;
 
 public class LOARequirement : IAuthorizationRequirement
 {
-    private readonly string _level = ACR.LOALevel1;
-    public int Level { get => int.Parse(_level.Replace("Level", String.Empty)); }
+    public string PolicyType { get; }
+    public string PolicyValue { get; }
 
-    public LOARequirement(string LOALevel)
+    public LOARequirement(string type, string value)
     {
-        _level = LOALevel;
+        PolicyType = type;
+        PolicyValue = value;
     }
 }
