@@ -38,7 +38,7 @@ public class LOAHandler : AuthorizationHandler<LOARequirement>
             case "scope":
 
                 // If the scopes are comma seperated then split and trim (if any one matches its a match becasue policies stack anyway)
-                String[] scopeMatches = requirement.PolicyValue.Split(",").Select(p => p.Trim()).ToArray();
+                String[] scopeMatches = requirement.PolicyValue.Split(',').Select(p => p.Trim()).ToArray();
 
                 // Does one the possible required scopes exist for this user context?
                 Claim? scopeRaw = context.User.FindFirst(c => scopeMatches.Contains(c.Type, StringComparer.OrdinalIgnoreCase));
