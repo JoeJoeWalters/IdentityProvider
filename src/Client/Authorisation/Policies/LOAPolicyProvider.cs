@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace IdentityProvider.Client.Authorisation.Policies;
 
-// https://stackoverflow.com/questions/31464359/how-do-you-create-a-custom-authorizeattribute-in-asp-net-core/40824351#40824351
 // https://docs.microsoft.com/en-us/aspnet/core/security/authorization/iauthorizationpolicyprovider?view=aspnetcore-6.0
 public class LOAPolicyProvider : IAuthorizationPolicyProvider
 {
