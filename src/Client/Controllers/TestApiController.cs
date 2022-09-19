@@ -15,7 +15,7 @@ public class TestApiController : ControllerBase
     // GET: api/<TestApiController>
     [HttpGet]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Level:1")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Scope:Read")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Scope:Read,Write")]
     public IEnumerable<string> Get()
     {
         return new string[] { "value1", "value2" };
@@ -24,7 +24,7 @@ public class TestApiController : ControllerBase
     // GET api/<TestApiController>/5
     [HttpGet("{id}")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Level:1")]
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Scope:Read")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Scope:Read,Write")]
     //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Policy = "Level1")]
     public string Get(int id)
     {

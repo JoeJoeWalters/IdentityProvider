@@ -26,21 +26,28 @@ public class LOAHandler : AuthorizationHandler<LOARequirement>
                 int acrLevel = int.Parse(acrRaw.Value.Replace("Level", String.Empty));
                 int requirementLevel = int.Parse(requirement.PolicyValue);
                 if (acrLevel >= requirementLevel)
-                {
                     context.Succeed(requirement);
+                else
+                {
+#warning TODO: Implement step up response message here
+                    context.Fail(new AuthorizationFailureReason(this, "Step up required, too low an ACR Level for this resource"));
                 }
 
                 break;
 
             case "scope":
 
-                Claim? scopeRaw = context.User.FindFirst(c => string.Compare(c.Type, requirement.PolicyValue, true) == 0);
+                // If the scopes are comma seperated then split and trim (if any one matches its a match becasue policies stack anyway)
+                String[] scopeMatches = requirement.PolicyValue.Split(",").Select(p => p.Trim()).ToArray();
+
+                // Does one the possible required scopes exist for this user context?
+                Claim? scopeRaw = context.User.FindFirst(c => scopeMatches.Contains(c.Type, StringComparer.OrdinalIgnoreCase));
 
                 // No claim then fail
                 if (!(scopeRaw is null))
-                {
                     context.Succeed(requirement);
-                }
+                else
+                    context.Fail(new AuthorizationFailureReason(this, "Scopes did not match"));
 
                 break;
         }
