@@ -23,7 +23,7 @@ public class LOAHandler : AuthorizationHandler<LOARequirement>
                 }
 
                 // Does the LOA Level in the token exceed or equal what is required?
-                int acrLevel = int.Parse(acrRaw.Value.Replace("Level", String.Empty));
+                int acrLevel = int.Parse(acrRaw.Value.Replace("Level", String.Empty, StringComparison.OrdinalIgnoreCase));
                 int requirementLevel = int.Parse(requirement.PolicyValue);
                 if (acrLevel >= requirementLevel)
                     context.Succeed(requirement);
