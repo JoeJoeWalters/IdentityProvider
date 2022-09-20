@@ -396,6 +396,23 @@
 
         //var crypto = requires("crypto-js");
 
+
+        class tokenStorage
+        {
+            constructor(accessToken, refreshToken) {
+
+                var accessTokenDecoded = parseJwt(accessToken);
+                var refreshTokenDecoded = parseJwt(refreshToken);
+
+                this.accessToken = accessToken;
+                this.refreshToken = refreshToken;
+                this.accessTokenExpires = unixTicksToIsoString(accessTokenDecoded['exp']),
+                this.accessTokenDecoded = accessTokenDecoded,
+                this.refreshTokenExpires = unixTicksToIsoString(refreshTokenDecoded['exp']),
+                this.refreshTokenDecoded = refreshTokenDecoded
+            }
+        }
+
         function parseJwt(token) {
             if (token != undefined && token != "") {
                 var base64Url = token.split('.')[1];
@@ -610,17 +627,10 @@
                 },
                 callbackToken(success, response) {
                     if (success) {
+
                         var accessTokenDecoded = parseJwt(response.accessToken);
                         var refreshTokenDecoded = parseJwt(response.refreshToken);
-                        this.tokens.push(
-                            { 
-                                accessToken: response.accessToken, 
-                                accessTokenExpires: unixTicksToIsoString(accessTokenDecoded['exp']), 
-                                accessTokenDecoded: accessTokenDecoded, 
-                                refreshToken: response.refreshToken, 
-                                refreshTokenExpires: unixTicksToIsoString(refreshTokenDecoded['exp']), 
-                                refreshTokenDecoded: refreshTokenDecoded
-                            });
+                        this.tokens.push(new tokenStorage(response.accessToken, response.refreshToken));
                     }
                     else {
                         var failureData = JSON.parse(response.data);
