@@ -437,9 +437,17 @@
                 }
             return str.join("&");
         }
-        $('.modal').on('shown.bs.modal', function() {
-            $(this).find('iframe').attr('src', 'http://www.google.com')
-        })
+
+        function unixTicksToIsoString(seconds) {
+            var expiryDateTime = new Date(seconds * 1000);
+            return expiryDateTime.toISOString();
+        }
+
+        function uuidv4() {
+            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+            );
+        }
 
         // Make an API call with the given parameters
         function apiCall(url, method, request, callback) {
@@ -485,17 +493,6 @@
                     callback(false, { data: jgXHR.responseText, messsages: ["Error Connecting To Api"] });
                 }
             });
-        }
-
-        function unixTicksToIsoString(seconds) {
-            var expiryDateTime = new Date(seconds * 1000);
-            return expiryDateTime.toISOString();
-        }
-
-        function uuidv4() {
-            return ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
-                (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
-            );
         }
 
         const app = createApp({
@@ -684,7 +681,6 @@
 
                     // Send the payload to the server inside the iframe
                     $("#authenticationIframe").attr('src', "https://localhost:7198/authorize?" + serialisedData);
-
                 }
             },
         }).mount('#app');
