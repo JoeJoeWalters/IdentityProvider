@@ -184,7 +184,7 @@
                     </form>
                 </div>
 
-                <div v-if="!authDisabled" class="tab-pane fade" id="nav-authentication" role="tabpanel" aria-labelledby="nav-authentication-tab">
+                <div v-if="!authenticationDisabled" class="tab-pane fade" id="nav-authentication" role="tabpanel" aria-labelledby="nav-authentication-tab">
 
                     <!-- Start Documentation -->
                     <a data-bs-toggle="collapse" data-bs-target="#collapseInfoAuth" aria-expanded="false" aria-controls="collapseInfoAuth"><i class="fa-solid fa-circle-question"></i></a>
@@ -242,7 +242,7 @@
                         </div>
                     </form>
                 </div>
-                <div v-if="!authDisabled" class="tab-pane fade" id="nav-token" role="tabpanel" aria-labelledby="nav-token-tab">
+                <div v-if="!authenticationDisabled" class="tab-pane fade" id="nav-token" role="tabpanel" aria-labelledby="nav-token-tab">
 
                     <!-- Start Documentation -->
                     <a data-bs-toggle="collapse" data-bs-target="#collapseInfoToken" aria-expanded="false" aria-controls="collapseInfoToken"><i class="fa-solid fa-circle-question"></i></a>
@@ -292,7 +292,7 @@
                         <button type="button" class="btn btn-primary" v-on:click="getToken" :disabled="tokenDisabled">Retrieve Token</button>
                     </form>
                 </div>
-                <div v-if="!authDisabled" class="tab-pane fade" id="nav-introspection" role="tabpanel" aria-labelledby="nav-introspection-tab">
+                <div v-if="!introspectDisabled" class="tab-pane fade" id="nav-introspection" role="tabpanel" aria-labelledby="nav-introspection-tab">
 
                     <!-- Start Documentation -->
                     <a data-bs-toggle="collapse" data-bs-target="#collapseInfoIntrospection" aria-expanded="false" aria-controls="collapseInfoIntrospection"><i class="fa-solid fa-circle-question"></i></a>
@@ -313,11 +313,11 @@
                         </div>
                         <div class="form-group" v-if="introspectionScreen.token_type_hint == 'jwt'">
                             <label for="introspectionToken">JWT Token</label>
-                            <input type="text" class="form-control" id="introspectionJWTToken" v-model="token" readonly="readonly">
+                            <input type="text" class="form-control" id="introspectionJWTToken" v-model="tokens[0].accessToken" readonly="readonly">
                         </div>
                         <div class="form-group" v-if="introspectionScreen.token_type_hint == 'refresh'">
                             <label for="introspectionToken">Refresh Token</label>
-                            <input type="text" class="form-control" id="introspectionRefreshToken" v-model="refreshToken" readonly="readonly">
+                            <input type="text" class="form-control" id="introspectionRefreshToken" v-model="tokens[0].refreshToken" readonly="readonly">
                         </div>
                         <div class="btn-toolbar">
                             <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
@@ -364,20 +364,20 @@
                 <pre><code>{{ authorization_code }}</code></pre>
             </div>
         </div>
-        <div class="card mt-1" v-if="tokenVisible">
+        <div class="card mt-1" v-for="token in tokens">
             <div class="card-body">
                 <h5 class="card-title">JWT Token <a href="/documents/rfc/rfc7519.txt" target="_blank"><i class="fa-solid fa-circle-question"></i></a></h5>
-                <pre><code>{{ token }}</code></pre>
-                <p>Expires: <b>{{ tokenExpires }}</b></p>
+                <pre><code>{{ token.accessToken }}</code></pre>
+                <p>Expires: <b>{{ token.accessTokenExpires }}</b></p>
             </div>
             <div class="card-body">
                 <h5 class="card-title">Decoded</h5>
-                <pre><code>{{ decodedToken }}</code></pre>
+                <pre><code>{{ token.accessTokenDecoded }}</code></pre>
             </div>
             <div class="card-body">
                 <h5 class="card-title">Refresh Token</h5>
-                <pre><code>{{ refreshToken }}</code></pre>
-                <p>Expires: <b>{{ refreshTokenExpires }}</b></p>
+                <pre><code>{{ token.refreshToken }}</code></pre>
+                <p>Expires: <b>{{ token.refreshTokenExpires }}</b></p>
             </div>
         </div>
     </div>
@@ -487,6 +487,7 @@
                     client_id: "7ac39504-53f1-47f5-96b9-3c2682962b8b",
                     client_secret: "a2ffaf61-fde6-4b5d-b69d-5697321ea668",
                     authorization_code: "",
+                    tokens: [],
                     token: "",
                     refreshToken: "",
                     tokenExpires: "",
@@ -543,7 +544,7 @@
             },
             computed: {
                 tokenVisible: function() {
-                    return (this.token != undefined && this.token != "");
+                    return (this.tokens.length > 0);
                 },
                 authCodeVisible: function() {
                     return (this.authorization_code != undefined && this.authorization_code != "");
@@ -561,28 +562,7 @@
                     return (this.wellKnownData.token_endpoint == undefined || this.wellKnownData.token_endpoint == "");
                 },
                 introspectDisabled: function() {
-                    return (this.token == "" && this.refreshToken == "");
-                },
-                decodedToken: function() {
-                    if (this.token != undefined && this.token != "") {
-                        var result = parseJwt(this.token);
-                        this.tokenExpires = unixTicksToIsoString(result['exp']);
-                        return result;
-                    }
-                    else {
-                        this.expiryDate = "";
-                        return "";
-                    }
-                },
-                refreshTokenExpires: function() {
-                    if (this.refreshToken != undefined && this.refreshToken != "") {
-                        var result = parseJwt(this.refreshToken);
-                        return unixTicksToIsoString(result['exp']);
-                    }
-                    else {
-                        this.expiryDate = "";
-                        return "";
-                    }
+                    return (this.tokens.length == 0);
                 }
             },
             methods: {
@@ -630,29 +610,32 @@
                 },
                 callbackToken(success, response) {
                     if (success) {
-                        this.token = response.accessToken;
-                        this.refreshToken = response.refreshToken;
+                        var accessTokenDecoded = parseJwt(response.accessToken);
+                        var refreshTokenDecoded = parseJwt(response.refreshToken);
+                        this.tokens.push(
+                            { 
+                                accessToken: response.accessToken, 
+                                accessTokenExpires: unixTicksToIsoString(accessTokenDecoded['exp']), 
+                                accessTokenDecoded: accessTokenDecoded, 
+                                refreshToken: response.refreshToken, 
+                                refreshTokenExpires: unixTicksToIsoString(refreshTokenDecoded['exp']), 
+                                refreshTokenDecoded: refreshTokenDecoded
+                            });
                     }
                     else {
                         var failureData = JSON.parse(response.data);
 
                         debugger;
-
-                        // Failure .. Kill the context
-                        this.token = "";
-                        this.tokenExpires = "";
-                        this.refreshToken = "";
-                        this.refreshTokenExpires = "";
                     }
                 },
                 getIntrospection() {
                     // Post but with query params (I know right!)
                     var tokenToUse;
                     if (this.introspectionScreen.token_type_hint == "jwt") {
-                        tokenToUse = this.token;
+                        tokenToUse = this.tokens[0].accessToken;
                     }
                     else {
-                        tokenToUse = this.refreshToken;
+                        tokenToUse = this.tokens[0].refreshToken;
                     }
 
                     apiCall(this.wellKnownData.introspection_endpoint + "?" + serialize({ token: tokenToUse, token_type_hint: this.introspectionScreen.token_type_hint }), "POST", {}, this.callbackIntrospection);
