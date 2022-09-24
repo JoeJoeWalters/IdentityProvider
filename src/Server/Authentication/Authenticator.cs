@@ -76,7 +76,7 @@ public class Authenticator : IAuthenticator
     /// </summary>
     /// <param name="tokenRequest"></param>
     /// <returns></returns>
-    public JwtSecurityToken AuthenticateCustom(CustomTokenRequest tokenRequest)
+    public JwtSecurityToken AuthenticateCustom(TokenRequest tokenRequest)
         => Task.Run(() => AuthenticateCustomAsync(tokenRequest)).Result;
 
     /// <summary>
@@ -84,7 +84,7 @@ public class Authenticator : IAuthenticator
     /// </summary>
     /// <param name="tokenRequest"></param>
     /// <returns></returns>
-    public async Task<JwtSecurityToken> AuthenticateCustomAsync(CustomTokenRequest tokenRequest)
+    public async Task<JwtSecurityToken> AuthenticateCustomAsync(TokenRequest tokenRequest)
     {
         SecurityData data = null;
         DateTime now = _timeProvider.Now(); // Fixed point in time to be used in this method as a point of reference
@@ -139,7 +139,7 @@ public class Authenticator : IAuthenticator
     /// </summary>
     /// <param name="tokenRequest"></param>
     /// <returns></returns>
-    public JwtSecurityToken AuthenticateOAuth(OAuthTokenRequest tokenRequest)
+    public JwtSecurityToken AuthenticateOAuth(TokenRequest tokenRequest)
         => Task.Run(() => AuthenticateOAuthAsync(tokenRequest)).Result;
 
     /// <summary>
@@ -147,7 +147,7 @@ public class Authenticator : IAuthenticator
     /// </summary>
     /// <param name="tokenRequest"></param>
     /// <returns></returns>
-    public async Task<JwtSecurityToken> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest)
+    public async Task<JwtSecurityToken> AuthenticateOAuthAsync(TokenRequest tokenRequest)
     {
         SecurityData data = null;
         JwtSecurityToken response = null;

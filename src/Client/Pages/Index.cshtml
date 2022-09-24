@@ -305,6 +305,12 @@
 
                     <form id="IntrospectionForm">
                         <div class="form-group">
+                            <label for="token_type_hint">Token</label>
+                            <select class="form-control" id="token_type_hint" v-model="introspectionScreen.selectedToken">
+                                <option v-for="token in tokens">{{token.name}}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="token_type_hint">Type</label>
                             <select class="form-control" id="token_type_hint" v-model="introspectionScreen.token_type_hint">
                                 <option>jwt</option>
@@ -313,11 +319,11 @@
                         </div>
                         <div class="form-group" v-if="introspectionScreen.token_type_hint == 'jwt'">
                             <label for="introspectionToken">JWT Token</label>
-                            <input type="text" class="form-control" id="introspectionJWTToken" v-model="tokens[0].accessToken" readonly="readonly">
+                            <input type="text" class="form-control" id="introspectionJWTToken" v-if="introspectionScreen.selectedToken != null" v-model="introspectionScreen.selectedToken.accessToken" readonly="readonly">
                         </div>
                         <div class="form-group" v-if="introspectionScreen.token_type_hint == 'refresh'">
                             <label for="introspectionToken">Refresh Token</label>
-                            <input type="text" class="form-control" id="introspectionRefreshToken" v-model="tokens[0].refreshToken" readonly="readonly">
+                            <input type="text" class="form-control" id="introspectionRefreshToken" v-if="introspectionScreen.selectedToken != null" v-model="introspectionScreen.selectedToken.refreshToken" readonly="readonly">
                         </div>
                         <div class="btn-toolbar">
                             <button type="button" class="btn btn-primary" v-on:click="getIntrospection" :disabled="introspectDisabled">Run Introspection</button>
@@ -366,7 +372,7 @@
         </div>
         <div class="card mt-1" v-for="token in tokens">
             <div class="card-body">
-                <h5 class="card-title">JWT Token <a href="/documents/rfc/rfc7519.txt" target="_blank"><i class="fa-solid fa-circle-question"></i></a></h5>
+                <h5 class="card-title"><input type="text" class="form-control" id="tokenName" v-model="token.name" readonly="readonly"> <a href="/documents/rfc/rfc7519.txt" target="_blank"><i class="fa-solid fa-circle-question"></i></a></h5>
                 <pre><code>{{ token.accessToken }}</code></pre>
                 <p>Expires: <b>{{ token.accessTokenExpires }}</b></p>
             </div>
@@ -397,19 +403,19 @@
         //var crypto = requires("crypto-js");
 
 
-        class tokenStorage
-        {
+        class tokenStorage {
             constructor(accessToken, refreshToken) {
 
                 var accessTokenDecoded = parseJwt(accessToken);
                 var refreshTokenDecoded = parseJwt(refreshToken);
 
+                this.name = "Token '" + unixTicksToIsoString(accessTokenDecoded['exp']) + "'";
                 this.accessToken = accessToken;
                 this.refreshToken = refreshToken;
-                this.accessTokenExpires = unixTicksToIsoString(accessTokenDecoded['exp']),
-                this.accessTokenDecoded = accessTokenDecoded,
-                this.refreshTokenExpires = unixTicksToIsoString(refreshTokenDecoded['exp']),
-                this.refreshTokenDecoded = refreshTokenDecoded
+                this.accessTokenExpires = unixTicksToIsoString(accessTokenDecoded['exp']);
+                this.accessTokenDecoded = accessTokenDecoded;
+                this.refreshTokenExpires = unixTicksToIsoString(refreshTokenDecoded['exp']);
+                this.refreshTokenDecoded = refreshTokenDecoded;
             }
         }
 
@@ -526,6 +532,7 @@
                         code_challenge_method: ""
                     },
                     introspectionScreen: {
+                        selectedToken: null,
                         token_type_hint: "jwt"
                     },
                     introspectionData: {

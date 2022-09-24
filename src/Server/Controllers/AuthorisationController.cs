@@ -39,7 +39,7 @@ public class AuthorisationController : Controller
     [Route(URIs.authorization_endpoint)]
     public ActionResult Index(AuthoriseRequest request)
     {
-        IndexModel model = new IndexModel() { Request = request, Step = AuthoriseStep.UserEntry, TokenRequest = new CustomTokenRequest() { RedirectUri = request.redirect_uri, Username = String.Empty, Client_Id = request.client_id } };
+        IndexModel model = new IndexModel() { Request = request, Step = AuthoriseStep.UserEntry, TokenRequest = new TokenRequest() { RedirectUri = request.redirect_uri, Username = String.Empty, Client_Id = request.client_id } };
         return View("~/Views/Authorisation/Index.cshtml", model);
     }
 

@@ -28,16 +28,16 @@ public interface IAuthenticator
     /// </summary>
     /// <param name="tokenRequest">OAuth Request Payload</param>
     /// <returns>The user that was found and validated, a null will be returned if no user was validated</returns>
-    JwtSecurityToken AuthenticateOAuth(OAuthTokenRequest tokenRequest);
-    Task<JwtSecurityToken> AuthenticateOAuthAsync(OAuthTokenRequest tokenRequest);
+    JwtSecurityToken AuthenticateOAuth(TokenRequest tokenRequest);
+    Task<JwtSecurityToken> AuthenticateOAuthAsync(TokenRequest tokenRequest);
 
     /// <summary>
     /// Authenticate via custom methods (pin / face etc. from the authorize endpoint)
     /// </summary>
     /// <param name="tokenRequest">OAuth Request Payload</param>
     /// <returns>The user that was found and validated, a null will be returned if no user was validated</returns>
-    JwtSecurityToken AuthenticateCustom(CustomTokenRequest tokenRequest);
-    Task<JwtSecurityToken> AuthenticateCustomAsync(CustomTokenRequest tokenRequest);
+    JwtSecurityToken AuthenticateCustom(TokenRequest tokenRequest);
+    Task<JwtSecurityToken> AuthenticateCustomAsync(TokenRequest tokenRequest);
 
     /// <summary>
     /// Get the security data of a credential based on the username (for choosing what authentication options to display etc.)

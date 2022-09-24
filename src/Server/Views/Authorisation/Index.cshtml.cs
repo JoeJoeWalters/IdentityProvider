@@ -39,7 +39,7 @@ public class IndexModel
     /// <summary>
     /// The eventual token request which we can build up over time from the screens
     /// </summary>
-    public CustomTokenRequest TokenRequest { get; set; } = new CustomTokenRequest() { };
+    public TokenRequest TokenRequest { get; set; } = new TokenRequest() { };
 
     /// <summary>
     /// Pin entries with strict naming due to the way 

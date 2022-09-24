@@ -68,7 +68,7 @@ public class TokenController : ControllerBase
     /// <returns></returns> 
     [HttpGet]
     [Route(URIs.token_endpoint)]
-    public ActionResult Token([FromQuery] OAuthTokenRequest request)
+    public ActionResult Token([FromQuery] TokenRequest request)
     {
         DateTime now = _timeProvider.Now(); // Fixed point in time
         long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
