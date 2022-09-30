@@ -18,5 +18,5 @@ public class ServerSettings
     public string Issuer { get; set; } = string.Empty;
     public List<Audience> Audiences { get; set; } = new List<Audience>() { };
 
-    public SecurityData SecurityData { get; set; } = new SecurityData() { };
+    public AccessControl AccessControl { get; set; } = new AccessControl() { };
 }

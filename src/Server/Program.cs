@@ -43,10 +43,9 @@ internal class Program
             settings.PrivateKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "private.pem"), Encoding.UTF8);
             settings.PublicKey = File.ReadAllText(Path.Combine(Environment.CurrentDirectory, "keys", "public.pem"), Encoding.UTF8);
             settings.Issuer = Issuers.PrimaryIssuer; // Override the issuer in this specific case so we know the constant
-            builder.Services.AddSingleton<ServerSettings>(settings);
 
             // Load the default users and client registrations from the json file
-            string path = Path.Combine(Environment.CurrentDirectory, "users.json");
+            string path = Path.Combine(Environment.CurrentDirectory, "setup.json");
             using (FileStream accessControlStream = File.OpenRead(path))
             {
                 // Generate the signing credentials and create a singleton so they can be used by the dependent services via DI
@@ -73,10 +72,14 @@ internal class Program
                 {
                     string raw = reader.ReadToEnd();
                     AccessControl accessControl = JsonConvert.DeserializeObject<AccessControl>(raw);
+                    settings.AccessControl = accessControl;
                     builder.Services.AddSingleton<AccessControl>(accessControl);
                 }
                 builder.Services.AddSingleton<IAuthenticator, Authenticator>();
             }
+
+            // Add the singleton for the server settings now it has been properly populated from the json configuration
+            builder.Services.AddSingleton<ServerSettings>(settings);
 
         }
 

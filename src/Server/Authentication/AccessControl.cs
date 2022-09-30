@@ -11,6 +11,9 @@ namespace IdentityProvider.Server.Authentication;
 public class AccessControl
 {
     [JsonProperty(Required = Required.Default)]
+    public List<SecurityScope> Scopes { get; set; }
+
+    [JsonProperty(Required = Required.Default)]
     public List<SecurityClient> Clients { get; set; }
 
     [JsonProperty(Required = Required.Default)]

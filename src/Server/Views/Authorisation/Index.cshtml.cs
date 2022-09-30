@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using IdentityProvider.Server.Contracts.Tokens;
+using IdentityProvider.Server.Authentication;
 
 namespace IdentityProvider.Server.Views.Authorisation;
 
@@ -69,5 +70,5 @@ public class IndexModel
     /// <summary>
     /// List of scopes that have been requested by the caller split by the space delimited method
     /// </summary>
-    public List<String> Scopes { get; set; } = new List<String>();
+    public List<SecurityScope> Scopes { get; set; } = new List<SecurityScope>();
 }

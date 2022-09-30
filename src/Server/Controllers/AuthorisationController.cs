@@ -42,7 +42,9 @@ public class AuthorisationController : Controller
         // Parse the scopes first, the origional scope string will be passed onwards to the token request,
         // only the screen for display as the "scope" attribute can be passed to the token request
         // endpoint directly if it's a client credential flow but used at the 
-        List<String> scopes = String.IsNullOrEmpty(request.scope) ? new List<String>() : request.scope.Split(' ').Select(x => x.Trim()).ToList();
+        List<String> rawScopes = String.IsNullOrEmpty(request.scope) ? new List<String>() : request.scope.Split(' ').Select(x => x.Trim()).ToList();
+        List<SecurityScope> scopes = _serverSettings.AccessControl.Scopes.Where(scope => rawScopes.Contains(scope.Id, StringComparer.OrdinalIgnoreCase)).Select(scope => scope).ToList();
+
 #warning TODO: Check the scopes are valid scope types (but not if the user owns them here)
         if (scopes.Count != 0)
         {

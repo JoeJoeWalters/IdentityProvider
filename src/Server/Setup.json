@@ -1,4 +1,14 @@
 {
+  "Scopes": [
+    {
+      "Id": "Read",
+      "Value": "Read Data"
+    },
+    {
+      "Id": "Write",
+      "Value": "Write Data"
+    }
+  ],
   "Clients": [
     {
       "Id": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
@@ -33,7 +43,7 @@
       },
       "ClientId": "7ac39504-53f1-47f5-96b9-3c2682962b8b",
       "Claims": [],
-      "Scopes": ["Read", "Write"],
+      "Scopes": [ "Read", "Write" ],
       "Created": "0001-01-01 00:00:00.000",
       "Expires": "2050-01-01 00:00:00.000"
     },

@@ -14,7 +14,7 @@
         <ul class="list-group">
             @foreach (var item in Model.Scopes)
             {
-                <li class="list-group-item">@item</li>
+                <li class="list-group-item">@item.Value</li>
             }
         </ul>
     </div>
@@ -119,6 +119,7 @@
     @Html.HiddenFor(model => model.TokenRequest.Scope)
     @for (int i = 0; i < Model.Scopes.Count; i++)
     {
-        @Html.HiddenFor(model => model.Scopes[i])
+        @Html.HiddenFor(model => model.Scopes[i].Id)
+        @Html.HiddenFor(model => model.Scopes[i].Value)
     }
 }
