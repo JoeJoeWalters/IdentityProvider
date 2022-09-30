@@ -65,4 +65,10 @@ public class TokenRequest
     /// </summary>
     [JsonProperty(Required = Required.Default, PropertyName = "refresh_token")]
     public String Refresh_Token { get; set; } = String.Empty;
+
+    /// <summary>
+    /// List of scopes for this request (either alredy defined when requesting vai a code or passed in here if e.g. client auth flow
+    /// </summary>
+    [JsonProperty(Required = Required.Default, PropertyName = "scope")]
+    public String Scope { get; set; } = String.Empty;
 }

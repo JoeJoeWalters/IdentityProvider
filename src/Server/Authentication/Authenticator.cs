@@ -131,7 +131,7 @@ public class Authenticator : IAuthenticator
                 break;
         }
 
-        return await GenerateTokenFromSecurityData(data, amr, now);
+        return await GenerateTokenFromSecurityData(data, amr, now, tokenRequest);
     }
 
     /// <summary>
@@ -173,7 +173,7 @@ public class Authenticator : IAuthenticator
 
                     amr = AMR.ClientCredentials;
 
-                    response = await GenerateTokenFromSecurityData(data, amr, now);
+                    response = await GenerateTokenFromSecurityData(data, amr, now, tokenRequest);
 
                     break;
 
@@ -194,7 +194,7 @@ public class Authenticator : IAuthenticator
 
                     amr = AMR.Password;
 
-                    response = await GenerateTokenFromSecurityData(data, amr, now);
+                    response = await GenerateTokenFromSecurityData(data, amr, now, tokenRequest);
 
                     break;
 
@@ -228,7 +228,7 @@ public class Authenticator : IAuthenticator
 
     }
 
-    private async Task<JwtSecurityToken> GenerateTokenFromSecurityData(SecurityData data, string amr, DateTime now)
+    private async Task<JwtSecurityToken> GenerateTokenFromSecurityData(SecurityData data, string amr, DateTime now, TokenRequest tokenRequest)
     {
         long unixTime = (new DateTimeOffset(now)).ToUnixTimeSeconds();
 
@@ -237,12 +237,12 @@ public class Authenticator : IAuthenticator
             // Generate a new JWT Header to wrap the token
             JwtHeader header = new JwtHeader(_signingCredentials);
             header.Add("kid", _serverSettings.PublicKey.ComputeSha1Hash());
-            
-            // Combine the claims list to a standard claim array for the JWT payload
-            List<Claim> claims = new List<Claim>()
-            {
-                new Claim("scope", "test")
-            };
+
+            // Cross reference the requested scopes against the available scopes to get the delta
+            List<String> requestedScopes = String.IsNullOrEmpty(tokenRequest.Scope) ? new List<String>() : tokenRequest.Scope.Split(' ').Select(x => x.Trim()).ToList();
+            List<Claim> claims = requestedScopes.Where(requestedScope => data.Scopes.Contains(requestedScope)).Select(requestedScope => new Claim("scope", requestedScope)).ToList();
+
+            // Add in any other required claims
             claims.AddRange(data.Claims ?? new List<Claim>());
             claims.Add(new Claim("sub", data.Id)); // Add the user id as the subject (sub claim) 
             claims.Add(new Claim("ait", unixTime.ToString())); // Creation Time claim

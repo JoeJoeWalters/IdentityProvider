@@ -41,7 +41,7 @@ public class LOAHandler : AuthorizationHandler<LOARequirement>
                 String[] scopeMatches = requirement.PolicyValue.Split(',').Select(p => p.Trim()).ToArray();
 
                 // Does one the possible required scopes exist for this user context?
-                Claim? scopeRaw = context.User.FindFirst(c => scopeMatches.Contains(c.Type, StringComparer.OrdinalIgnoreCase));
+                Claim? scopeRaw = context.User.FindFirst(c => (c.Type == "scope") && scopeMatches.Contains(c.Value, StringComparer.OrdinalIgnoreCase));
 
                 // No claim then fail
                 if (!(scopeRaw is null))

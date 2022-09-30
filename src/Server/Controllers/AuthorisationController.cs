@@ -39,7 +39,18 @@ public class AuthorisationController : Controller
     [Route(URIs.authorization_endpoint)]
     public ActionResult Index(AuthoriseRequest request)
     {
-        IndexModel model = new IndexModel() { Request = request, Step = AuthoriseStep.UserEntry, TokenRequest = new TokenRequest() { RedirectUri = request.redirect_uri, Username = String.Empty, Client_Id = request.client_id } };
+        // Parse the scopes first, the origional scope string will be passed onwards to the token request,
+        // only the screen for display as the "scope" attribute can be passed to the token request
+        // endpoint directly if it's a client credential flow but used at the 
+        List<String> scopes = String.IsNullOrEmpty(request.scope) ? new List<String>() : request.scope.Split(' ').Select(x => x.Trim()).ToList();
+#warning TODO: Check the scopes are valid scope types (but not if the user owns them here)
+        if (scopes.Count != 0)
+        {
+#warning TOOO: Actually do a redirect to an error page to display the problem to the user as this is the visible auth screen if the requested scopes are not valid ones
+            //throw new Exception("Invalid Scopes");
+        }
+
+        IndexModel model = new IndexModel() { Request = request, Step = AuthoriseStep.UserEntry, Scopes = scopes, TokenRequest = new TokenRequest() { RedirectUri = request.redirect_uri, Username = String.Empty, Client_Id = request.client_id, Scope = request.scope } };
         return View("~/Views/Authorisation/Index.cshtml", model);
     }
 
@@ -63,13 +74,13 @@ public class AuthorisationController : Controller
                     new SelectListItem("OTP", CustomGrantTypes.OTP)
                 };
 
-                IndexModel selectMethodModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.SelectMethod, AuthOptions = authOptions, TokenRequest = model.TokenRequest };
+                IndexModel selectMethodModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.SelectMethod, AuthOptions = authOptions, TokenRequest = model.TokenRequest, Scopes = model.Scopes };
                 return View("~/Views/Authorisation/Index.cshtml", selectMethodModel);
 
             case AuthoriseStep.SelectMethod:
 
                 SecurityData entryData = _authenticator.GetByUsername(model.TokenRequest.Username); // Get the credential properties based on the username so we can determine the types of authrication it can use
-                IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, AuthOptions = new List<SelectListItem>(), TokenRequest = model.TokenRequest };
+                IndexModel methodEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, AuthOptions = new List<SelectListItem>(), TokenRequest = model.TokenRequest, Scopes = model.Scopes };
 
                 switch (model.TokenRequest.Type)
                 {
@@ -110,7 +121,7 @@ public class AuthorisationController : Controller
 
             case AuthoriseStep.SelectDeliveryMedium:
 
-                IndexModel mediumEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, AuthOptions = new List<SelectListItem>(), TokenRequest = model.TokenRequest };
+                IndexModel mediumEntryModel = new IndexModel() { Request = model.Request, Step = AuthoriseStep.MethodEntry, AuthOptions = new List<SelectListItem>(), TokenRequest = model.TokenRequest, Scopes = model.Scopes };
 
                 switch (model.TokenRequest.Type)
                 {

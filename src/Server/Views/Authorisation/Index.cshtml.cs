@@ -65,4 +65,9 @@ public class IndexModel
     /// Drop down list of the OTP Delivery options
     /// </summary>
     public List<SelectListItem> OTPDeliveryOptions { get; set; } = new List<SelectListItem>();
+
+    /// <summary>
+    /// List of scopes that have been requested by the caller split by the space delimited method
+    /// </summary>
+    public List<String> Scopes { get; set; } = new List<String>();
 }
